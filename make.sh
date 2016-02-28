@@ -1,29 +1,29 @@
-L=linux-4.4.3
-B=busybox-1.24.1
-CONFIG_LINUX=linux-configs/1.config
-CONFIG_BUSYBOX=busybox-config/0.config
+L=linux-4.4.3 &&
+B=busybox-1.24.1 &&
+CONFIG_LINUX=linux-configs/1.config &&
+CONFIG_BUSYBOX=busybox-configs/0.config &&
+I=arch/x86/boot/bzImage &&
 
-cp -a $CONFIG_LINUX $L
-cp -a $CONFIG_BUSYBOX $B
+cp -a $CONFIG_LINUX $L/.config &&
+cp -a $CONFIG_BUSYBOX $B/.config &&
 
-T=rootfs
-F=fs.cpio
-S=src
+T=rootfs &&
+F=fs.cpio &&
+S=src &&
 
-
-#CC="clang++ -std=c++11"
-CC="g++ -std=c++11"
-#BIN=xiinux
-BIN=$T/sbin/xiinux
-SRC=$S/xiinux.cpp
-DBG=
-#DBG="-g -O0"
-#DBG="$DBG --coverage -fprofile-arcs -ftest-coverage"
-#OPTS=-Os
-OPTS="-O3 -static"
-WARNINGS="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wfatal-errors"
-#LIB="-pthread -lgcov"
-LIB=-pthread
+#CC="clang++ -std=c++11" &&
+CC="g++ -std=c++11" &&
+#BIN=xiinux &&
+BIN=$T/sbin/xiinux &&
+SRC=$S/xiinux.cpp &&
+DBG= &&
+#DBG="-g -O0" &&
+#DBG="$DBG --coverage -fprofile-arcs -ftest-coverage" &&
+#OPTS=-Os &&
+OPTS="-O3 -static" &&
+WARNINGS="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wfatal-errors" &&
+#LIB="-pthread -lgcov" &&
+LIB=-pthread &&
 
 rm -rf $T&&
 mkdir -p $T/sbin&&
@@ -54,19 +54,24 @@ echo "ifconfig lo up&&">>init&&
 echo "ifconfig eth0 up&&/bin/busybox udhcpc&&">>init&&
 echo "ifconfig&&">>init&&
 echo "exec /bin/sh">>init&&
+#echo "exec /sbin/xiinux">>init&&
 chmod +x init&&
 
 # mknod -m 666 dev/tty c 5 0 
-fakeroot sh -c 'mknod dev/console c 5 1 && mknod -m 664 dev/null c 1 3 && chown -R root.root . && find .|cpio -H newc -o > ../fs.cpio' &&
+fakeroot sh -c "mknod dev/console c 5 1 && mknod -m 664 dev/null c 1 3 && chown -R root.root . && find .|cpio -H newc -o > ../$F" &&
 cd .. &&
 echo && ls -ho --color fs.cpio && echo &&
 
-echo " * building kernel"
+echo " * building kernel"&&
 cd $L &&
 make &&
-I=arch/x86/boot/bzImage &&
 echo && ls -ho --color $I && echo &&
 cd .. &&
 
+qemu-system-x86_64 -kernel $L/$I -initrd $F -redir tcp:5555::80
 
-qemu-system-x86_64 -kernel linux-4.4.3/$I -initrd fs.cpio -netdev user,id=network0 -device e1000,netdev=network0
+#sudo /etc/qemu-ifup tap0 &&
+#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net tap,ifname=tap0,script=no,downscript=no &&
+#sudo /etc/qemu-ifdown tap0
+
+
