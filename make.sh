@@ -1,8 +1,15 @@
+L=linux-4.4.3
+B=busybox-1.24.1
+CONFIG_LINUX=linux-configs/1.config
+CONFIG_BUSYBOX=busybox-config/0.config
+
+cp -a $CONFIG_LINUX $L
+cp -a $CONFIG_BUSYBOX $B
+
 T=rootfs
 F=fs.cpio
 S=src
-L=linux-4.4.3
-B=busybox-1.24.1
+
 
 #CC="clang++ -std=c++11"
 CC="g++ -std=c++11"
