@@ -1,14 +1,11 @@
 . ./make-env.sh
 
-CONFIG_LINUX=linux-configs/1.config &&
-CONFIG_BUSYBOX=busybox-configs/0.config &&
-
 cp -a $CONFIG_LINUX $L/.config &&
 cp -a $CONFIG_BUSYBOX $B/.config &&
 
-T=rootfs &&
-F=fs.cpio &&
-S=src &&
+T=rootfs
+F=rootfs.cpio
+S=src
 
 #CC="clang++ -std=c++11" &&
 CC="g++ -std=c++11" &&
