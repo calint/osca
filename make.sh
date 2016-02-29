@@ -1,8 +1,7 @@
-L=linux-4.4.3 &&
-B=busybox-1.24.1 &&
+. ./make-env.sh
+
 CONFIG_LINUX=linux-configs/1.config &&
 CONFIG_BUSYBOX=busybox-configs/0.config &&
-I=arch/x86/boot/bzImage &&
 
 cp -a $CONFIG_LINUX $L/.config &&
 cp -a $CONFIG_BUSYBOX $B/.config &&
@@ -25,35 +24,47 @@ WARNINGS="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wfatal-errors" &&
 #LIB="-pthread -lgcov" &&
 LIB=-pthread &&
 
-rm -rf $T&&
-mkdir -p $T/sbin&&
-mkdir -p $T/bin&&
-$CC  -o $BIN $SRC $DBG $LIB $OPTS $WARNINGS&& 
-echo&&ls -ho --color $BIN&&echo&&
+rm -rf $T &&
+mkdir -p $T/sbin &&
+mkdir -p $T/bin &&
+$CC  -o $BIN $SRC $DBG $LIB $OPTS $WARNINGS && 
+echo && ls -ho --color $BIN && echo &&
 
-cd $B&&make&&
+cd $B &&
+make &&
 ls -ho --color busybox&&echo&&
 cp -a busybox ../$T/bin&&
 
-cd ../$T&&
+cd ../$T &&
 
-cd bin&&
-ln busybox sh&&
-ln busybox ls&&
-ln busybox mount&&
-ln busybox hostname&&
-ln busybox ifconfig&&
-cd ..&&
+cd bin &&
+ln busybox sh &&
+ln busybox ash &&
+ln busybox ls &&
+ln busybox mount &&
+ln busybox hostname &&
+ln busybox ifconfig &&
+ln busybox route &&
+ln busybox nameserver &&
+ln busybox ip &&
+ln busybox udhcpc &&
+ln busybox cat &&
+ln busybox ping &&
+cd .. &&
 
-mkdir proc sys dev &&
+mkdir proc sys dev etc &&
 
-echo "#!/bin/sh -x">init&&
-echo "mount -t proc proc /proc&&">>init&&
-echo "mount -t sysfs sysfs /sys&&">>init&&
-echo "ifconfig lo up&&">>init&&
-echo "ifconfig eth0 up&&/bin/busybox udhcpc&&">>init&&
-echo "ifconfig&&">>init&&
-echo "exec /bin/sh">>init&&
+cp -a ../$S/udhcpc.script etc/ && chmod +x etc/udhcpc.script &&
+
+cat<<EOF>init
+#!/bin/sh -x
+mount -t proc proc /proc &&
+mount -t sysfs sysfs /sys &&
+ip link set lo up &&
+ip link set eth0 up && udhcpc -s /etc/udhcpc.script &&
+ip addr show &&
+exec /bin/sh
+EOF
 #echo "exec /sbin/xiinux">>init&&
 chmod +x init&&
 
@@ -68,8 +79,15 @@ make &&
 echo && ls -ho --color $I && echo &&
 cd .. &&
 
-qemu-system-x86_64 -kernel $L/$I -initrd $F -redir tcp:5555::80
+# ! guest closes connection
+qemu-system-x86_64 -append "quiet" -kernel $L/$I -initrd $F -redir tcp:5555::80 
 
+# ! guest behind firewall, cannot web serve
+#qemu-system-x86_64 -append "quiet" -kernel $L/$I -initrd $F -net nic -net user
+#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net user -nographic -curses
+#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net user
+
+# ! does not work on mine
 #sudo /etc/qemu-ifup tap0 &&
 #qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net tap,ifname=tap0,script=no,downscript=no &&
 #sudo /etc/qemu-ifdown tap0

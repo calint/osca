@@ -1,0 +1,21 @@
+
+-rwxrwxr-x 1 c 1.3M Feb 29 07:59 [0m[01;32mrootfs/sbin/xiinux[0m
+
+-rwxrwxr-x 1 c 2.5M Feb 29 00:32 [0m[01;32mbusybox[0m
+
+
+-rw-rw-r-- 1 c 3.7M Feb 29 07:59 fs.cpio
+
+ * building kernel
+  CHK     include/config/kernel.release
+  CHK     include/generated/uapi/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CHK     include/generated/bounds.h
+  CHK     include/generated/timeconst.h
+  CHK     include/generated/asm-offsets.h
+  CALL    scripts/checksyscalls.sh
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+
+-rw-rw-r-- 1 c 5.8M Feb 29 00:18 arch/x86/boot/bzImage
+
