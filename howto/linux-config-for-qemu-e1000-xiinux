@@ -60,28 +60,48 @@
     [ ] Enable SLUB debugging supportal ramdisks compressed using LZ4  
     [ ] Enable PCI quirk workarounds
 
+--> Processor type and features
+    [ ] Enable MPS table
+    [ ] Enable vsyscall emulation
+
+--> Power management and ACPI options
+    [ ] ACPI (Advanced Configuration and Power Interface) Support  ---- 
+
 --> Bus options (PCI etc.) --->    
     [ ] ISA-style DMA support   
 
-
 --> Networking support --->
         Networking options  --->
+        [ ] Unix domain sockets
+        [*] TCP/IP networking
         [ ]   IP: IPsec transport mode
         [ ]   IP: IPsec tunnel mode
         [ ]   IP: IPsec BEET mode
         [ ]   Large Receive Offload (ipv4/tcp)
         [ ]   INET: socket monitoring interface    
-        [ ]   TCP/IP v6    
-
---> Processor type and features
-    [ ] Enable MPS table
-    [ ] Enable vsyscall emulation
+        [ ]   TCP/IP v6
+    [ ]   Wireless  ----
 
 --> Device Drivers
+    --> Character devices 
+        [*] Enable TTY                                                         
+        [ ]   Virtual terminal                                                 
+        [ ]   Unix98 PTY support                                               
+        [ ]   Legacy (BSD) PTY support                                         
+        [ ]   Non-standard serial port support (NEW)                           
+        [ ]   HSDPA Broadband Wireless Data Card - Globe Trotter (NEW)          
+        [ ]   GSM MUX line discipline support (EXPERIMENTAL) (NEW)              
+        [ ]   Trace data sink for MIPI P1149.7 cJTAG standard (NEW)
+              Serial drivers  --->
+              [*] 8250/16550 and compatible serial support
+              [ ]   Support 8250_core.* kernel options (DEPRECATED) 
+    --> Network device support
+        [ ]   Network core driver support
+        [ ]   Wireless LAN  ----
     [ ] HID bus support Drivers
     [ ] Power supply class support  --->
     [ ] Generic Thermal sysfs driver
-        Graphics support
+    --> Graphics support
         [ ] VGA Arbitration
         Console display driver support  ---> 
         [ ] VGA text console
@@ -89,16 +109,19 @@
 --> File systems
     [ ] Network File Systems  ---- 
 
---> Power management and ACPI options
-    [ ] ACPI (Advanced Configuration and Power Interface) Support  ---- 
+--> Kernel hacking
+    [ ] Collect scheduler debugging info
 
---> Cryptographic API
+--> Cryptographic API   #  disable all
     [ ]   Disable run-time self tests
     [ ]   Encrypted Chain IV Generator
     [ ]   NIST SP800-90A DRBG  ---- 
     [ ]   Jitterentropy Non-Deterministic Random Number Generator
     [ ]   Hardware crypto devices  ----
     [ ] XZ decompression support
+
+
+
 
 # then
   # make -j2  # use 2 cores
