@@ -35,16 +35,25 @@
 
 --> Networking support --->
     [*] Networking support
-        Networking options  --->
-          <*> Packet socket
-          <*> Unix domain sockets
-          [*] TCP/IP networking
+            Networking options  --->
+            <*> Packet socket
+            [*] TCP/IP networking
+            [ ] Unix domain sockets
+            [*] TCP/IP networking
+            [ ]   IP: IPsec transport mode
+            [ ]   IP: IPsec tunnel mode
+            [ ]   IP: IPsec BEET mode
+            [ ]   Large Receive Offload (ipv4/tcp)
+            [ ]   INET: socket monitoring interface    
+            [ ]   TCP/IP v6
+        [ ]   Wireless  ----
 
 --> Device Drivers  --->
-      Network Device support  --->
-         [*] Network device support
-          -> Ethernet driver support --->
-             [*] Intel(R) PRO/1000 Gigabit Ethernet support
+    [*] Network device support
+        [ ]   Network core driver support
+        [ ]   Wireless LAN  ----
+    [*]   Ethernet driver support (NEW)  --->
+           [*] Intel(R) PRO/1000 Gigabit Ethernet support
 
 
 ##
