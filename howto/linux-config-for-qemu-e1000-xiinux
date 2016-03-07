@@ -58,6 +58,20 @@
     [ ]   Support initial ramdisks compressed using LZO                      
     [ ]   Support initi
     [ ] Enable SLUB debugging supportal ramdisks compressed using LZ4  
+    [ ] Enable PCI quirk workarounds
+
+--> Bus options (PCI etc.) --->    
+    [ ] ISA-style DMA support   
+
+
+--> Networking support --->
+        Networking options  --->
+        [ ]   IP: IPsec transport mode
+        [ ]   IP: IPsec tunnel mode
+        [ ]   IP: IPsec BEET mode
+        [ ]   Large Receive Offload (ipv4/tcp)
+        [ ]   INET: socket monitoring interface    
+        [ ]   TCP/IP v6    
 
 --> Processor type and features
     [ ] Enable MPS table
