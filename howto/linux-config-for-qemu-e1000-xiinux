@@ -1,0 +1,44 @@
+# start from make allnoconfig
+
+[*] 64-bit kernel
+
+-> General setup
+   [*] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+  -> Configure standard kernel features
+     [*] Enable support for printk
+     [*] Initial RAM filesystem and RAM disk (initramfs/initrd) support    
+     [*] Enable eventpoll support
+
+-> Executable file formats / Emulations
+   [*] Kernel support for ELF binaries
+   [*] Kernel support for scripts starting with #!
+
+-> Device Drivers
+  -> Character devices
+     [*] Enable TTY
+    -> Serial drivers
+      [*] 8250/16550 and compatible serial support
+      [*]   Console on 8250/16550 and compatible serial port
+
+-> File systems
+  -> Pseudo filesystems
+     [*] /proc file system support
+     [*] sysfs file system support
+
+
+Bus options (PCI etc.) --->
+  [*] PCI Support     # to make Intel(R) PRO/1000 Gigabit Ethernet driver e1000 available
+
+Networking   --->
+  [*] Networking support
+      Networking options  --->
+        <*> Packet socket
+        <*> Unix domain sockets
+        [*] TCP/IP networking
+
+Device Drivers  --->
+  Network Device support  --->
+     [*] Network device support
+           Ethernet (1000Mbit)  --->
+              [*] Intel(R) PRO/1000 Gigabit Ethernet support
+

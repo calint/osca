@@ -1,4 +1,5 @@
 /linux-4.4.3/
 /busybox-1.24.1/
 /rootfs/
+/linux-kernels/
 rootfs.cpio
