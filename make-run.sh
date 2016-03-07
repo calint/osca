@@ -4,7 +4,5 @@ echo "kernel: $I"
 echo " ramfs: $F"
 echo
 
-#kvm -kernel $L/$I -initrd $F
-#kvm -kernel $L/$I -initrd $F -net nic -net user
-kvm -kernel $L/$I -initrd $F -netdev user,id=user.0 -device e1000,netdev=user.0
-#kvm -kernel $L/$I -initrd $F -netdev user,id=vn -device e1000,netdev=user,id=vn,hostfwd=tcp::5555-:8088
+qemu-system-x86_64 -enable-kvm -kernel $L/$I -initrd $F -redir tcp:8088::8088
+

@@ -29,11 +29,10 @@ echo && ls -ho --color $BIN && echo &&
 cd $B &&
 make &&
 ls -ho --color busybox&&echo&&
-cp -a busybox ../$T/bin&&
+cd .. &&
+cp -a $B/busybox $T/bin&&
 
-cd ../$T &&
-
-cd bin &&
+cd $T/bin &&
 ln busybox sh &&
 ln busybox ash &&
 ln busybox ls &&
@@ -59,6 +58,7 @@ mount -t sysfs sysfs /sys &&
 ip link set lo up &&
 ip link set eth0 up && udhcpc -s /etc/udhcpc.script &&
 ip addr show &&
+xiinux &
 exec /bin/sh
 EOF
 #echo "exec /sbin/xiinux">>init&&
@@ -76,17 +76,3 @@ echo && ls -ho --color $I && echo &&
 cd .. &&
 
 sh make-run.sh
-# ! guest closes connection
-#qemu-system-x86_64 -append "quiet" -kernel $L/$I -initrd $F -redir tcp:5555::80 
-
-# ! guest behind firewall, cannot web serve
-#qemu-system-x86_64 -append "quiet" -kernel $L/$I -initrd $F -net nic -net user
-#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net user -nographic -curses
-#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net user
-
-# ! does not work on mine
-#sudo /etc/qemu-ifup tap0 &&
-#qemu-system-x86_64 -kernel $L/$I -initrd $F -net nic -net tap,ifname=tap0,script=no,downscript=no &&
-#sudo /etc/qemu-ifdown tap0
-
-
