@@ -77,8 +77,14 @@
     [ ] Enable MPS table
     [ ] Enable vsyscall emulation
 
---> Device
+--> Device Drivers
     [ ] HID bus support Drivers
+    [ ] Power supply class support  --->
+    [ ] Generic Thermal sysfs driver
+        Graphics support
+        [ ] VGA Arbitration
+        Console display driver support  ---> 
+        [ ] VGA text console
 
 --> File systems
     [ ] Network File Systems  ---- 
