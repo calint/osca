@@ -1,0 +1,168 @@
+ linux: linux
+kernel: arch/x86/boot/bzImage
+ ramfs: rootfs.cpio
+
+Linux version 4.5.0-rc6 (c@c) (gcc version 5.3.0 (GCC) ) #5 Mon Mar 7 15:46:12 ICT 2016
+Command line: console=ttyS0
+x86/fpu: Legacy x87 FPU detected.
+x86/fpu: Using 'lazy' FPU context switches.
+e820: BIOS-provided physical RAM map:
+BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+BIOS-e820: [mem 0x0000000000100000-0x0000000007fdffff] usable
+BIOS-e820: [mem 0x0000000007fe0000-0x0000000007ffffff] reserved
+BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+NX (Execute Disable) protection: active
+e820: last_pfn = 0x7fe0 max_arch_pfn = 0x400000000
+RAMDISK: [mem 0x07caf000-0x07fdffff]
+ACPI: Early table checksum verification disabled
+ACPI: RSDP 0x00000000000F69A0 000014 (v00 BOCHS )
+ACPI: RSDT 0x0000000007FE16B4 000034 (v01 BOCHS  BXPCRSDT 00000001 BXPC 00000001)
+ACPI: FACP 0x0000000007FE0BDA 000074 (v01 BOCHS  BXPCFACP 00000001 BXPC 00000001)
+ACPI: DSDT 0x0000000007FE0040 000B9A (v01 BOCHS  BXPCDSDT 00000001 BXPC 00000001)
+ACPI: FACS 0x0000000007FE0000 000040
+ACPI: SSDT 0x0000000007FE0C4E 0009B6 (v01 BOCHS  BXPCSSDT 00000001 BXPC 00000001)
+ACPI: APIC 0x0000000007FE1604 000078 (v01 BOCHS  BXPCAPIC 00000001 BXPC 00000001)
+ACPI: HPET 0x0000000007FE167C 000038 (v01 BOCHS  BXPCHPET 00000001 BXPC 00000001)
+Zone ranges:
+  DMA32    [mem 0x0000000000001000-0x0000000007fdffff]
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000001000-0x000000000009efff]
+  node   0: [mem 0x0000000000100000-0x0000000007fdffff]
+Initmem setup node 0 [mem 0x0000000000001000-0x0000000007fdffff]
+ACPI: PM-Timer IO Port: 0x608
+ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+Using ACPI (MADT) for SMP configuration information
+ACPI: HPET id: 0x8086a201 base: 0xfed00000
+e820: [mem 0x08000000-0xfeffbfff] available for PCI devices
+clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645519600211568 ns
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32105
+Kernel command line: console=ttyS0
+PID hash table entries: 512 (order: 0, 4096 bytes)
+Dentry cache hash table entries: 16384 (order: 5, 131072 bytes)
+Inode-cache hash table entries: 8192 (order: 4, 65536 bytes)
+Memory: 120876K/130552K available (2154K kernel code, 436K rwdata, 508K rodata, 480K init, 404K bss, 9676K reserved, 0K cma-reserved)
+SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+NR_IRQS:4352 nr_irqs:256 16
+Console: colour VGA+ 80x25
+console [ttyS0] enabled
+clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+tsc: Fast TSC calibration using PIT
+tsc: Detected 2166.799 MHz processor
+Calibrating delay loop (skipped), value calculated using timer frequency.. 4333.59 BogoMIPS (lpj=8667196)
+pid_max: default: 4096 minimum: 301
+ACPI: Core revision 20160108
+ACPI: 2 ACPI AML tables successfully acquired and loaded
+
+Mount-cache hash table entries: 512 (order: 0, 4096 bytes)
+Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes)
+Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+CPU: Intel QEMU Virtual CPU version 2.5+ (family: 0x6, model: 0x6, stepping: 0x3)
+Performance Events: Broken PMU hardware detected, using software events only.
+Failed to access perfctr msr (MSR c2 is 0)
+..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+NET: Registered protocol family 16
+cpuidle: using governor ladder
+ACPI: bus type PCI registered
+PCI: Using configuration type 1 for base access
+ACPI: Added _OSI(Module Device)
+ACPI: Added _OSI(Processor Device)
+ACPI: Added _OSI(3.0 _SCP Extensions)
+ACPI: Added _OSI(Processor Aggregator Device)
+ACPI: Interpreter enabled
+ACPI: (supports S0 S5)
+ACPI: Using IOAPIC for interrupt routing
+PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+acpi PNP0A03:00: _OSC: OS supports [Segments]
+acpi PNP0A03:00: _OSC failed (AE_NOT_FOUND); disabling ASPM
+PCI host bridge to bus 0000:00
+pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+pci_bus 0000:00: root bus resource [mem 0x08000000-0xfebfffff window]
+pci_bus 0000:00: root bus resource [bus 00-ff]
+pci 0000:00:01.1: legacy IDE quirk: reg 0x10: [io  0x01f0-0x01f7]
+pci 0000:00:01.1: legacy IDE quirk: reg 0x14: [io  0x03f6]
+pci 0000:00:01.1: legacy IDE quirk: reg 0x18: [io  0x0170-0x0177]
+pci 0000:00:01.1: legacy IDE quirk: reg 0x1c: [io  0x0376]
+ACPI: PCI Interrupt Link [LNKA] (IRQs 5 *10 11)
+ACPI: PCI Interrupt Link [LNKB] (IRQs 5 *10 11)
+ACPI: PCI Interrupt Link [LNKC] (IRQs 5 10 *11)
+ACPI: PCI Interrupt Link [LNKD] (IRQs 5 10 *11)
+ACPI: PCI Interrupt Link [LNKS] (IRQs *9)
+ACPI: Enabled 16 GPEs in block 00 to 0F
+vgaarb: setting as boot device: PCI:0000:00:02.0
+vgaarb: device added: PCI:0000:00:02.0,decodes=io+mem,owns=io+mem,locks=none
+vgaarb: loaded
+vgaarb: bridge control possible 0000:00:02.0
+PCI: Using ACPI for IRQ routing
+clocksource: Switched to clocksource hpet
+pnp: PnP ACPI init
+pnp: PnP ACPI: found 6 devices
+clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+NET: Registered protocol family 2
+TCP established hash table entries: 1024 (order: 1, 8192 bytes)
+TCP bind hash table entries: 1024 (order: 1, 8192 bytes)
+TCP: Hash tables configured (established 1024 bind 1024)
+UDP hash table entries: 128 (order: 0, 4096 bytes)
+UDP-Lite hash table entries: 128 (order: 0, 4096 bytes)
+NET: Registered protocol family 1
+Unpacking initramfs...
+Freeing initrd memory: 3268K (ffff880007caf000 - ffff880007fe0000)
+input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+ACPI: Power Button [PWRF]
+Warning: Processor Platform Limit event detected, but not handled.
+Consider compiling CPUfreq support into your kernel.
+Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+00:05: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+e1000: Intel(R) PRO/1000 Network Driver - version 7.3.21-k8-NAPI
+e1000: Copyright (c) 1999-2006 Intel Corporation.
+ACPI: PCI Interrupt Link [LNKC] enabled at IRQ 11
+e1000 0000:00:03.0 eth0: (PCI:33MHz:32-bit) 52:54:00:12:34:56
+e1000 0000:00:03.0 eth0: Intel(R) PRO/1000 Network Connection
+i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+serio: i8042 KBD port at 0x60,0x64 irq 1
+serio: i8042 AUX port at 0x60,0x64 irq 12
+mousedev: PS/2 mouse device common for all mice
+input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+NET: Registered protocol family 17
+microcode: CPU0 sig=0x663, pf=0x1, revision=0x1
+microcode: Microcode Update Driver: v2.01 <tigran@aivazian.fsnet.co.uk>, Peter Oruba
+Freeing unused kernel memory: 480K (ffffffff8130a000 - ffffffff81382000)
+udhcpc (v1.24.1) started
+DHCP event deconfig
+Sending discover...
+tsc: Refined TSC clocksource calibration: 2166.665 MHz
+clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x1f3b30bc0fa, max_idle_ns: 440795312762 ns
+clocksource: Switched to clocksource tsc
+input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input4
+e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+Sending discover...
+Sending select for 10.0.2.15...
+Lease of 10.0.2.15 obtained, lease time 86400
+DHCP event bound
+deleting routers
+route: SIOCDELRT: No such process
+adding dns 10.0.2.3
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast qlen 1000
+    link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
+       valid_lft forever preferred_lft forever
+xiinux web server on port 8088

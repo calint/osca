@@ -83,6 +83,9 @@
 --> File systems
     [ ] Network File Systems  ---- 
 
+--> Power management and ACPI options
+    [ ] ACPI (Advanced Configuration and Power Interface) Support  ---- 
+
 --> Cryptographic API
     [ ]   Disable run-time self tests
     [ ]   Encrypted Chain IV Generator
