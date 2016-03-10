@@ -13,11 +13,11 @@ p "         ramfs: $F"
 p "        source: src"
 p
 
-mkdir -p $T/{bin,proc,sys,dev,etc} &&
+mkdir -p $T/{bin,proc,sys,dev,etc,web} &&
 
 # make xiinux
 CC='g++ -std=c++11' &&
-BIN=$T/bin/xiinux &&
+BIN=$T/web/xiinux &&
 SRC=src/xiinux.cpp &&
 DBG= &&
 #DBG="-g -O0" &&
@@ -85,6 +85,7 @@ b free && p &&
 p && p &&
 #exec /bin/xiinux
 #exec xiinux -p
+exec busybox chroot /web xiinux &&
 exec busybox ash
 EOF
 chmod +x init &&

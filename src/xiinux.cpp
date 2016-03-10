@@ -10,13 +10,14 @@
 #include<signal.h>
 #include<unistd.h>
 #include<sys/sendfile.h>
-#include<pthread.h>
+//#include<pthread.h>
 #include<ctype.h>
 #include<sys/types.h>
 #include<sys/stat.h>
 //#include<thread>
 #include<netinet/tcp.h>
 #include<typeinfo>
+#include<time.h>
 static int const K=1024;
 static size_t const conbufnn=K;
 static int const nclients=K;
@@ -828,22 +829,22 @@ private:
 	}
 };
 static sock server_socket;
-static void*thdwatchrun(void*arg){
-	if(arg)
-		puts((const char*)arg);
-	stats.printhdr(stdout);
-	while(1){
-		int n=10;
-		while(n--){
-			const int sleep=100000;
-			usleep(sleep);
-			stats.ms+=sleep/1000;//? not really
-			stats.print(stdout);
-		}
-		fprintf(stdout,"\n");
-	}
-	return nullptr;
-}
+//static void*thdwatchrun(void*arg){
+//	if(arg)
+//		puts((const char*)arg);
+//	stats.printhdr(stdout);
+//	while(1){
+//		int n=10;
+//		while(n--){
+//			const int sleep=100000;
+//			usleep(sleep);
+//			stats.ms+=sleep/1000;//? not really
+//			stats.print(stdout);
+//		}
+//		fprintf(stdout,"\n");
+//	}
+//	return nullptr;
+//}
 static void sigexit(int i){
 	puts("exiting");
 	delete homepage;
@@ -859,17 +860,18 @@ static void sig(int i){
 }
 //extern char**environ;
 int main(int argc,char**argv,char**env){
-	{
-		char cwd[256];if(!getcwd(cwd,sizeof cwd)){perror("getcwd");exit(14);}
-		if(chdir("web-root")){perror("cd web-root");exit(13);}
-		printf("%s on port %d in dir %s/web-root\n",APP,port,cwd);
-	}
+//	{
+//		char cwd[256];if(!getcwd(cwd,sizeof cwd)){perror("getcwd");exit(14);}
+//		if(chdir("web-root")){perror("cd web-root");exit(13);}
+//		printf("%s on port %d in dir %s/web-root\n",APP,port,cwd);
+//	}
+	printf("%s on port %d in dir %s/\n",APP,port,getenv("PWD"));
 	for(int i=0;i<_NSIG;i++){
 		signal(SIGINT,sig);
 	}
 	signal(SIGINT,sigexit);
 //	printf(" environ==env   %d\n",environ==env);
-		while(*env)puts(*env++);
+//	while(*env)puts(*env++);
 //	for(char**var=environ;*var!=NULL;*var++)puts(*var);
 
 
@@ -899,14 +901,16 @@ int main(int argc,char**argv,char**env){
 	if(epoll_ctl(epollfd,EPOLL_CTL_ADD,server_socket.fd,&ev)<0){perror("epolladd");exit(5);}
 	struct epoll_event events[nclients];
 	const bool watch_thread=argc>1;
-	pthread_t thdwatch;
-	if(watch_thread)if(pthread_create(&thdwatch,nullptr,&thdwatchrun,nullptr)){perror("threadcreate");exit(6);}
+//	pthread_t thdwatch;
+//	if(watch_thread)if(pthread_create(&thdwatch,nullptr,&thdwatchrun,nullptr)){perror("threadcreate");exit(6);}
+	if(watch_thread)stats.printhdr(stdout);
 	while(true){
 		//printf(" epoll_wait\n");
-		const int nn=epoll_wait(epollfd,events,nclients,-1);
+		const int nn=epoll_wait(epollfd,events,nclients,1000/*ms*/);
+		if(watch_thread){stats.print(stdout);puts("");}
 		//printf(" epoll_wait returned %d\n",nn);
 		if(nn==0){
-			puts("epoll 0");
+//			puts("epoll 0");
 			continue;
 		}
 		if(nn==-1){
@@ -970,6 +974,7 @@ int main(int argc,char**argv,char**env){
 		}
 	}
 }
+
 //-- application
 namespace web{
 class hello:public widget{

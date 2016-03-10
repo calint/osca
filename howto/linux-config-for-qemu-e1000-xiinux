@@ -22,7 +22,7 @@
     [*] Kernel support for scripts starting with #!
 
 --> Device Drivers
-    --> Character devices   # to use-nographic with qemu
+    --> Character devices   # to use -nographic with qemu
         [*] Enable TTY
          -> Serial drivers
             [*] 8250/16550 and compatible serial support
@@ -58,7 +58,7 @@
 
 
 ###
-# for qemu hda in /dev/sda (b 8 0) /dev/sda1 (b 8 1)
+# for qemu -hda in /dev/sda (b 8 0) /dev/sda1 (b 8 1)
   [*] Enable the block layer  ---> 
       [ ]   Block layer data integrity support
       [ ]   Block device command line partition parser 
