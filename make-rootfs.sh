@@ -17,7 +17,7 @@ mkdir -p $T/{bin,proc,sys,dev,etc,web} &&
 
 # make xiinux
 CC='g++ -std=c++11' &&
-BIN=$T/web/xiinux &&
+BIN=$T/bin/xiinux &&
 SRC=src/xiinux.cpp &&
 DBG= &&
 #DBG="-g -O0" &&
@@ -83,9 +83,9 @@ b ip link set eth0 up && b udhcpc -s /etc/udhcpc.script && p &&
 b ip addr show && p &&
 b free && p &&
 p && p &&
-#exec /bin/xiinux
+cd web && xiinux &
 #exec xiinux -p
-exec busybox chroot /web xiinux &&
+#exec busybox chroot /web xiinux
 exec busybox ash
 EOF
 chmod +x init &&

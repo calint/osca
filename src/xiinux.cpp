@@ -74,23 +74,23 @@ class xwriter{
 public:
 	inline xwriter(const int fd=0):fd(fd){}
 	inline void send_session_id_at_next_opportunity(const char*id){set_session_id=id;}
-	xwriter&reply_http(int code,const char*content,size_t len){
+	xwriter&reply_http(int code,const char*content_type,const char*content,size_t len){
 		char bb[K];
 		int n;
 		if(set_session_id){
 			// Connection: Keep-Alive\r\n  for apache bench
-			n=snprintf(bb,sizeof bb,"HTTP/1.1 %d\r\nConnection: Keep-Alive\r\nContent-Length: %zu\r\nSet-Cookie: i=%s;Expires=Wed, 09 Jun 2021 10:18:14 GMT\r\n\r\n",code,len,set_session_id);
+			n=snprintf(bb,sizeof bb,"HTTP/1.1 %d\r\nConnection: Keep-Alive\r\nContent-Type: %s\r\nContent-Length: %llu\r\nSet-Cookie: i=%s;Expires=Wed, 09 Jun 2021 10:18:14 GMT\r\n\r\n",code,content_type,len,set_session_id);
 			set_session_id=nullptr;
 		}else{
-			n=snprintf(bb,sizeof bb,"HTTP/1.1 %d\r\nConnection: Keep-Alive\r\nContent-Length: %zu\r\n\r\n",code,len);
+			n=snprintf(bb,sizeof bb,"HTTP/1.1 %d\r\nConnection: Keep-Alive\r\nContent-Type: %s\r\nContent-Length: %llu\r\n\r\n",code,content_type,len);
 		}
 		if(n<0)throw"send";
 		pk(bb,(size_t)n).pk(content,len);
 		return*this;
 	}
-	xwriter&reply_http(int code,const char*content){
+	xwriter&reply_http(int code,const char*content_type,const char*content){
 		const size_t nn=strlen(content); //?? strnlen
-		return reply_http(code,content,nn);
+		return reply_http(code,content_type,content,nn);
 	}
 	xwriter&pk(const char*s,const size_t nn){
 		io_send(fd,s,nn,true);
@@ -751,19 +751,19 @@ private:
 			return;
 		}
 		if(strstr(path,"..")){
-			x.reply_http(403,"path contains ..");
+			x.reply_http(403,"text/plain","path contains ..");
 			state=method;
 			return;
 		}
 		stats.files++;
 		struct stat fdstat;
 		if(stat(path,&fdstat)){
-			x.reply_http(404,"not found");
+			x.reply_http(404,"text/plain","not found");
 			state=method;
 			return;
 		}
 		if(S_ISDIR(fdstat.st_mode)){
-			x.reply_http(403,"path is directory");
+			x.reply_http(403,"text/plain","path is directory");
 			state=method;
 			return;
 		}
@@ -781,7 +781,7 @@ private:
 		}
 		file_fd=open(path,O_RDONLY);
 		if(file_fd==-1){
-			x.reply_http(404,"cannot open");
+			x.reply_http(404,"text/plain","cannot open");
 			state=method;
 			return;
 		}
@@ -865,7 +865,7 @@ int main(int argc,char**argv,char**env){
 //		if(chdir("web-root")){perror("cd web-root");exit(13);}
 //		printf("%s on port %d in dir %s/web-root\n",APP,port,cwd);
 //	}
-	printf("%s on port %d in dir %s/\n",APP,port,getenv("PWD"));
+	printf("%s on port %d in dir %s\n",APP,port,getenv("PWD"));
 	for(int i=0;i<_NSIG;i++){
 		signal(SIGINT,sig);
 	}
@@ -881,7 +881,7 @@ int main(int argc,char**argv,char**env){
 
 	char buf[4*K];
 	// Connection: Keep-Alive for apachebench
-	snprintf(buf,sizeof buf,"HTTP/1.1 200\r\nConnection: Keep-Alive\r\nContent-Length: %zu\r\n\r\n%s",strlen(APP),APP);
+	snprintf(buf,sizeof buf,"HTTP/1.1 200\r\nConnection: Keep-Alive\r\nContent-Type: %s\r\nContent-Length: %llu\r\n\r\n%s","text/plain",strlen(APP),APP);
 	homepage=new doc(buf);
 
 	struct sockaddr_in srv;
@@ -979,31 +979,31 @@ int main(int argc,char**argv,char**env){
 namespace web{
 class hello:public widget{
 	virtual void to(xwriter&x)override{
-		x.reply_http(200,"hello world");
+		x.reply_http(200,"text/plain","hello world");
 	}
 };
 class bye:public widget{
 	virtual void to(xwriter&x)override{
-		x.reply_http(200,"b y e");
+		x.reply_http(200,"text/plain","b y e");
 	}
 };
 class notfound:public widget{
 	virtual void to(xwriter&x)override{
-		x.reply_http(404,"path not found");
+		x.reply_http(404,"text/plain","path not found");
 	}
 };
 class typealine:public widget{
 	virtual void to(xwriter&x)override{
-		x.reply_http(200,"typealine");
+		x.reply_http(200,"text/plain","typealine");
 	}
 	virtual void on_content(xwriter&x,/*scan*/const char*content,const size_t content_len)override{
 //		printf(" typealine received content: %s\n",content);
-		x.reply_http(200,content,content_len);
+		x.reply_http(200,"text/plain",content,content_len);
 	}
 };
 class diro:public widget{
 	virtual void to(xwriter&x)override{
-		x.reply_http(200,"file directory");
+		x.reply_http(200,"text/plain","file directory");
 	}
 };
 }
