@@ -18,6 +18,7 @@
 #include<netinet/tcp.h>
 #include<typeinfo>
 #include<time.h>
+namespace xiinux{
 static int const K=1024;
 static size_t const conbufnn=K;
 static int const nclients=K;
@@ -368,14 +369,14 @@ public:
 		stats.socks--;
 		//printf(" * delete sock %p\n",(void*)this);
 		delete[]content;
-		if(!::close(fd)){
+		if(!close(fd)){
 			return;
 		}
 		stats.errors++;
 		printf("%s:%d ",__FILE__,__LINE__);perror("sockdel");
 	}
-	void close(){
-		::close(fd);
+	inline void close_sock(){
+		close(fd);
 	}
 	void run(){while(true){
 		//printf(" state %d\n",state);
@@ -849,7 +850,7 @@ static void sigexit(int i){
 	puts("exiting");
 	delete homepage;
 //	if(shutdown(server_socket.fd,SHUT_RDWR))perror("shutdown");
-	server_socket.close();
+	server_socket.close_sock();
 //	close(server_socket.fd);
 	signal(SIGINT,SIG_DFL);
 	kill(getpid(),SIGINT);
@@ -974,9 +975,12 @@ int main(int argc,char**argv,char**env){
 		}
 	}
 }
-
+}
 //-- application
 namespace web{
+	using xiinux::widget;
+	using xiinux::xwriter;
+
 class hello:public widget{
 	virtual void to(xwriter&x)override{
 		x.reply_http(200,"text/plain","hello world");
@@ -1007,6 +1011,7 @@ class diro:public widget{
 	}
 };
 }
+namespace xiinux{
 //-- generated
 static widget*widgetget(const char*qs){
 	if(!strcmp("hello",qs))return new web::hello();
@@ -1015,3 +1020,8 @@ static widget*widgetget(const char*qs){
 	if(!strcmp("diro",qs))return new web::diro();
 	return new web::notfound();
 }
+}
+int main(int argc,char**argv,char**env){
+	xiinux::main(argc,argv,env);
+}
+
