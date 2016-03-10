@@ -1,0 +1,8 @@
+/linux/
+/busybox/
+/rootfs/
+rootfs.cpio
+/linux-kernels/
+/Debug/
+/Release/
+hd.img

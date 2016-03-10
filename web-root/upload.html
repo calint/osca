@@ -1,0 +1,56 @@
+<!doctype html><title>upload</title>
+<pre>
+<input type="file" id="files" name="files[]" multiple onchange="send()">
+<div id="outp" style="border:1px dotted green"></div>
+<script>
+function send(){
+	document.getElementById('outp').innerHTML='';
+	var files=document.getElementById("files").files;
+	for(var i=0,f;f=files[i];i++){
+		document.getElementById('outp').innerHTML+=f.name+'  '+f.size+'\n<progress id=pb'+i+' value=0 style=width:100%></progress>\n';
+		upload(f.name,f,'pb'+i);
+	}
+}
+function po(e){
+	console.log(e+"\n");
+	for(var nm in e){
+		var v=e[nm];
+		console.log("  "+nm+"="+v+"\n");
+	}
+}
+function upload(path,blobOrFile,progressbarId){
+//	console.log(progressbarId);
+	document.getElementById(progressbarId).value=0;
+	var xhr=new XMLHttpRequest();
+	xhr.onreadystatechange=function(){
+//		console.log('onreadychange '+xhr.readyState+' status: '+xhr.status+' '+path);
+	};
+	xhr.upload.onprogress=function(e){
+		if(!e.lengthComputable)return;
+//		console.log('onprogress '+progressbarId+'   '+path+' '+xhr.status+'   '+(e.loaded/e.total)*100);
+		document.getElementById(progressbarId).value=e.loaded/e.total;
+	};
+	xhr.onload=function(e){
+//		console.log('onload '+path+' '+xhr.status);
+		document.getElementById(progressbarId).value=1;
+	};
+	xhr.onloadstart=function(e){
+//		console.log('onloadstart '+path+'  '+xhr.status);
+	};
+	xhr.onabort=function(e){
+		console.log('onabort:'+e);
+	};
+	xhr.onerror=function(e){
+		console.log('onerror:'+e);
+	};
+	xhr.ontimeout=function(e){
+		console.log('ontimeout:'+e);
+	};
+	xhr.onloadend=function(e){
+//		console.log('onloadend '+path+'  '+progressbarId+'  status:'+xhr.status);
+	};
+	xhr.open('PUT','/'+escape(path),true);
+	xhr.setRequestHeader("Content-Type","file");
+	xhr.send(blobOrFile);
+}
+</script>

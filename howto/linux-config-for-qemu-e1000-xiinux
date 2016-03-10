@@ -1,0 +1,246 @@
+# in linux source dir
+  # make mrproper allnoconfig
+  # make nconfig
+
+##
+# then check
+#
+#
+
+[*] 64-bit kernel
+--> General setup
+    [*] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+    --> Configure standard kernel features
+        [*] Enable support for printk
+        [*] Enable eventpoll support
+
+--> Bus options (PCI etc.) --->
+    [*] PCI Support     # to make Intel(R) PRO/1000 Gigabit Ethernet driver e1000 available
+
+--> Executable file formats / Emulations
+    [*] Kernel support for ELF binaries
+    [*] Kernel support for scripts starting with #!
+
+--> Device Drivers
+    --> Character devices   # to use-nographic with qemu
+        [*] Enable TTY
+         -> Serial drivers
+            [*] 8250/16550 and compatible serial support
+            [*]   Console on 8250/16550 and compatible serial port
+
+--> File systems
+    --> Pseudo filesystems
+        [*] /proc file system support
+        [*] sysfs file system support
+
+--> Networking support --->
+    [*] Networking support
+            Networking options  --->
+            <*> Packet socket
+            [*] TCP/IP networking
+            [ ] Unix domain sockets
+            [*] TCP/IP networking
+            [ ]   IP: IPsec transport mode
+            [ ]   IP: IPsec tunnel mode
+            [ ]   IP: IPsec BEET mode
+            [ ]   Large Receive Offload (ipv4/tcp)
+            [ ]   INET: socket monitoring interface    
+            [ ]   TCP/IP v6
+        [ ]   Wireless  ----
+
+--> Device Drivers  --->
+    [*] Network device support
+        [ ]   Network core driver support
+        [ ]   Wireless LAN  ----
+    [*]   Ethernet driver support (NEW)  --->
+           [*] Intel(R) PRO/1000 Gigabit Etqhernet support
+
+
+
+###
+# for qemu hda in /dev/sda (b 8 0) /dev/sda1 (b 8 1)
+  [*] Enable the block layer  ---> 
+      [ ]   Block layer data integrity support
+      [ ]   Block device command line partition parser 
+ ┌── Partition Types 
+ │        [*] Advanced partition selection                                    │
+ │        [ ]   Acorn partition support                                       │
+ │        [ ]   AIX basic partition table support                             │
+ │        [ ]   Alpha OSF partition support                                   │
+ │        [ ]   Amiga partition table support                                 │
+ │        [ ]   Atari partition table support                                 │
+ │        [ ]   Macintosh partition map support                               │
+ │        [*]   PC BIOS (MSDOS partition tables) support                      │
+ │        [ ]     BSD disklabel (FreeBSD partition tables) support            │
+ │        [ ]     Minix subpartition support                                  │
+ │        [ ]     Solaris (x86) partition table support                       │
+ │        [ ]     Unixware slices support                                     │
+ │        [ ]   Windows Logical Disk Manager (Dynamic Disk) support           │
+ │        [ ]   SGI partition support                                         │
+ │        [ ]   Ultrix partition table support                                │
+ │        [ ]   Sun partition tables support                                  │
+ │        [ ]   Karma Partition support                                       │
+ │        [ ]   EFI GUID Partition support                                    │
+ │        [ ]   SYSV68 partition table support                                │
+ │        [ ]   Command line partition support   
+ ┌── Device Drivers ──────────────────────────────────────────────────────────┐
+ │                                                                            │
+ │     Generic Driver Options  --->                                           │
+ │     Bus devices  ----                                                      │
+ │ [ ] Connector - unified userspace <-> kernelspace linker  ----             │
+ │ [ ] Memory Technology Device (MTD) support  ----                           │
+ │ [ ] Device Tree and Open Firmware support  ----                            │
+ │ [ ] Parallel port support  ----                                            │
+ │ [*] Block devices  --->                                                    │
+ │ [ ] NVM Express block device                                               │
+ │     Misc devices  --->                                                     │
+ │ [ ] ATA/ATAPI/MFM/RLL support (DEPRECATED)  ----                           │
+ │     SCSI device support  --->                                              │
+ │ [*] Serial ATA and Parallel ATA drivers (libata)  --->                     │
+ │ [ ] Multiple devices driver support (RAID and LVM)  ----                   │
+ │ [ ] Generic Target Core Mod (TCM) and ConfigFS Infrastructure  ----        │
+ │ [ ] Fusion MPT device support  ----                                        │
+ │     IEEE 1394 (FireWire) support  --->                                     │
+ │ [ ] Macintosh device drivers  ----                                         │
+ │ [*] Network device support  --->     
+
+ ┌── Serial ATA and Parallel ATA drivers (libata) ────────────────────────────┐
+ │                                                                            │
+ │       --- Serial ATA and Parallel ATA drivers (libata)                     │
+ │       [ ]   Verbose ATA error reporting                                    │
+ │       [ ]   SATA Port Multiplier support                                   │
+ │             *** Controllers with non-SFF native interface ***              │
+ │       [ ]   AHCI SATA support                                              │
+ │       [ ]   Platform AHCI SATA support                                     │
+ │       [ ]   Initio 162x SATA support (Very Experimental)                   │
+ │       [ ]   ACard AHCI variant (ATP 8620)                                  │
+ │       [ ]   Silicon Image 3124/3132 SATA support                           │
+ │       [*]   ATA SFF support (for legacy IDE and PATA)                      │
+ │               *** SFF controllers with custom DMA interface ***            │
+ │       [ ]     Pacific Digital ADMA support                                 │
+ │       [ ]     Pacific Digital SATA QStor support                           │
+ │       [ ]     Promise SATA SX4 support (Experimental)                      │
+ │       [*]     ATA BMDMA support                                            │
+ │                 *** SATA SFF controllers with BMDMA ***                    │
+ │       [*]       Intel ESB, ICH, PIIX3, PIIX4 PATA/SATA support   
+┌── SCSI device support ─────────────────────────────────────────────────────┐
+ │                                                                            │
+ │          [ ] RAID Transport Class                                          │
+ │          -*- SCSI device support                                           │
+ │          [ ] SCSI: use blk-mq I/O path by default                          │
+ │          [ ] legacy /proc/scsi/ support                                    │
+ │              *** SCSI support type (disk, tape, CD-ROM) ***                │
+ │          [*] SCSI disk support                                             │
+ │          [ ] SCSI tape support                                             │
+ │          [ ] SCSI OnStream SC-x0 tape support                              │
+ │          [ ] SCSI CDROM support                                            │
+ │          [ ] SCSI generic support                                          │
+ │          [ ] SCSI media changer support                                    │
+ │          [ ] Verbose SCSI error reporting (kernel size +=75K)              │
+ │          [ ] SCSI logging facility                                         │
+ │          [ ] Asynchronous SCSI scanning                                    │
+ │              SCSI Transports  --->                                         │
+ │          [ ] SCSI low-level drivers  ----                                  │
+ │          [ ] SCSI Device Handlers  ----                                    │
+ │          [ ] OSD-Initiator library             
+
+##
+# then uncheck
+#
+#
+--> General setup
+    [ ]   Support initial ramdisks compressed using bzip2                    
+    [ ]   Support initial ramdisks compressed using LZMA                     
+    [ ]   Support initial ramdisks compressed using XZ                       
+    [ ]   Support initial ramdisks compressed using LZO                      
+    [ ]   Support initi
+    [ ] Enable SLUB debugging supportal ramdisks compressed using LZ4  
+    [ ] Enable PCI quirk workarounds
+
+--> Processor type and features
+    [ ] Enable MPS table
+    [ ] Enable vsyscall emulation
+
+--> Power management and ACPI options
+    [ ] ACPI (Advanced Configuration and Power Interface) Support  ---- 
+
+--> Bus options (PCI etc.) --->    
+    [ ] ISA-style DMA support   
+
+--> Networking support --->
+        Networking options  --->
+        [ ] Unix domain sockets
+        [*] TCP/IP networking
+        [ ]   IP: IPsec transport mode
+        [ ]   IP: IPsec tunnel mode
+        [ ]   IP: IPsec BEET mode
+        [ ]   Large Receive Offload (ipv4/tcp)
+        [ ]   INET: socket monitoring interface    
+        [ ]   TCP/IP v6
+    [ ]   Wireless  ----
+
+--> Device Drivers
+    --> Character devices 
+        [*] Enable TTY                                                         
+        [ ]   Virtual terminal                                                 
+        [ ]   Unix98 PTY support                                               
+        [ ]   Legacy (BSD) PTY support                                         
+        [ ]   Non-standard serial port support (NEW)                           
+        [ ]   HSDPA Broadband Wireless Data Card - Globe Trotter (NEW)          
+        [ ]   GSM MUX line discipline support (EXPERIMENTAL) (NEW)              
+        [ ]   Trace data sink for MIPI P1149.7 cJTAG standard (NEW)
+              Serial drivers  --->
+              [*] 8250/16550 and compatible serial support
+              [ ]   Support 8250_core.* kernel options (DEPRECATED) 
+    --> Network device support
+        [ ]   Network core driver support
+        [ ]   Wireless LAN  ----
+    [ ] HID bus support Drivers
+    [ ] Power supply class support  --->
+    [ ] Generic Thermal sysfs driver
+    --> Graphics support
+        [ ] VGA Arbitration
+        Console display driver support  ---> 
+        [ ] VGA text console
+
+--> File systems
+    [ ] Network File Systems  ---- 
+
+--> Kernel hacking
+    [ ] Collect scheduler debugging info
+
+--> Cryptographic API   #  disable all
+    [ ]   Disable run-time self tests
+    [ ]   Encrypted Chain IV Generator
+    [ ]   NIST SP800-90A DRBG  ---- 
+    [ ]   Jitterentropy Non-Deterministic Random Number Generator
+    [ ]   Hardware crypto devices  ----
+    [ ] XZ decompression support
+
+
+
+
+# then
+  # make -j2  # use 2 cores
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

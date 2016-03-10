@@ -1,0 +1,42 @@
+<!doctype html>
+<title>post</title>
+<input id=line type=text> <input id=btn type=button value="send" onclick="this.disabled=true;ajax_post('/?typealine',$('line').value,function(){$('btn').disabled=false;$('line').focus();})">
+<script>
+$=function(eid){return document.getElementById(eid);}
+$("line").focus();
+function ajax_post(uri,data,on_done){
+	console.log("ajax post to "+uri+"\n"+data);
+	var req=new XMLHttpRequest();
+	req.onreadystatechange=function(){
+		console.log("state: "+this.readyState);
+		switch(this.readyState){
+		case 1:// Open
+			console.log("open");
+			this.setRequestHeader('Content-Type','text/plain;charset=utf-8');
+			this.send(data);
+			break;
+		case 2:// Sent
+			console.log("sent");
+			break;
+		case 3:// Receiving
+			console.log("receiving");
+			console.log("  response length:"+this.response.length);
+			break;
+		case 4:// Loaded
+			console.log("loaded");
+			console.log("      status:"+this.status);
+			console.log("resonse type:"+this.responseType);
+			console.log("    response:\n"+this.response);
+			if(on_done)on_done();
+			break;		
+		}
+	};
+	req.onerror=function(){
+		console.log("error");
+	}
+	req.ontimeout=function(){
+		console.log("timeout");
+	}
+	req.open('post',uri,true);
+}
+</script>
