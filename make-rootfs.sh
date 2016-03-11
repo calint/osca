@@ -36,7 +36,7 @@ ls -ho --color $BIN &&
 cd $B && make -j && cd .. && cp -a $B/busybox $T/bin &&
 
 BACK_PWD=$(pwd) &&
-cp -ar web-root $T/
+cp -ar web $T/ &&
 cd $T &&
 ls -ho --color bin/busybox &&
 cd bin && ln busybox sh && cd .. &&
