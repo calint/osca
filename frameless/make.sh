@@ -4,16 +4,19 @@ set -e
 # change to directory of the script
 cd $(dirname "$0")
 
-CC="gcc"
+#CC=cc
+CC="cc -std=c99"
 BIN=frameless
 SRC=src/frameless.c
-CF="-Wfatal-errors -Werror"
-CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-result -Wno-maybe-uninitialized"
-CL="-lX11"
-CMD="$CC $SRC -o $BIN $CL $CF $CW"
-#echo $CMD
-$CMD
+# ! -Os breaks moving and resizing windows
+#OPTS="-Os -pedantic-errors -Wfatal-errors"
+OPTS="-pedantic-errors -Wfatal-errors"
+WARNINGS="-Wall -Wextra -Wpedantic -Wno-unused-result -Wno-maybe-uninitialized"
+#WARNINGS="-Wall -Wextra -Wno-unused-result"
+LIBS=-lX11
+
 echo
+$CC -o $BIN  $SRC $LIBS $OPTS $WARNINGS
 echo    "             lines  words   chars"
 echo -n "   source:"
 cat $SRC | wc

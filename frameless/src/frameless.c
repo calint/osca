@@ -500,7 +500,7 @@ int main(int argc,char**args,char**env){
 				system("xii-editor");
 				break;
 			case 9://esc
-			case 49://§
+      case 49://§
 				if(winfocused)
 					xwinclose(winfocused);
 				break;
