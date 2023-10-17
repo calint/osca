@@ -417,7 +417,7 @@ int main(int argc, char **args, char **env) {
 
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
-    xwin *xw;
+    xwin *xw = NULL;
     fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
             (void *)ev.xany.window);
     switch (ev.type) {

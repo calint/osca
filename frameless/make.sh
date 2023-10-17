@@ -3,8 +3,7 @@ CC="cc -std=c99"
 BIN=frameless
 SRC=src/frameless.c
 # ! -Os breaks moving and resizing windows
-#OPTS="-Os -pedantic-errors -Wfatal-errors"
-OPTS="-Werror -Wfatal-errors"
+OPTS="-Os -Werror -Wfatal-errors"
 WARNINGS="-Wall -Wextra -Wpedantic -Wno-unused-result"
 LIBS=-lX11
 
