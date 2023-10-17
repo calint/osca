@@ -381,7 +381,7 @@ static void _rendcputhrottles(){
 		snprintf(bbuf,sizeof bbuf,"/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",n);
 		const long long cur_freq=sysvaluelng(bbuf);
 		strbp(&sb," ");
-		const long long proc=(cur_freq*100)/max_freq;
+		const long long proc=max_freq==0?0:(cur_freq*100)/max_freq;
 		strbfmtlng(&sb,proc);
 		strbp(&sb,"%");
 //		printf("%d  %lld    %lld   %lld\n",n,proc,cur_freq,max_freq);
