@@ -188,7 +188,7 @@ static void xwintogglefullscreen(xwin *this) {
   }
 }
 static void xwintogglefullheight(xwin *this) {
-  fprintf(flog, "  toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
+  fprintf(flog, "  pre toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
           this->y, this->wi, this->hi);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
     int y = this->y;
@@ -200,6 +200,8 @@ static void xwintogglefullheight(xwin *this) {
     xwingeomset(this, this->x, -WIN_BORDER_WIDTH, this->wi, scr.hi);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
+  fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
+          this->y, this->wi, this->hi);
 }
 static void xwintogglefullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
