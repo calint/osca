@@ -59,10 +59,10 @@ sudo pacman -S xorg xorg-xinit xterm
 sudo pacman -S libxft acpi sysstat
 
 # frameless launched applications
-sudo pacman -S ttf-dejavu chromium thunar leafpad
+sudo pacman -S chromium thunar leafpad ttf-dejavu
 
 # sticky
-sudo pacman -S pkg-config gtk3 gtk2
+sudo pacman -S pkg-config gtk3
 
 cd /home/c/w/a/osca
 sh make-all.sh
