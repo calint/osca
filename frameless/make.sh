@@ -7,8 +7,8 @@ cd $(dirname "$0")
 CC="gcc"
 BIN=frameless
 SRC=src/frameless.c
-CF="-Os -Wfatal-errors -Werror"
-CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-result"
+CF="-Wfatal-errors -Werror"
+CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-result -Wno-maybe-uninitialized"
 CL="-lX11"
 CMD="$CC $SRC -o $BIN $CL $CF $CW"
 #echo $CMD
