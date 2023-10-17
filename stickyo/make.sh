@@ -6,11 +6,14 @@ cd $(dirname "$0")
 
 BIN=stickyo
 SRC=src/stickyo.c
-
-gcc -o $BIN $SRC -Wfatal-errors -Wall -Wextra -Wpedantic -Wno-deprecated-declarations `pkg-config --cflags --libs gtk+-3.0`
-
+CF="-Wfatal-errors -Werror"
+CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter"
+CMD="gcc $SRC -o $BIN $CF $CW `pkg-config --cflags --libs gtk+-3.0`"
+#echo
+#echo $CMD
+$CMD
 echo
-echo    "             lines  words   chars"
+echo    "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
 echo -n "   zipped:"
