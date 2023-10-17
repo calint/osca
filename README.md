@@ -13,6 +13,6 @@ contains:
 * snap: screenshot
 * stickyo: sticky notes
 * menuq: binary launcher
-* menuq: automatic mounter of USB
+* mounte: automatic mounter of USB
 
 ![screenshot](screenshots/frameless-archlinux-1.png)
