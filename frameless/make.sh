@@ -11,7 +11,7 @@ SRC=src/frameless.c
 # ! -Os breaks moving and resizing windows
 #OPTS="-Os -pedantic-errors -Wfatal-errors"
 OPTS="-pedantic-errors -Wfatal-errors"
-WARNINGS="-Wall -Wextra -Wno-unused-result -Wno-maybe-uninitialized"
+WARNINGS="-Wall -Wextra -Wno-unused-result"
 #WARNINGS="-Wall -Wextra -Wno-unused-result"
 LIBS=-lX11
 
