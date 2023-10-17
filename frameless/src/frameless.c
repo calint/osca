@@ -1,6 +1,7 @@
 // todo: make windows count dynamic
 // todo: when window dimensions equal screen dimensions consider window
 // maximized
+// todo: consolidate xwin.vh and bits into one field
 
 #define APP "window manager frameless"
 #include <X11/Xlib.h>
@@ -18,7 +19,7 @@
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
 
 typedef int xdesk;
-typedef unsigned bits;
+typedef char bits;
 typedef char bool;
 typedef struct xwin {
   Window w;           // x11 window handle
@@ -175,7 +176,7 @@ static void xwintogglefullscreen(xwin *this) {
   } else { // toggle to fullscreen
     xwingeom(this);
     xwingeomset(this, -WIN_BORDER_WIDTH, -WIN_BORDER_WIDTH, scr.wi, scr.hi);
-    this->vh = 3;
+    this->vh |= 3;
   }
 }
 static void xwintogglefullheight(xwin *this) {
@@ -379,9 +380,7 @@ int main(int argc, char **args, char **env) {
             (void *)ev.xany.window);
     switch (ev.type) {
     default:
-      fprintf(flog, "  unhandled event: %s   %p %s  unhandled\n",
-              ix_evnames[ev.type], (void *)ev.xany.window,
-              ev.xany.window == root ? "*" : "");
+      fprintf(flog, "  unhandled\n");
       fflush(flog);
       break;
       //		case ClientMessage:break;
@@ -407,7 +406,6 @@ int main(int argc, char **args, char **env) {
           ev.xmap.override_redirect) {
         break;
       }
-      //			fprintf(flog,"unmapnotify  1\n");fflush(flog);
       xwinfree(ev.xmap.window);
       break;
     case EnterNotify:
