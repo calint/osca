@@ -12,20 +12,21 @@ sudo pacman -S --noconfirm gcc
 # X11
 sudo pacman -S --noconfirm xorg xorg-xinit xterm
 
-# frameless launched applications
-sudo pacman -S --noconfirm chromium thunar leafpad alsa-utils
+# clonky dependencies
+sudo pacman -S --noconfirm libxft acpi sysstat
 
 # stickyo
 sudo pacman -S --noconfirm pkg-config gtk3
 
+# compile all
+./make-all.sh
+
+# frameless launched applications
+sudo pacman -S --noconfirm chromium thunar leafpad alsa-utils
+
 # utils
 sudo pacman -S --noconfirm wget pcmanfm feh scrot mplayer pkgfile ttf-dejavu
 # faenza-icon-theme 
-
-# clonky dependencies
-sudo pacman -S --noconfirm libxft acpi sysstat
-
-./make-all.sh
 
 echo
 echo start X11 with 'start-frameless'
