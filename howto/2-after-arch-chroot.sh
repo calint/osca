@@ -10,9 +10,9 @@ useradd -d /home/c c
 chown -R c:c /home/c
 passwd c
 
-nano /etc/sudoers
-
 # uncomment:
 # %wheel ALL=(ALL) NOPASSWD: ALL 
+
+nano /etc/sudoers
 
 gpasswd -a c wheel
