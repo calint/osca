@@ -23,34 +23,34 @@ contains:
    source:    708    2229   20050
    zipped:     17      93    5111
 
--rwxrwxr-x 1 c 26472 okt 17 22:13 frameless
+-rwxrwxr-x 1 c 26472 okt 17 22:19 frameless
 
 
             lines   words   chars
    source:   1031    3434   27806
    zipped:     32     167    7286
 
--rwxrwxr-x 1 c 37384 okt 17 22:13 clonky
+-rwxrwxr-x 1 c 37384 okt 17 22:19 clonky
 
 
             lines   words   chars
    source:    122     429    3744
 wc zipped:      1      25    1227
 
--rwxrwxr-x 1 c 16544 okt 17 22:13 menuq
+-rwxrwxr-x 1 c 16544 okt 17 22:19 menuq
 
 
             lines   words   chars
    source:     54     128    1748
    zipped:      2      19     821
 
--rwxrwxr-x 1 c 16960 okt 17 22:13 stickyo
+-rwxrwxr-x 1 c 16960 okt 17 22:19 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 17 22:13 snap
+-rwxrwxr-x 1 c 16144 okt 17 22:19 snap
 
 ```
