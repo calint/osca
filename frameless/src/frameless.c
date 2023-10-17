@@ -17,18 +17,20 @@
 #define WIN_BUMP 59        // pixels to 'bump' a window
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
+#define XWIN_BIT_FULL_HEIGHT 1
+#define XWIN_BIT_FULL_WIDTH 2
+#define XWIN_BITS_FULL_SCREEN 3
+#define XWIN_BIT_ALLOCATED 4
 
 typedef int xdesk;
-typedef char bits;
 typedef char bool;
 typedef struct xwin {
-  Window w;           // x11 window handle
-  int gx, gy;         // position
-  unsigned gw, gh;    // width height
-  bits vh;            // bit 1 means fullheight    bit 2 means fullwidth
-  xdesk desk;         // desk the window is on
-  int desk_x;         // x coord of window before folded at desk switch
-  unsigned char bits; // bit 1 means allocated
+  Window w;        // x11 window handle
+  int gx, gy;      // position
+  unsigned gw, gh; // width height
+  xdesk desk;      // desk the window is on
+  int desk_x;      // x coord of window before folded at desk switch
+  char bits;       // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
 } xwin;
 static xwin wins[WIN_MAX_COUNT];
 static FILE *flog;
@@ -64,8 +66,8 @@ static xwin *xwinget(Window w) {
   xwin *xw = NULL;
   int firstavail = -1;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    if (wins[i].bits & 1) { // check if allocated
-      if (wins[i].w == w) { // same handle?
+    if (wins[i].bits & XWIN_BIT_ALLOCATED) { // check if allocated
+      if (wins[i].w == w) {                  // same handle?
         return &wins[i];
       }
     } else {
@@ -81,10 +83,9 @@ static xwin *xwinget(Window w) {
     return xwinget(w);
   }
   xw = &wins[firstavail];
-  xw->bits |= 1; // allocated
+  xw->bits = XWIN_BIT_ALLOCATED;
   wincount++;
   xw->w = w;
-  xw->vh = 0;
   xw->desk = dsk;
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
   return xw;
@@ -101,7 +102,7 @@ static void xwinraise(xwin *this) { XRaiseWindow(dpy, this->w); }
 static void focusfirstondesk() {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *w = &wins[i];
-    if ((w->bits & 1) && (w->desk == dsk)) {
+    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
       xwinraise(w);
       xwinfocus(w);
       return;
@@ -121,8 +122,8 @@ static void xwinfree(Window w) {
   if (!xw) {
     return;
   }
-  if (xw->bits & 1) { // if allocateds
-    xw->bits &= 0xfe; // mark free
+  if (xw->bits & XWIN_BIT_ALLOCATED) {
+    xw->bits = 0; // mark free
     wincount--;
   }
   if (winfocused == xw) {
@@ -170,17 +171,19 @@ static void xwinclose(xwin *this) {
   XSendEvent(dpy, this->w, False, NoEventMask, &ke);
 }
 static void xwintogglefullscreen(xwin *this) {
-  if ((this->vh & 3) == 3) { // toggle from fullscreen
+  if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
+    // toggle from fullscreen
     xwingeomset(this, this->gx, this->gy, this->gw, this->gh);
-    this->vh = 0;
-  } else { // toggle to fullscreen
+    this->bits &= ~XWIN_BITS_FULL_SCREEN;
+  } else {
+    // toggle to fullscreen
     xwingeom(this);
     xwingeomset(this, -WIN_BORDER_WIDTH, -WIN_BORDER_WIDTH, scr.wi, scr.hi);
-    this->vh |= 3;
+    this->bits |= XWIN_BITS_FULL_SCREEN;
   }
 }
 static void xwintogglefullheight(xwin *this) {
-  if (this->vh & 1) {
+  if (this->bits & XWIN_BIT_FULL_HEIGHT) {
     int gy = this->gy;
     int gh = this->gh;
     xwingeom(this);
@@ -189,10 +192,10 @@ static void xwintogglefullheight(xwin *this) {
     xwingeom(this);
     xwingeomset(this, this->gx, -WIN_BORDER_WIDTH, this->gw, scr.hi);
   }
-  this->vh ^= 1;
+  this->bits ^= XWIN_BIT_FULL_HEIGHT;
 }
 static void xwintogglefullwidth(xwin *this) {
-  if (this->vh & 2) {
+  if (this->bits & XWIN_BIT_FULL_WIDTH) {
     int gx = this->gx;
     int gw = this->gw;
     xwingeom(this);
@@ -201,7 +204,7 @@ static void xwintogglefullwidth(xwin *this) {
     xwingeom(this);
     xwingeomset(this, -WIN_BORDER_WIDTH, this->gy, scr.wi, this->gh);
   }
-  this->vh ^= 2;
+  this->bits ^= XWIN_BIT_FULL_WIDTH;
 }
 static void xwinhide(xwin *this) {
   xwingeom(this);
@@ -231,7 +234,7 @@ static int _xwinix(xwin *this) {
 }
 static int _focustry(int k) {
   xwin *w = &wins[k];
-  if ((w->bits & 1) && (w->desk == dsk)) {
+  if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
     xwinraise(w);
     xwinfocus(w);
     return 1;
@@ -290,7 +293,7 @@ static void deskshow(int dsk, int dskprv) {
   int n;
   for (n = 0; n < WIN_MAX_COUNT; n++) {
     xwin *xw = &wins[n];
-    if (!(xw->bits & 1)) //? magicnum
+    if (!(xw->bits & XWIN_BIT_ALLOCATED))
       continue;
     if (xw->w == 0)
       continue;
@@ -576,11 +579,11 @@ int main(int argc, char **args, char **env) {
       int nw = xw->gw + xdiff;
       int ny = xw->gy + ydiff;
       int nh = xw->gh + ydiff;
-      if (xw->vh & 2) {
+      if (xw->bits & XWIN_BIT_FULL_WIDTH) {
         nx = -WIN_BORDER_WIDTH;
         nw = scr.wi;
       }
-      if (xw->vh & 1) {
+      if (xw->bits & XWIN_BIT_FULL_HEIGHT) {
         ny = -WIN_BORDER_WIDTH;
         nh = scr.hi;
       }
