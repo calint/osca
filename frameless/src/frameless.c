@@ -390,6 +390,7 @@ int main(int argc,char**args,char**env){
 	XGrabKey(dpy,123,0,root,True,GrabModeAsync,GrabModeAsync);//volup
 	XGrabKey(dpy,107,0,root,True,GrabModeAsync,GrabModeAsync);//print
 	XSelectInput(dpy,root,SubstructureNotifyMask);
+  int dskprv = 0;
 	XEvent ev;
 	while(!XNextEvent(dpy,&ev)){
 		xwin*xw;
@@ -570,8 +571,6 @@ int main(int argc,char**args,char**env){
 //				XSetCloseDownMode(dpy,RetainPermanent);
 //				XCloseDisplay(dpy);
 				break;
-
-int dskprv;//? weirddeclarelocation
 			case 38://a
 			case 111://up
 				dskprv=dsk;
