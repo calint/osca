@@ -182,12 +182,25 @@ static void xwinclose(xwin *this) {
 static void xwintogglefullscreen(xwin *this) {
   if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
     // toggle from fullscreen
-    xwingeomset(this, this->x, this->y, this->wi, this->hi);
+    xwingeom(this);
+    this->x = this->x_pf;
+    this->y = this->y_pf;
+    this->wi = this->wi_pf;
+    this->hi = this->hi_pf;
+    xwingeomset2(this);
     this->bits &= ~XWIN_BITS_FULL_SCREEN;
   } else {
     // toggle to fullscreen
     xwingeom(this);
-    xwingeomset(this, -WIN_BORDER_WIDTH, -WIN_BORDER_WIDTH, scr.wi, scr.hi);
+    this->x_pf = this->x;
+    this->y_pf = this->y;
+    this->wi_pf = this->wi;
+    this->hi_pf = this->hi;
+    this->x = -WIN_BORDER_WIDTH;
+    this->y = -WIN_BORDER_WIDTH;
+    this->wi = scr.wi;
+    this->hi = scr.hi;
+    xwingeomset2(this);
     this->bits |= XWIN_BITS_FULL_SCREEN;
   }
 }
@@ -213,13 +226,17 @@ static void xwintogglefullheight(xwin *this) {
 }
 static void xwintogglefullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
-    int x = this->x;
-    int wi = this->wi;
     xwingeom(this);
-    xwingeomset(this, x, this->y, wi, this->hi);
+    this->x = this->x_pf;
+    this->wi = this->wi_pf;
+    xwingeomset2(this);
   } else {
     xwingeom(this);
-    xwingeomset(this, -WIN_BORDER_WIDTH, this->y, scr.wi, this->hi);
+    this->x_pf = this->x;
+    this->wi_pf = this->wi;
+    this->x = -WIN_BORDER_WIDTH;
+    this->wi = scr.wi;
+    xwingeomset2(this);
   }
   this->bits ^= XWIN_BIT_FULL_WIDTH;
 }
