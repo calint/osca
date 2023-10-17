@@ -25,7 +25,7 @@ sudo pacman -S --noconfirm pkg-config gtk3
 sudo pacman -S --noconfirm chromium thunar leafpad alsa-utils
 
 # utils
-sudo pacman -S --noconfirm wget pcmanfm feh scrot mplayer pkgfile ttf-dejavu
+sudo pacman -S --noconfirm wget htop pcmanfm feh scrot mplayer pkgfile ttf-dejavu
 # faenza-icon-theme 
 
 echo
