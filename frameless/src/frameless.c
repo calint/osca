@@ -378,12 +378,6 @@ int main(int argc, char **args, char **env) {
       fprintf(flog, "  unhandled\n");
       fflush(flog);
       break;
-      //		case ClientMessage:break;
-      //		case ReparentNotify:break;
-      //		case CreateNotify:break;
-      //		case DestroyNotify:break;
-      //		case ConfigureNotify:break;
-      //		case MapRequest:break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
           ev.xmap.override_redirect) {
@@ -421,7 +415,6 @@ int main(int argc, char **args, char **env) {
       case 54: // c
         system("xii-term");
         break;
-        //			case 107://sysrq prntscr
       case 33: // p
         system("xii-scrsht");
         break;
@@ -584,6 +577,7 @@ int main(int argc, char **args, char **env) {
       switch (key) {
       default:
         xwingeomset(xw, nx, ny, xw->wi, xw->hi);
+        fprintf(flog,"  move x=%d  y=%d  wi=%d  hi=%d\n", nx, ny, xw->wi, xw->hi);
         break;
       case 27: // r
         if (nw < 0) {
@@ -593,6 +587,7 @@ int main(int argc, char **args, char **env) {
           nh = 0;
         }
         xwingeomset(xw, xw->x, xw->y, nw, nh);
+        fprintf(flog,"  resize x=%d  y=%d  wi=%d  hi=%d\n", nx, ny, xw->wi, xw->hi);
         break;
       }
       break;
