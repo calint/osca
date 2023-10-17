@@ -1,11 +1,13 @@
 # https://wiki.archlinux.org/title/Installation_guide
+
+# before arch-chroot
+# copy network config
+cp /etc/systemd/network/* /mnt/etc/systemd/network/ 
+
 # after "arch-chroot /mnt" and before booting into the installation
 
 # install text editors
 pacman -S vi nano
-
-# copy network config
-cp /etc/systemd/network/* /mnt/etc/systemd/network/ 
 
 # after booting
 
@@ -43,8 +45,8 @@ gpasswd -a c wheel
 mkdir w
 cd w
 pacman -S git
-git clone https://github.com/calint/a
-cd a/osca
+git clone https://github.com/calint/osca
+cd osca
 cp -rav etc/skel/. ~/
 
 # log-out log-in
@@ -64,7 +66,7 @@ sudo pacman -S chromium thunar leafpad ttf-dejavu
 # sticky
 sudo pacman -S pkg-config gtk3
 
-cd /home/c/w/a/osca
+cd /home/c/w/osca
 sh make-all.sh
 
 sudo pacman -S wget pcmanfm feh scrot mplayer pkgfile alsa-utils
