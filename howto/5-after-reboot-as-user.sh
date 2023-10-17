@@ -2,8 +2,7 @@
 set -e
 cd $(dirname "$0")
 
-cd ~/w/osca
-cp -rav etc/skel/. ~/
+cp -rav ~/w/osca/etc/skel/. ~/
 
 source ~/.bashrc
 
