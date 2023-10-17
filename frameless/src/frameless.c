@@ -194,14 +194,16 @@ static void xwintogglefullheight(xwin *this) {
     int y = this->y;
     int hi = this->hi;
     xwingeom(this);
-    xwingeomset(this, this->x, y, this->wi, hi);
+    this->y = y;
+    this->hi = hi;
+    xwingeomset(this, this->x, this->y, this->wi, this->hi);
   } else {
     xwingeom(this);
     xwingeomset(this, this->x, -WIN_BORDER_WIDTH, this->wi, scr.hi);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
-  fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
-          this->y, this->wi, this->hi);
+  fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n",
+          this->x, this->y, this->wi, this->hi);
 }
 static void xwintogglefullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
