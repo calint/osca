@@ -1,8 +1,6 @@
-/linux/
-/busybox/
-/rootfs/
-rootfs.cpio
-/linux-kernels/
-/Debug/
-/Release/
-hd.img
+/clonky/clonky
+/frameless/frameless
+/menuq/menuq
+/mounte/mounte
+/snap/snap
+/stickyo/stickyo

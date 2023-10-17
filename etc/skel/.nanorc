@@ -1,0 +1,8 @@
+set autoindent
+set boldtext
+set constantshow
+set nonewlines
+set nowrap
+set preserve
+set tabsize 4
+

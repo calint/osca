@@ -1,0 +1,2 @@
+sudo ip link set enp0s20f0u3 up
+sudo dhcpcd enp0s20f0u3

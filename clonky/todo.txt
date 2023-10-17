@@ -1,0 +1,2 @@
+[ ] throttle percentage display not same in htop
+[ ] net up/down in KB/s instead of total

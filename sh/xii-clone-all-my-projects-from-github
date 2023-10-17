@@ -1,0 +1,6 @@
+if [ -z "$WORKSPACE" ]; then echo "environment WORKSPACE is not set";exit 1;fi
+
+for d in $(cat githubprojects);do
+	git clone http://github.com/calint/$d
+	echo ;
+done

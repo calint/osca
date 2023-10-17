@@ -1,0 +1,68 @@
+style "gtkcompact" {
+	font_name="Sans 7"
+	GtkButton::default_border={0,0,0,0}
+	GtkButton::default_outside_border={0,0,0,0}
+	GtkButton::default_spacing=0
+	GtkButton::focus-line-width=1
+	GtkButton::focus-padding=1
+	GtkButtonBox::child_min_width=0
+	GtkButtonBox::child_min_heigth=0
+	GtkButtonBox::child_internal_pad_x=0
+	GtkButtonBox::child_internal_pad_y=0
+	GtkMenu::vertical-padding=0
+	GtkMenuBar::internal_padding=0
+	GtkMenuBar::shadow_type=none
+	GtkMenuItem::horizontal_padding=8
+	GtkMenuItem::selected_shadow_type=none
+	GtkToolbar::internal-padding=0
+	GtkToolbar::space-size=0
+	GtkOptionMenu::indicator_size=0
+	GtkOptionMenu::indicator_spacing=0
+	GtkPaned::handle_size=0
+	GtkRange::trough_border=0
+	GtkRange::stepper_spacing=0
+	GtkScale::value_spacing=0
+	GtkScrolledWindow::scrollbar_spacing=0
+	GtkExpander::expander_size=0
+	GtkExpander::expander_spacing=0
+	GtkTreeView::vertical-separator=2
+	GtkTreeView::horizontal-separator=7
+	GtkTreeView::expander-size=11
+	GtkTreeView::fixed-height-mode=TRUE
+	GtkWidget::focus_padding=1
+	GtkWidget::focus-line-width=1
+	GtkWidget::focus_padding=1
+	GtkWidget::interior_focus=1
+	GtkWidget::internal_padding=1
+}
+class "GtkWidget" style "gtkcompact"
+
+style "gtkcompactextra" {
+	xthickness=0
+	ythickness=0
+}
+class "GtkButton" style "gtkcompactextra"
+class "GtkToolbar" style "gtkcompactextra"
+class "GtkPaned" style "gtkcompactextra"
+
+gtk-font-name="Sans 7"
+gtk-icon-theme-name="Faenza"
+
+binding "gtk-binding-tree-view" {
+    bind "j"        { "move-cursor" (display-lines, 1) }
+    bind "k"        { "move-cursor" (display-lines, -1) }
+    bind "h"        { "expand-collapse-cursor-row" (1,0,0) }
+    bind "l"        { "expand-collapse-cursor-row" (1,1,0) }
+    bind "o"        { "move-cursor" (pages, 1) }
+    bind "u"        { "move-cursor" (pages, -1) }
+    bind "g"        { "move-cursor" (buffer-ends, -1) }
+    bind "y"        { "move-cursor" (buffer-ends, 1) }
+    bind "p"        { "select-cursor-parent" () }
+    bind "Left"     { "expand-collapse-cursor-row" (0,0,0) }
+    bind "Right"    { "expand-collapse-cursor-row" (0,1,0) }
+    bind "semicolon" { "expand-collapse-cursor-row" (0,1,1) }
+    bind "slash"    { "start-interactive-search" () }
+}
+class "GtkTreeView" binding "gtk-binding-tree-view"
+
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+d=`date +%Y-%m-%d---%H:%M:%S-`
+mkdir -p ~/snp/ && cp -ar $1 ~/snp/$2$1---$d
+ls -l ~/snp/$1*

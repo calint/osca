@@ -1,0 +1,2 @@
+xbacklight -inc 5
+#light -A 5

@@ -1,0 +1,5 @@
+DEST=~/img/
+FN=$(date +%Y-%m-%d--%H-%M-%S).png
+mkdir -p $DEST &&
+cd $DEST &&
+$OSCA/snap/snap $FN

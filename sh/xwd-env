@@ -1,0 +1,11 @@
+[[ -n $XWD ]] && return
+
+pl(){
+	echo -e "\033[32m **** $* \e[0m"
+}
+p(){
+	echo -n "$*"
+}
+export -f pl p
+export XWD_PNG=~/xwd/record/ XWD_ARCHIVE=~/xwd/archive/ XWD_MP4=~/xwd/mp4/ XWD=1
+pl $(set|grep ^XWD)

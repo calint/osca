@@ -1,0 +1,54 @@
+
+ #                                  oOo.o.
+ #         frameless osca          oOo.oOo
+ #      __________________________  .oOo.        
+ #     O\        -_   .. \      _ \    
+ #    O  \  hp stream 11  \     \\ \  
+ #   o   /\   ubuntu 14.1  \    |\\ \  
+ #  .   //\\    linux 4     \   ||   \ 
+ #   .  \\/\\    lowlatency  \  \_\   \ 
+ #    .  \\//\________________\________\       
+ #     .  \/_/, \\\--\\..\\ - /\_____  /     
+ #      .  \ \ . \\\__\\__\\./ / \__/ / 
+ #       .  \ \ , \    \\ ///./ ,/./ /
+ #        .  \ \___\ sticky notes / /        
+ #         .  \/\________________/ /                    
+ #    ./\.  . / /                 /
+ #    /--\   .\/_________________/    
+ #         ___.                 .
+ #        |o o|. . . . . . . . . 
+ #        /| |\ . .
+ #    ____       . .
+ #   |O  O|       . .
+ #   |_ -_|        . . 
+ #    /||\       
+ #      ___      
+ #     /- -\     
+ #    /\_-_/\    
+ #      | |      
+ # 
+
+
+# additional ubuntu packages for osca
+sudo apt-get install scrot leafpad alsamixer vlc thunar alsa-utils chromium-browser xbacklight
+
+# enable alsamixer
+sudo addgroup `id -un` audio
+
+# x11 developers
+sudo apt-get install libx11-dev libxft-dev
+
+# gnome developers
+sudo apt-get install gnome-devel
+
+# opengl developers
+sudo apt-get install freeglut3 freeglut3-dev libxmu-dev libxi-dev
+
+# enable opengl
+sudo adduser `id -un` video
+
+# emulatation packages
+sudo apt-get install qemu wine
+
+# enable qemu kvm
+sudo adduser `id -un` libvirtd

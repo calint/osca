@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ -z "$WORKSPACE" ]; then echo "environment WORKSPACE is not set";exit 1;fi
+if [ $# -eq 0 ]; then echo -e "usage:\n   $(basename "$0") <project>\nwhere project is a github repository in $WORKSPACE";exit 2;fi
+
+cd $WORKSPACE/$1 &&
+pwd &&
+git remote set-url origin git@github.com:calint/$1.git &&
+git add . &&
+git commit -m "."
+git push --all &&
+git push --tags

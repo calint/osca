@@ -1,0 +1,11 @@
+#!/bin/sh
+REPOSITORY=$(basename $(pwd)) &&
+echo deleting history of $REPOSITORY
+rm -rf .git &&
+git init &&
+git add . &&
+git commit -m "." &&
+git remote add origin git@github.com:calint/$REPOSITORY.git &&
+du -sh .git &&
+git push -u --force origin master &&
+echo ... done

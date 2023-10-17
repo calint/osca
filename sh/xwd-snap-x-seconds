@@ -1,0 +1,7 @@
+. $OSCA/sh/xwd-env &&
+pl "$0 start"
+xwd-record-archive &&
+xwd-record $1 &&
+xwd-record-to-mp4 $2 $3 $4 &&
+[[ $3 = *a* ]] && xwd-record-archive
+pl "$0 done"
