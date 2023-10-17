@@ -7,16 +7,12 @@
 #include <X11/cursorfont.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
-#define logfile "frameless.log"
-#define bin_screenshot_area                                                    \
-  "scrot -s 'scr--%Y-%m-%d---%H-%M-%S.jpg' -e 'mkdir -p ~/img/&&mv $f "        \
-  "~/img/&&feh ~/img/$f'"
 typedef int xdesk;
 typedef unsigned int bits;
-typedef struct {
+typedef struct xwin {
   Window w;            // x11 window handle
   int gx, gy;          // position
   unsigned int gw, gh; // width height
@@ -33,7 +29,7 @@ static Display *dpy;
 static Window root;
 static xdesk dsk = 0;
 static int wincount = 0;
-static struct {
+static struct scr {
   int id, wi, hi;
 } scr;
 // static int scr=0;
@@ -94,15 +90,15 @@ static xwin *xwinget(Window w) {
   return xw;
 }
 static void xwinfocus(xwin *this) {
-  fprintf(flog, "xwinfocus  %p\n", (void *)this->w);
-  fflush(flog);
+  // fprintf(flog, "xwinfocus  %p\n", (void *)this->w);
+  // fflush(flog);
   if (winfocused) {
     XSetWindowBorder(dpy, winfocused->w, 0x00000000); //? magicnum
   }
   XSetInputFocus(dpy, this->w, RevertToParent, CurrentTime);
   XSetWindowBorder(dpy, this->w, 0x00008000); //? magicnum
-  fprintf(flog, "xwinfocus  .\n");
-  fflush(flog);
+  // fprintf(flog, "xwinfocus  .\n");
+  // fflush(flog);
   winfocused = this;
 }
 static void xwinraise(xwin *this) { XRaiseWindow(dpy, this->w); }
@@ -119,8 +115,8 @@ static void focusfirstondesk() {
   winfocused = NULL;
 }
 static xwin *_winfind(Window w) {
-  fprintf(flog, "! xwinfind  %p\n", (void *)w);
-  fflush(flog);
+  // fprintf(flog, "! xwinfind  %p\n", (void *)w);
+  // fflush(flog);
   int n;
   for (n = 0; n < xwinsct; n++) {
     if (wins[n].w == w)
@@ -129,20 +125,20 @@ static xwin *_winfind(Window w) {
   return NULL;
 }
 static void xwinfree(Window w) {
-  fprintf(flog, "   xwinfree   %p\n", (void *)w);
-  fflush(flog);
+  // fprintf(flog, "   xwinfree   %p\n", (void *)w);
+  // fflush(flog);
   xwin *xw = _winfind(w);
   if (!xw) {
-    fprintf(flog, "! did not find window %p\n", (void *)w);
+    // fprintf(flog, "! did not find window %p\n", (void *)w);
     return;
   }
-  fprintf(flog, "       found xwin   %p    bits: %x\n", (void *)xw, xw->bits);
+  // fprintf(flog, "       found xwin   %p    bits: %x\n", (void *)xw, xw->bits);
   fflush(flog);
   if (xw->bits & 1) {
     xw->bits &= 0xfe; // free  //? magicnum
     wincount--;
-    fprintf(flog, "          freed    wincount: %d\n", wincount);
-    fflush(flog);
+    // fprintf(flog, "          freed    wincount: %d\n", wincount);
+    // fflush(flog);
   }
   if (winfocused == xw) {
     winfocused = NULL;
@@ -255,7 +251,7 @@ static int _xwinix(xwin *this) {
 static int _focustry(int k) {
   xwin *w = &wins[k];
   if ((w->bits & 1) && (w->desk == dsk)) {
-    fprintf(flog, "     focustry %p\n", (void *)w->w);
+    // fprintf(flog, "     focustry %p\n", (void *)w->w);
     xwinraise(w);
     xwinfocus(w);
     return 1;
@@ -326,43 +322,29 @@ static void deskshow(int dsk, int dskprv) {
       xwinshow(xw);
   }
 }
-static void desksave(int dsk, FILE *f) {
-  int n = 0;
-  fprintf(flog, "desktop %d\n", dsk);
-  fflush(flog);
-  for (n = 0; n < xwinsct; n++) {
-    xwin *w = &wins[n];
-    if (!(w->bits & 1)) //? magicnum
-      continue;
-    xwingeom(w);
-    char **argv;
-    int argc;
-    XGetCommand(dpy, w->w, &argv, &argc);
-    if (argc > 0)
-      while (argc--)
-        fprintf(flog, "%s ", *argv++);
-    else
-      fprintf(flog, "%x", (unsigned int)w->w);
-    //		fprintf(f,"   %x %dx%d+%d+%d\n",(unsigned
-    // int)w->w,w->rw,w->rh,w->rx,w->ry);
-    fflush(f);
-  }
-}
-#include <execinfo.h>
-static void print_trace() {
-  void *array[10];
-  size_t i;
-  size_t size = backtrace(array, 10); //? magicnum
-  char **strings = backtrace_symbols(array, size);
-  fprintf(flog, "Obtained %zd stack frames.\n", size);
-  for (i = 0; i < size; i++) {
-    fprintf(flog, "%s\n", strings[i]);
-  }
-  fflush(flog);
-  free(strings);
-}
+// static void desksave(int dsk, FILE *f) {
+//   int n = 0;
+//   fprintf(flog, "desktop %d\n", dsk);
+//   fflush(flog);
+//   for (n = 0; n < xwinsct; n++) {
+//     xwin *w = &wins[n];
+//     if (!(w->bits & 1)) //? magicnum
+//       continue;
+//     xwingeom(w);
+//     char **argv;
+//     int argc;
+//     XGetCommand(dpy, w->w, &argv, &argc);
+//     if (argc > 0)
+//       while (argc--)
+//         fprintf(flog, "%s ", *argv++);
+//     else
+//       fprintf(flog, "%x", (unsigned int)w->w);
+//     //		fprintf(f,"   %x %dx%d+%d+%d\n",(unsigned
+//     // int)w->w,w->rw,w->rh,w->rx,w->ry);
+//     fflush(f);
+//   }
+// }
 static int errorhandler(Display *d, XErrorEvent *e) {
-  print_trace();
   char buffer_return[1024] = "";
   int length = 1024;
   XGetErrorText(d, e->error_code, buffer_return, length);
@@ -383,7 +365,6 @@ int main(int argc, char **args, char **env) {
   srand(0);
   //	_Xdebug=1;
   XSetErrorHandler(errorhandler);
-  int n;
   //	flog=stdout;
   flog = stdout; // fopen(logfile,"a");
   if (!flog)
@@ -394,11 +375,11 @@ int main(int argc, char **args, char **env) {
   scr.id = DefaultScreen(dpy);
   scr.wi = DisplayWidth(dpy, scr.id);
   scr.hi = DisplayHeight(dpy, scr.id);
-  fprintf(flog, "\n\n\n\n%s\nscreen dimension: %d x %d\n", APP, scr.wi, scr.hi);
-  fflush(flog);
+  // fprintf(flog, "\n\n\n\n%s\nscreen dimension: %d x %d\n", APP, scr.wi, scr.hi);
+  // fflush(flog);
 
-  for (n = 0; n < xwinsct; n++)
-    wins[n].bits = 0;
+  for (unsigned i = 0; i < xwinsct; i++)
+    wins[i].bits = 0;
 
   root = DefaultRootWindow(dpy);
   Cursor root_window_cursor = XCreateFontCursor(dpy, XC_arrow);
@@ -414,7 +395,7 @@ int main(int argc, char **args, char **env) {
   int dskprv = 0;
   xwin *xw = NULL;
   XButtonEvent buttonevstart;
-  memset(&buttonevstart, 0, sizeof(XButtonEvent));
+  memset(&buttonevstart, 0, sizeof(buttonevstart));
 
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
@@ -510,7 +491,7 @@ int main(int argc, char **args, char **env) {
           //-p ~/img/&&mv $f ~/img/&&feh ~/img/$f",NULL);
           //					fprintf(flog,"screenshot rect:
           //%d\n",r); 					fflush(flog);
-          //exit(r);
+          // exit(r);
           fprintf(flog, "exec scrot -s\n");
           int r = execlp("scrot", "-s", NULL);
           fprintf(flog, " after exec:  %d\n", r);
@@ -593,7 +574,7 @@ int main(int argc, char **args, char **env) {
         //			case 118://insert
         //			case 127://pause
       case 57: // n
-        desksave(dsk, flog);
+        // desksave(dsk, flog);
         break;
       case 72: // toggle mute
         system("xii-vol-toggle");
@@ -673,8 +654,8 @@ int main(int argc, char **args, char **env) {
         ny = -border_width;
         nh = scr.hi;
       }
-      fprintf(flog, "button=%d    btn1msk=%d    btn2msk=%d    btn3msk=%d\n",
-              buttonevstart.button, Button1Mask, Button2Mask, Button3Mask);
+      // fprintf(flog, "button=%d    btn1msk=%d    btn2msk=%d    btn3msk=%d\n",
+      //         buttonevstart.button, Button1Mask, Button2Mask, Button3Mask);
       if (buttonevstart.button == 3) {
         if (nw < 0)
           nw = 0;

@@ -9,8 +9,7 @@ BIN=frameless
 SRC=src/frameless.c
 OPTS="-Os -pedantic-errors -Wfatal-errors"
 WARNINGS="-Wall -Wextra -Wno-unused-result"
-#WARNINGS="-Wall -Wextra -Wno-unused-result"
-LIBS=-lX11
+LIBS="-lX11"
 
 echo
 $CC -o $BIN  $SRC $LIBS $OPTS $WARNINGS
