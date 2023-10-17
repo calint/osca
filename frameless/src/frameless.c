@@ -7,7 +7,9 @@
 #include <X11/cursorfont.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+
 #define logfile "frameless.log"
 #define bin_screenshot_area                                                    \
   "scrot -s 'scr--%Y-%m-%d---%H-%M-%S.jpg' -e 'mkdir -p ~/img/&&mv $f "        \
@@ -342,7 +344,7 @@ static void desksave(int dsk, FILE *f) {
     else
       fprintf(flog, "%x", (unsigned int)w->w);
     //		fprintf(f,"   %x %dx%d+%d+%d\n",(unsigned
-    //int)w->w,w->rw,w->rh,w->rx,w->ry);
+    // int)w->w,w->rw,w->rh,w->rx,w->ry);
     fflush(f);
   }
 }
@@ -409,8 +411,9 @@ int main(int argc, char **args, char **env) {
   XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync); // print
   XSelectInput(dpy, root, SubstructureNotifyMask);
 
-  int dskprv;                 //? weirddeclarelocation
-  XButtonEvent buttonevstart; //? decllocation
+  int dskprv = 0;
+  XButtonEvent buttonevstart;
+  memset(&buttonevstart, 0, sizeof(XButtonEvent));
 
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
@@ -503,10 +506,11 @@ int main(int argc, char **args, char **env) {
         fflush(flog);
         if (pid == 0) { // child
           //					int
-          //r=execl("/usr/bin/scrot","-s","scr--%Y-%m-%d---%H-%M-%S.jpg","-e","mkdir
+          // r=execl("/usr/bin/scrot","-s","scr--%Y-%m-%d---%H-%M-%S.jpg","-e","mkdir
           //-p ~/img/&&mv $f ~/img/&&feh ~/img/$f",NULL);
           //					fprintf(flog,"screenshot rect:
-          //%d\n",r); 					fflush(flog); 					exit(r);
+          //%d\n",r); 					fflush(flog);
+          // exit(r);
           fprintf(flog, "exec scrot -s\n");
           int r = execlp("scrot", "-s", NULL);
           fprintf(flog, " after exec:  %d\n", r);
