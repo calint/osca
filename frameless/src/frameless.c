@@ -393,7 +393,7 @@ int main(int argc,char**args,char**env){
   int dskprv = 0;
 	XEvent ev;
 	while(!XNextEvent(dpy,&ev)){
-		xwin*xw = NULL;
+		xwin*xw;
 		fprintf(flog,"event: %s   win=%p\n",ix_evnames[ev.type],(void*)ev.xany.window);
 		switch(ev.type){
 		default:
