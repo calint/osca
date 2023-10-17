@@ -26,7 +26,11 @@ sudo pacman -S chromium thunar leafpad ttf-dejavu
 sudo pacman -S pkg-config gtk3
 
 cd /home/c/w/osca
-sh make-all.sh
+./make-all.sh
 
 sudo pacman -S wget pcmanfm feh scrot mplayer pkgfile alsa-utils
 # faenza-icon-theme 
+
+echo
+echo start X11 with 'start-frameless'
+echo
