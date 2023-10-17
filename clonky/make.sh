@@ -9,13 +9,15 @@ CC="gcc"
 BIN=clonky
 SRC=src/*.c
 #OPTS="-Os -pedantic-errors -Wfatal-errors"
-OPTS="-z execstack"
-WARNINGS="-Wall -Wextra -Wno-unused-result -Wno-unused-function"
+OPTS="-Os -z execstack"
+CW="-Wall -Wextra -Wno-unused-result -Wno-unused-function"
+#  -Wpedantic
 LIBS="-lX11 -lXft"
 INCLUDES=-I/usr/include/freetype2/
-
+CMD="$CC $SRC -o $BIN $OPTS $LIBS $CW $INCLUDES"
+#echo $CMD
+$CMD
 echo
-$CC -o $BIN  $SRC $INCLUDES $LIBS $OPTS $WARNINGS
 echo    "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc

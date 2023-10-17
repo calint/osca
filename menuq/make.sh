@@ -4,16 +4,15 @@ set -e
 # change to directory of the script
 cd $(dirname "$0")
 
-CC="gcc -std=c11"
 BIN=menuq
 SRC=src/menuq.c
-#OPTS=-Os
-WARNINGS="-Wall -Wextra -Wpedantic"
-LIBS=-lX11
-
+CF="-Os -Wfatal-errors -Werror"
+CW="-Wall -Wextra -Wpedantic"
+LIBS="-lX11"
+CMD="gcc $SRC -o $BIN $CF $CW $LIBS"
+$CMD
 echo
-$CC  -o $BIN  $SRC $LIBS $OPTS $WARNINGS
-echo    "             lines  words   chars"
+echo    "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
 echo -n "wc zipped:"

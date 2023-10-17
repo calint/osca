@@ -6,7 +6,7 @@ cd $(dirname "$0")
 
 BIN=stickyo
 SRC=src/stickyo.c
-CF="-Wfatal-errors -Werror"
+CF="-Os -Wfatal-errors -Werror"
 CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter"
 CMD="gcc $SRC -o $BIN $CF $CW `pkg-config --cflags --libs gtk+-3.0`"
 #echo
