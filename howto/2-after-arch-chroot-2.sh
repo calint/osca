@@ -2,10 +2,9 @@
 set -e
 cd $(dirname "$0")
 
-pacman -S vi nano git sudo
+pacman -S vi nano sudo
 
 # create user 'c' and home directory
-mkdir /home/c
 useradd -d /home/c c
 chown -R c:c /home/c
 passwd c
