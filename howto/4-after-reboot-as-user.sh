@@ -2,10 +2,7 @@
 set -e
 cd $(dirname "$0")
 
-mkdir w
-cd w
-git clone https://github.com/calint/osca
-cd osca
+cd w/osca
 cp -rav etc/skel/. ~/
 
 source ~/.bashrc

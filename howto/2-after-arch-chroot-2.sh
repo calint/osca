@@ -10,7 +10,7 @@ chown -R c:c /home/c
 passwd c
 
 # uncomment:
-# %wheel ALL=(ALL) NOPASSWD: ALL 
+# %wheel ALL=(ALL:ALL) NOPASSWD: ALL 
 
 nano /etc/sudoers
 
