@@ -37,7 +37,7 @@ static FILE *flog;
 static Display *dpy;
 static Window root;
 static xdesk dsk = 0;
-static int wincount = 0;
+static unsigned wincount = 0;
 static struct scr {
   int id, wi, hi;
 } scr;
@@ -85,6 +85,7 @@ static xwin *xwinget(Window w) {
   xw = &wins[firstavail];
   xw->bits = XWIN_BIT_ALLOCATED;
   wincount++;
+  fprintf(flog, "windows allocated: %d\n", wincount);
   xw->w = w;
   xw->desk = dsk;
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
