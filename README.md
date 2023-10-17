@@ -1,4 +1,4 @@
-# osca desktop environment
+# osca
 
 experimental minimal X11 desktop environment
 
