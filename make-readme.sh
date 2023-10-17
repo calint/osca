@@ -5,6 +5,7 @@ set -e
 cd $(dirname "$0")
 
 cat README.1.md > README.md
+echo >> README.md
 echo '```' >> README.md
 ./make-all.sh >> README.md
 echo '```' >> README.md

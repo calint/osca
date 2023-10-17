@@ -20,5 +20,5 @@ cat $SRC | wc
 echo -n "   zipped:"
 cat $SRC | gzip | wc
 echo
-ls -o --color $BIN
+ls -o $BIN
 echo
