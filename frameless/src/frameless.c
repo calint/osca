@@ -31,6 +31,10 @@ typedef struct xwin {
   int y;       // position y
   unsigned wi; // width
   unsigned hi; // height
+  int x_pf;    // x pre full width / full screen
+  int y_pf;    // y pre full width / full screen
+  int wi_pf;   // wi pre full width / full screen
+  int hi_pf;   // hi pre full width / full screen
   xdesk desk;  // desk the window is on
   int desk_x;  // x coord of window before folded at desk switch
   char bits;   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
@@ -191,15 +195,17 @@ static void xwintogglefullheight(xwin *this) {
   fprintf(flog, "  pre toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
           this->y, this->wi, this->hi);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
-    int y = this->y;
-    int hi = this->hi;
     xwingeom(this);
-    this->y = y;
-    this->hi = hi;
-    xwingeomset(this, this->x, this->y, this->wi, this->hi);
+    this->y = this->y_pf;
+    this->hi = this->hi_pf;
+    xwingeomset2(this);
   } else {
     xwingeom(this);
-    xwingeomset(this, this->x, -WIN_BORDER_WIDTH, this->wi, scr.hi);
+    this->y_pf = this->y;
+    this->hi_pf = this->hi;
+    this->y = -WIN_BORDER_WIDTH;
+    this->hi = scr.hi;
+    xwingeomset2(this);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
   fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n",
