@@ -138,8 +138,8 @@ static void xwinfree(Window w) {
 static void xwingeom(xwin *this) {
   Window wsink;
   unsigned dummy;
-  XGetGeometry(dpy, this->win, (Window *)&wsink, &this->x, &this->y, &this->wi,
-               &this->hi, &dummy, &dummy);
+  XGetGeometry(dpy, this->win, &wsink, &this->x, &this->y, &this->wi, &this->hi,
+               &dummy, &dummy);
 }
 static void xwingeomset(xwin *this, int x, int y, int w, int h) {
   XMoveResizeWindow(dpy, this->win, x, y, w, h);
@@ -188,6 +188,8 @@ static void xwintogglefullscreen(xwin *this) {
   }
 }
 static void xwintogglefullheight(xwin *this) {
+  fprintf(flog, "  toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
+          this->y, this->wi, this->hi);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
     int y = this->y;
     int hi = this->hi;
@@ -577,7 +579,8 @@ int main(int argc, char **args, char **env) {
       switch (key) {
       default:
         xwingeomset(xw, nx, ny, xw->wi, xw->hi);
-        fprintf(flog,"  move x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y, xw->wi, xw->hi);
+        fprintf(flog, "  move x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y, xw->wi,
+                xw->hi);
         break;
       case 27: // r
         if (nw < 0) {
@@ -587,7 +590,8 @@ int main(int argc, char **args, char **env) {
           nh = 0;
         }
         xwingeomset(xw, xw->x, xw->y, nw, nh);
-        fprintf(flog,"  resize x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y, xw->wi, xw->hi);
+        fprintf(flog, "  resize x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y,
+                xw->wi, xw->hi);
         break;
       }
       break;
