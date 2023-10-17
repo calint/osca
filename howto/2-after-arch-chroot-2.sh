@@ -2,7 +2,7 @@
 set -e
 cd $(dirname "$0")
 
-pacman -S vi nano sudo
+pacman -S --noconfirm vi nano sudo
 
 # create user 'c' and home directory
 useradd -d /home/c c
