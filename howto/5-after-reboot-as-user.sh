@@ -15,11 +15,11 @@ sudo pacman -S --noconfirm xorg xorg-xinit xterm
 # clonky dependencies
 sudo pacman -S --noconfirm libxft acpi sysstat
 
-# stickyo
+# stickyo dependencies
 sudo pacman -S --noconfirm pkg-config gtk3
 
 # compile all
-./make-all.sh
+~/w/osca/make-all.sh
 
 # frameless launched applications
 sudo pacman -S --noconfirm chromium thunar leafpad alsa-utils
