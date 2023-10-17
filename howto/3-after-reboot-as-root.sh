@@ -9,3 +9,4 @@ systemctl status systemd-networkd
 systemctl enable systemd-resolved
 systemctl start systemd-resolved
 systemctl status systemd-resolved
+
