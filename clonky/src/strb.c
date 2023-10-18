@@ -59,7 +59,13 @@ int strb_fmt_bytes(strb *self, long long bytes) {
   return 0;
 }
 
-/// clears buffer by setting index to 0 and first char to EOS
+void strb_back(strb *self) {
+  if (self->index > 0) {
+    self->index--;
+    self->chars[self->index] = '\0';
+  }
+}
+
 void strb_clear(strb *self) {
   self->index = 0;
   self->chars[0] = '\0';

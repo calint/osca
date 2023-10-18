@@ -344,12 +344,13 @@ static void render_acpi() {
 
 inline static void render_date_time() {
   const time_t t = time(NULL);
-  const struct tm *lt = localtime(&t); //? free?
+  const struct tm *lt = localtime(&t);
   strb sb;
   strb_init(&sb);
   if (strb_p(&sb, asctime(lt))) {
     return;
   }
+  strb_back(&sb);
   dc_newline(dc);
   dc_draw_str(dc, sb.chars);
 }
