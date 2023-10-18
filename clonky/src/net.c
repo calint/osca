@@ -96,8 +96,8 @@ int net_main(struct dc *dc) {
     char buf[1024];
     snprintf(buf, sizeof buf, "%s  %s  %llu/%llu KB", i->name,
              i->hostname ? "up" : "down", i->tx_bytes >> 10, i->rx_bytes >> 10);
-    dccr(dc);
-    dcdrwstr(dc, buf);
+    dc_newline(dc);
+    dc_draw_str(dc, buf);
     return 0;
   }
   ifcs_foreach(foo);

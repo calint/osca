@@ -15,7 +15,7 @@ CW="-Wall -Wextra -Wno-unused-result -Wno-unused-function"
 LIBS="-lX11 -lXft"
 INCLUDES=-I/usr/include/freetype2/
 CMD="$CC $SRC -o $BIN $OPTS $LIBS $CW $INCLUDES"
-#echo $CMD
+echo $CMD
 $CMD
 echo
 echo    "            lines   words   chars"
@@ -26,5 +26,4 @@ cat $SRC | gzip | wc
 echo
 ls -o $BIN
 echo
-#valgrind --leak-check=yes --leak-check=full --show-leak-kinds=all ./$BIN
-#valgrind --leak-check=yes ./$BIN
+#valgrind --track-origins=yes --leak-check=full ./$BIN

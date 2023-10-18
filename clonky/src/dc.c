@@ -20,7 +20,7 @@ struct dc {
   int dotx;
   XRenderColor rendcol;
 };
-struct dc *dcnew() {
+struct dc *dc_new() {
   struct dc *this = calloc(sizeof(struct dc), 1);
   setlocale(LC_ALL, "");
   this->dpy = XOpenDisplay(NULL);
@@ -50,46 +50,46 @@ struct dc *dcnew() {
                      &this->rendcol, &this->color);
   return this;
 }
-void dcdel(struct dc *this) {
+void dc_del(struct dc *this) {
   XftDrawDestroy(this->draw);
   XftFontClose(this->dpy, this->font);
   XFree(this->gc);
   free(this);
 }
-void dcclrbw(struct dc *this) {
+void dc_clear(struct dc *this) {
   XSetForeground(this->dpy, this->gc, BlackPixel(this->dpy, this->scr));
   XFillRectangle(this->dpy, this->win, this->gc, this->xlft, this->ytop,
                  this->width, this->dpy_height);
   XSetForeground(this->dpy, this->gc, WhitePixel(this->dpy, this->scr));
 }
-void dcdrwline(struct dc *this, const int x0, const int y0, const int x1,
+void dc_draw_line(struct dc *this, const int x0, const int y0, const int x1,
                const int y1) {
   XDrawLine(this->dpy, this->win, this->gc, this->xlft + x0, this->ytop + y0,
             this->xlft + x1, this->ytop + y1);
 }
-void dccr(struct dc *this) { this->doty += this->ddoty; }
-void dcdrwstr(struct dc *this, const char *s) {
+void dc_newline(struct dc *this) { this->doty += this->ddoty; }
+void dc_draw_str(struct dc *this, const char *s) {
   XftDrawStringUtf8(this->draw, &this->color, this->font,
                     this->xlft + this->dotx, this->ytop + this->doty,
                     (FcChar8 *)s, strlen(s));
 }
-void dcdrwhr(struct dc *this) {
+void dc_draw_hr(struct dc *this) {
   this->doty += 3;
   XDrawLine(this->dpy, this->win, this->gc, this->xlft, this->doty,
             this->xlft + this->width, this->doty);
 }
-void dcdrwhr1(struct dc *this, const int w) {
+void dc_draw_hr1(struct dc *this, const int w) {
   this->doty += 3;
   XDrawLine(this->dpy, this->win, this->gc, this->xlft, this->doty,
             this->xlft + w, this->doty);
 }
-void dcyinc(struct dc *this, const int dy) { this->doty += dy; }
-void dcflush(const struct dc *this) { XFlush(this->dpy); }
-int dcxget(const struct dc *this) { return this->dotx; }
-void dcxset(struct dc *this, const int x) { this->dotx = x; }
-void dcxlftset(struct dc *this, const int x) { this->xlft = x; }
-int dcyget(const struct dc *this) { return this->doty; }
-void dcyset(struct dc *this, const int y) { this->doty = y; }
-int dcwget(const struct dc *this) { return this->width; }
-void dcwset(struct dc *this, const int width) { this->width = width; }
-int dcwscrget(const struct dc *this) { return this->dpy_width; }
+void dc_inc_y(struct dc *this, const int dy) { this->doty += dy; }
+void dc_flush(const struct dc *this) { XFlush(this->dpy); }
+int dc_get_x(const struct dc *this) { return this->dotx; }
+void dc_set_x(struct dc *this, const int x) { this->dotx = x; }
+void dc_set_left_x(struct dc *this, const int x) { this->xlft = x; }
+int dc_get_y(const struct dc *this) { return this->doty; }
+void dc_set_y(struct dc *this, const int y) { this->doty = y; }
+int dc_get_width(const struct dc *this) { return this->width; }
+void dc_set_width(struct dc *this, const int width) { this->width = width; }
+int dc_get_screen_width(const struct dc *this) { return this->dpy_width; }

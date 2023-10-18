@@ -8,7 +8,7 @@ struct graphd {
   int ix;
   long long _prvvalue;
 };
-struct graphd *graphdnew(const int nvalues) {
+struct graphd *graphd_new(const int nvalues) {
   struct graphd *g = calloc(sizeof(struct graphd), 1);
   if (!g) {
     printf("dgraphnew can not alloc\n");
@@ -24,15 +24,15 @@ struct graphd *graphdnew(const int nvalues) {
   //	graphprint(g);
   return g;
 }
-void graphdprint(const struct graphd *g) {
+void graphd_print(const struct graphd *g) {
   printf("dgraph:\n size %lu\n addr:%p\n nvalues: %d\n values: %p\n ix: %d\n",
          sizeof(*g), (void *)g, g->nvalues, (void *)g->values, g->ix);
 }
-void graphddel(struct graphd *g) {
+void graphd_del(struct graphd *g) {
   free(g->values);
   free(g);
 }
-void graphdaddvalue(struct graphd *g, const long long value) {
+void graphd_add_value(struct graphd *g, const long long value) {
   long long dv = value - g->_prvvalue;
   g->_prvvalue = value;
   g->values[g->ix] = dv;
@@ -47,11 +47,11 @@ static long long _adjust(long long v, const int height) {
     v = 0;
   return v;
 }
-void graphddraw(struct graphd *g, struct dc *dc, const int height,
+void graphd_draw(struct graphd *g, struct dc *dc, const int height,
                 const long long maxvalue) {
-  const int x = dcxget(dc);
-  const int y = dcyget(dc);
-  dcdrwline(dc, x, y - height, x + g->nvalues, y - height);
+  const int x = dc_get_x(dc);
+  const int y = dc_get_y(dc);
+  dc_draw_line(dc, x, y - height, x + g->nvalues, y - height);
   int i = g->ix;
   int xx = x;
   while (i < g->nvalues) {
@@ -59,7 +59,7 @@ void graphddraw(struct graphd *g, struct dc *dc, const int height,
     v = _adjust(v, height);
     if (v == 0 && g->values[i] != 0)
       v = 1;
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }
@@ -69,7 +69,7 @@ void graphddraw(struct graphd *g, struct dc *dc, const int height,
     v = _adjust(v, height);
     if (v == 0 && g->values[i] != 0)
       v = 1;
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }

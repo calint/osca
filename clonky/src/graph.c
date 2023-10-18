@@ -6,7 +6,7 @@ struct graph {
   long long *values;
   int ix;
 };
-struct graph *graphnew(int nvalues) {
+struct graph *graph_new(int nvalues) {
   struct graph *g = malloc(sizeof(struct graph));
   if (!g) {
     printf("graphnew can not alloc\n");
@@ -22,25 +22,25 @@ struct graph *graphnew(int nvalues) {
   //	graphprint(g);
   return g;
 }
-void graphprint(const struct graph *g) {
+void graph_print(const struct graph *g) {
   printf("graph:\n size %lu\n addr:%p\n nvalues: %d\n values: %p\n ix: %d\n",
          sizeof(*g), (void *)g, g->nvalues, (void *)g->values, g->ix);
 }
-void graphdel(struct graph *g) {
+void graph_del(struct graph *g) {
   free(g->values);
   free(g);
 }
-void graphaddvalue(struct graph *g, const long long value) {
+void graph_add_value(struct graph *g, const long long value) {
   //	printf("graphaddvalue %x %d   %d\n",g->values,g->ix,value);
   g->values[g->ix] = value;
   g->ix++;
   if (g->ix == g->nvalues)
     g->ix = 0;
 }
-void graphdraw(const struct graph *g, struct dc *dc, const int ysclshft) {
-  const int x = dcxget(dc);
-  const int y = dcyget(dc);
-  dcdrwline(dc, x, y - (100 >> ysclshft), x + g->nvalues,
+void graph_draw(const struct graph *g, struct dc *dc, const int ysclshft) {
+  const int x = dc_get_x(dc);
+  const int y = dc_get_y(dc);
+  dc_draw_line(dc, x, y - (100 >> ysclshft), x + g->nvalues,
             y - (100 >> ysclshft));
   int i = g->ix;
   int xx = x;
@@ -48,7 +48,7 @@ void graphdraw(const struct graph *g, struct dc *dc, const int ysclshft) {
     long long v = g->values[i] >> ysclshft;
     if (v == 0 && g->values[i] != 0)
       v = 1;
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }
@@ -57,7 +57,7 @@ void graphdraw(const struct graph *g, struct dc *dc, const int ysclshft) {
     long long v = g->values[i] >> ysclshft;
     if (v == 0 && g->values[i] != 0)
       v = 1;
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }
@@ -69,13 +69,13 @@ static long long _adjust(long long v, const int height) {
     v = 0;
   return v;
 }
-void graphdraw2(const struct graph *g, struct dc *dc, const int height,
+void graph_draw2(const struct graph *g, struct dc *dc, const int height,
                 const long long maxvalue) {
   if (maxvalue == 0)
     return;
-  const int x = dcxget(dc);
-  const int y = dcyget(dc);
-  dcdrwline(dc, x, y - height, x + g->nvalues, y - height);
+  const int x = dc_get_x(dc);
+  const int y = dc_get_y(dc);
+  dc_draw_line(dc, x, y - height, x + g->nvalues, y - height);
   int i = g->ix;
   int xx = x;
   while (i < g->nvalues) {
@@ -83,7 +83,7 @@ void graphdraw2(const struct graph *g, struct dc *dc, const int height,
     if (v == 0 && g->values[i] != 0)
       v = 1;
     v = _adjust(v, height);
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }
@@ -93,7 +93,7 @@ void graphdraw2(const struct graph *g, struct dc *dc, const int height,
     if (v == 0 && g->values[i] != 0)
       v = 1;
     v = _adjust(v, height);
-    dcdrwline(dc, xx, y, xx, y - v);
+    dc_draw_line(dc, xx, y, xx, y - v);
     xx++;
     i++;
   }
