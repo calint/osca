@@ -51,23 +51,23 @@ static struct scr {
 static unsigned key;
 static xwin *winfocused;
 static bool dragging;
-static char *ix_evnames[LASTEvent] = {
-    "unknown",          "unknown",       // 0
-    "KeyPress",         "KeyRelease",    // 2
-    "ButtonPress",      "ButtonRelease", // 4
-    "MotionNotify",                      // 6
-    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
-    "FocusIn",          "FocusOut",      // 9 from XSetFocus
-    "KeymapNotify",                      // 11
-    "Expose",           "GraphicsExpose",   "NoExpose", // 12
-    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
-    "UnmapNotify",      "MapNotify", // 15
-    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
-    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
-    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
-    "SelectionClear",   "SelectionRequest", "SelectionNotify",
-    "ColormapNotify",   "ClientMessage",    "MappingNotify",
-    "GenericEvent"};
+// static char *ix_evnames[LASTEvent] = {
+//     "unknown",          "unknown",       // 0
+//     "KeyPress",         "KeyRelease",    // 2
+//     "ButtonPress",      "ButtonRelease", // 4
+//     "MotionNotify",                      // 6
+//     "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
+//     "FocusIn",          "FocusOut",      // 9 from XSetFocus
+//     "KeymapNotify",                      // 11
+//     "Expose",           "GraphicsExpose",   "NoExpose", // 12
+//     "VisibilityNotify", "CreateNotify",     "DestroyNotify",
+//     "UnmapNotify",      "MapNotify", // 15
+//     "MapRequest",       "ReparentNotify",   "ConfigureNotify",
+//     "ConfigureRequest", "GravityNotify",    "ResizeRequest",
+//     "CirculateNotify",  "CirculateRequest", "PropertyNotify",
+//     "SelectionClear",   "SelectionRequest", "SelectionNotify",
+//     "ColormapNotify",   "ClientMessage",    "MappingNotify",
+//     "GenericEvent"};
 
 static xwin *xwin_get(Window w) {
   xwin *xw = NULL;
@@ -92,7 +92,7 @@ static xwin *xwin_get(Window w) {
   xw = &wins[firstavail];
   xw->bits = XWIN_BIT_ALLOCATED;
   wincount++;
-  fprintf(flog, "windows allocated: %d\n", wincount);
+  // fprintf(flog, "windows allocated: %d\n", wincount);
   xw->win = w;
   xw->desk = dsk;
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
@@ -133,7 +133,7 @@ static void xwin_free(Window w) {
   if (xw->bits & XWIN_BIT_ALLOCATED) {
     xw->bits = 0; // mark free
     wincount--;
-    fprintf(flog, "windows allocated: %d\n", wincount);
+    // fprintf(flog, "windows allocated: %d\n", wincount);
   }
   if (winfocused == xw) {
     winfocused = NULL;
@@ -204,8 +204,6 @@ static void xwin_toggle_fullscreen(xwin *this) {
   }
 }
 static void xwin_toggle_fullheight(xwin *this) {
-  fprintf(flog, "  pre toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
-          this->y, this->wi, this->hi);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
     xwin_read_geom(this);
     this->y = this->y_pf;
@@ -220,8 +218,6 @@ static void xwin_toggle_fullheight(xwin *this) {
     xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
-  fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n",
-          this->x, this->y, this->wi, this->hi);
 }
 static void xwin_toggle_fullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
@@ -394,17 +390,16 @@ int main(int argc, char **args, char **env) {
 
   int dskprv = 0;
   xwin *xw = NULL;
-  XButtonEvent buttonevstart;
-  memset(&buttonevstart, 0, sizeof(buttonevstart));
+  XButtonEvent button_start;
+  memset(&button_start, 0, sizeof(button_start));
 
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
-    fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
-            (void *)ev.xany.window);
+    // fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
+    //         (void *)ev.xany.window);
     switch (ev.type) {
     default:
-      fprintf(flog, "  unhandled\n");
-      fflush(flog);
+      // fprintf(flog, "  unhandled\n");
       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
@@ -573,16 +568,14 @@ int main(int argc, char **args, char **env) {
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
       xwin_raise(xw);
       xwin_read_geom(xw);
-      buttonevstart = ev.xbutton;
+      button_start = ev.xbutton;
       break;
     case MotionNotify:
       while (XCheckTypedEvent(dpy, MotionNotify, &ev))
         ;
-      printf("  ev x=%d  y=%d    evstrt x=%d  y=%d\n", ev.xbutton.x_root,
-             ev.xbutton.y_root, buttonevstart.x_root, buttonevstart.y_root);
-      int xdiff = ev.xbutton.x_root - buttonevstart.x_root;
-      int ydiff = ev.xbutton.y_root - buttonevstart.y_root;
-      buttonevstart = ev.xbutton;
+      int xdiff = ev.xbutton.x_root - button_start.x_root;
+      int ydiff = ev.xbutton.y_root - button_start.y_root;
+      button_start = ev.xbutton;
       int nx = xw->x + xdiff;
       int nw = xw->wi + xdiff;
       int ny = xw->y + ydiff;
@@ -595,7 +588,7 @@ int main(int argc, char **args, char **env) {
         ny = -WIN_BORDER_WIDTH;
         nh = scr.hi;
       }
-      if (buttonevstart.button == 3) {
+      if (button_start.button == 3) {
         if (nw < 0) {
           nw = 0;
         }
@@ -612,8 +605,6 @@ int main(int argc, char **args, char **env) {
         xw->x = nx;
         xw->y = ny;
         xwin_set_geom(xw);
-        fprintf(flog, "  move x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y, xw->wi,
-                xw->hi);
         break;
       case 27: // r
         if (nw < 0) {
@@ -625,8 +616,6 @@ int main(int argc, char **args, char **env) {
         xw->wi = nw;
         xw->hi = nh;
         xwin_set_geom(xw);
-        fprintf(flog, "  resize x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y,
-                xw->wi, xw->hi);
         break;
       }
       break;
