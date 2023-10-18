@@ -8,7 +8,7 @@ struct graphd {
   int nvalues;
   long long *values;
   int ix;
-  long long _prvvalue;
+  long long _value_prev;
 };
 
 struct graphd *graphd_new(const int nvalues) {
@@ -39,9 +39,9 @@ void graphd_del(struct graphd *self) {
 }
 
 void graphd_add_value(struct graphd *self, const long long value) {
-  long long dv = value - self->_prvvalue;
-  self->_prvvalue = value;
-  self->values[self->ix] = dv;
+  long long delta = value - self->_value_prev;
+  self->_value_prev = value;
+  self->values[self->ix] = delta;
   self->ix++;
   if (self->ix == self->nvalues)
     self->ix = 0;

@@ -22,36 +22,34 @@
 #include <time.h>
 #include <unistd.h>
 
-#define APP_NAME "clonky system overview"
-
 static struct dc *dc;
 static struct graph *graph_cpu;
 static struct graph *graph_mem;
 static struct graphd *graph_net;
 
 // prefix to battery directory
-const char sys_cls_pwr[] = "/sys/class/power_supply/";
+const char power_supply_path_prefix[] = "/sys/class/power_supply/";
 
 // quirk for different kernel names for battery charge indicator
 const char *battery_energy_or_charge_prefix = "";
 
-// auto_config_battery() copies the battery entry in '/sys/class/power_supply'I
-static char sys_cls_pwr_bat[32];
+// auto_config_battery() copies the battery entry in '/sys/class/power_supply/'I
+static char battery_name[32] = "";
 
 // auto_config_network_traffic() copies the device name found in
 // '/sys/class/net/' preferring wlan otherwise fallback on non loop-back device
-static char graph_net_device[32];
+static char net_device[32] = "";
 
 static void get_sys_value_str_tolower(const char *path, char *value,
                                       const int size) {
   FILE *file = fopen(path, "r");
   if (!file) {
-    *value = 0;
+    value[0] = '\0';
     return;
   }
   char fmt[32] = "";
-  snprintf(fmt, sizeof(fmt), "%%%ds\\n",
-           size - 1); // -1 to leave space for '\0'
+  // -1 to leave space for '\0'
+  snprintf(fmt, sizeof(fmt), "%%%ds\\n", size - 1);
   fscanf(file, fmt, value);
   fclose(file);
   char *p = value;
@@ -107,15 +105,16 @@ static void str_compact_spaces(char *str) {
       *d++ = ' ';
     }
   } while (1);
-  *d = 0;
+  *d = '\0';
 }
 
 static void render_hr() { dc_draw_hr(dc); }
 
 static void render_battery() {
   char buf[255] = "";
-  const int nchars = snprintf(buf, sizeof(buf), "%s%s/%s_", sys_cls_pwr,
-                              sys_cls_pwr_bat, battery_energy_or_charge_prefix);
+  const int nchars =
+      snprintf(buf, sizeof(buf), "%s%s/%s_", power_supply_path_prefix,
+               battery_name, battery_energy_or_charge_prefix);
   if (sizeof(buf) == nchars) {
     return;
   }
@@ -125,8 +124,8 @@ static void render_battery() {
   const long long charge_full = get_sys_value_long(buf);
   strncpy(p, "now", maxlen);
   const long long charge_now = get_sys_value_long(buf);
-  if (snprintf(buf, sizeof buf, "%s%s/status", sys_cls_pwr, sys_cls_pwr_bat) ==
-      sizeof(buf)) {
+  if (snprintf(buf, sizeof(buf), "%s%s/status", power_supply_path_prefix,
+               battery_name) == sizeof(buf)) {
     return;
   }
   get_sys_value_str_tolower(buf, buf, sizeof(buf));
@@ -173,7 +172,7 @@ static void render_cpu_load() {
 }
 
 static void render_hello_clonky() {
-  static long long unsigned counter;
+  static long long unsigned counter = 0;
   counter++;
   char bbuf[128];
   snprintf(bbuf, sizeof bbuf, "%llu hello%sclonky", counter,
@@ -193,7 +192,7 @@ static void render_mem_info() {
   long long mem_avail = 0;
   char bbuf[256] = "";
   fgets(bbuf, sizeof(bbuf), file); //	MemTotal:        1937372 kB
-  sscanf(bbuf, "%63s %lld %31s", name, &mem_total, unit);
+  sscanf(bbuf, "%31s %lld %15s", name, &mem_total, unit);
   fgets(bbuf, sizeof(bbuf), file); //	MemFree:           99120 kB
   fgets(bbuf, sizeof(bbuf), file); //	MemAvailable:     887512 kB
   fclose(file);
@@ -209,7 +208,7 @@ static void render_mem_info() {
     mem_total >>= 10;
     strcpy(unit, "MB");
   }
-  snprintf(bbuf, sizeof bbuf, "freemem %llu of %llu %s", mem_avail, mem_total,
+  snprintf(bbuf, sizeof(bbuf), "freemem %llu of %llu %s", mem_avail, mem_total,
            unit);
   dc_newline(dc);
   dc_draw_str(dc, bbuf);
@@ -219,10 +218,10 @@ static void render_net_traffic() {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
   char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
-           graph_net_device);
+           net_device);
   long long wifi_tx = get_sys_value_long(bbuf);
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
-           graph_net_device);
+           net_device);
   long long wifi_rx = get_sys_value_long(bbuf);
   graphd_add_value(graph_net, wifi_tx + wifi_rx);
   graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
@@ -394,8 +393,9 @@ static void render_cpu_throttles() {
 
 static void render_swaps() {
   FILE *file = fopen("/proc/swaps", "r");
-  if (!file)
+  if (!file) {
     return;
+  }
   // Filename         Type       Size     Used   Priority
   // /dev/mmcblk0p3   partition  2096124  16568  s-1
   char bbuf[1024];
@@ -427,7 +427,7 @@ static void auto_config_battery() {
     return;
   }
   struct dirent *entry;
-  *sys_cls_pwr_bat = 0;
+  *battery_name = 0;
   while ((entry = readdir(dir))) {
     if (entry->d_name[0] == '.') {
       // skip hidden files
@@ -444,11 +444,11 @@ static void auto_config_battery() {
       continue;
     }
     // found 'battery'
-    strncpy(sys_cls_pwr_bat, entry->d_name, sizeof(sys_cls_pwr_bat));
+    strncpy(battery_name, entry->d_name, sizeof(battery_name));
 
     //? quirk if it energy_full_design  charge_full_design
     if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
-                 sys_cls_pwr_bat) == sizeof(buf)) {
+                 battery_name) == sizeof(buf)) {
       return;
     }
     if (sys_value_exists(buf)) {
@@ -456,7 +456,7 @@ static void auto_config_battery() {
       break;
     }
     if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/charge_now",
-                 sys_cls_pwr_bat) == sizeof buf) {
+                 battery_name) == sizeof buf) {
       return;
     }
     if (sys_value_exists(buf)) {
@@ -467,11 +467,11 @@ static void auto_config_battery() {
     break;
   }
   closedir(dir);
-  if (!sys_cls_pwr_bat[0]) {
+  if (!battery_name[0]) {
     puts("[!] no battery found in /sys/class/power_supply");
   }
   printf("· battery: ");
-  puts(sys_cls_pwr_bat);
+  puts(battery_name);
   return;
 }
 
@@ -502,7 +502,7 @@ static void auto_config_network_traffic() {
     return;
   }
   struct dirent *entry;
-  graph_net_device[0] = '\0';
+  net_device[0] = '\0';
   while ((entry = readdir(dir))) {
     if (entry->d_name[0] == '.') {
       // ignore hidden files
@@ -510,7 +510,7 @@ static void auto_config_network_traffic() {
     }
     if (is_wlan_device(entry->d_name)) {
       // found wlan device (preferred)
-      strncpy(graph_net_device, entry->d_name, sizeof(graph_net_device));
+      strncpy(net_device, entry->d_name, sizeof(net_device));
       break;
     }
     if (!strcmp("lo", entry->d_name)) {
@@ -518,14 +518,14 @@ static void auto_config_network_traffic() {
       continue;
     }
     // network device (not preferred)
-    strncpy(graph_net_device, entry->d_name, sizeof(graph_net_device));
+    strncpy(net_device, entry->d_name, sizeof(net_device));
   }
   closedir(dir);
-  if (!graph_net_device[0]) {
+  if (!net_device[0]) {
     puts("[!] no network device found in /sys/class/net");
   }
   printf("· network device: ");
-  puts(graph_net_device);
+  puts(net_device);
   return;
 }
 
@@ -588,7 +588,7 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
   return ifc;
 }
 
-int _rend_net_callback(struct ifc *ifc) {
+int render_net_callback(struct ifc *ifc) {
   char buf[1024];
   snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
            ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
@@ -634,7 +634,7 @@ int render_net() {
       }
     }
   }
-  ifcs_for_each(_rend_net_callback);
+  ifcs_for_each(render_net_callback);
   // cleanup:
   freeifaddrs(ifas);
   ifcs_delete();
@@ -670,7 +670,7 @@ static void draw() {
 }
 
 static void signal_exit(int i) {
-  puts("exiting");
+  puts("\nexiting");
   dc_del(dc);
   if (graph_cpu) {
     graph_del(graph_cpu);
@@ -681,23 +681,25 @@ static void signal_exit(int i) {
   if (graph_net) {
     graphd_del(graph_net);
   }
-  signal(SIGINT, SIG_DFL);
-  kill(getpid(), SIGINT);
   exit(i);
 }
 
 int main() {
   signal(SIGINT, signal_exit);
 
-  puts(APP_NAME);
+  puts("clonky system overview");
 
   if (!(dc = dc_new())) {
     exit(1);
   }
+
   dc_set_width(dc, WIDTH);
+
   if (ALIGN == 1) {
+    // align right
     dc_set_left_x(dc, dc_get_screen_width(dc) - WIDTH);
   }
+
   graph_cpu = graph_new(WIDTH);
   graph_mem = graph_new(WIDTH);
   graph_net = graphd_new(WIDTH);
