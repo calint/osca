@@ -17,6 +17,7 @@
 #define WIN_BUMP 59
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
+// xwin.bits
 #define XWIN_BIT_FULL_HEIGHT 1
 #define XWIN_BIT_FULL_WIDTH 2
 #define XWIN_BIT_ALLOCATED 4
@@ -249,16 +250,16 @@ static int _xwin_ix(xwin *this) {
   }
   return -1;
 }
-static int _focus_try(unsigned ix) {
+static bool _focus_try(unsigned ix) {
   xwin *w = &wins[ix];
   if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
     xwin_raise(w);
     xwin_focus(w);
-    return 1;
+    return True;
   }
-  return 0;
+  return False;
 }
-static void desk_show(int dsk, int dskprv) {
+static void desk_show(int dsk, int dsk_prv) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
     if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
@@ -270,7 +271,7 @@ static void desk_show(int dsk, int dskprv) {
     if (xw->win == root) {
       continue;
     }
-    if (xw->desk == dskprv) {
+    if (xw->desk == dsk_prv) {
       xwin_hide(xw);
     }
     if (xw->desk == dsk) {
@@ -321,24 +322,6 @@ static void focus_prev_win() {
     }
   }
   focus_first_win_on_desk();
-}
-static void toggle_fullscreen() {
-  if (!win_focused) {
-    return;
-  }
-  xwin_toggle_fullscreen(win_focused);
-}
-static void toggle_fullheight() {
-  if (!win_focused) {
-    return;
-  }
-  xwin_toggle_fullheight(win_focused);
-}
-static void toggle_fullwidth() {
-  if (!win_focused) {
-    return;
-  }
-  xwin_toggle_fullwidth(win_focused);
 }
 static int error_handler(Display *d, XErrorEvent *e) {
   char buffer_return[1024] = "";
@@ -496,21 +479,24 @@ int main(int argc, char **args, char **env) {
         }
         break;
       case 12: // 3
-        toggle_fullscreen();
+        if (!win_focused) {
+          xwin_toggle_fullscreen(win_focused);
+        }
         break;
       case 13: // 4
-        toggle_fullheight();
+        if (win_focused) {
+          xwin_toggle_fullheight(win_focused);
+        }
         break;
       case 14: // 5
-        toggle_fullwidth();
+        if (win_focused) {
+          xwin_toggle_fullwidth(win_focused);
+        }
         break;
       case 15: // 6
         if (win_focused) {
           xwin_bump(win_focused, 200);
         }
-        break;
-      case 16: // 7
-        system("xii-ide");
         break;
       case 113: // left
         focus_prev_win();
