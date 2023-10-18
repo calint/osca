@@ -29,6 +29,12 @@ static struct graph *graph_cpu;
 static struct graph *graph_mem;
 static struct graphd *graph_net;
 
+// prefix to battery directory
+const char sys_cls_pwr[] = "/sys/class/power_supply/";
+
+// quirk for different kernel names for battery charge indicator
+const char *battery_energy_or_charge_prefix = "";
+
 // auto_config_battery() copies the battery entry in '/sys/class/power_supply'I
 static char sys_cls_pwr_bat[32];
 
@@ -54,6 +60,7 @@ static void get_sys_value_str_tolower(const char *path, char *value,
     p++;
   }
 }
+
 static int get_sys_value_int(const char *path) {
   FILE *file = fopen(path, "r");
   if (!file) {
@@ -64,6 +71,7 @@ static int get_sys_value_int(const char *path) {
   fclose(file);
   return num;
 }
+
 static long long get_sys_value_long(const char *path) {
   FILE *file = fopen(path, "r");
   if (!file) {
@@ -74,30 +82,28 @@ static long long get_sys_value_long(const char *path) {
   fclose(file);
   return num;
 }
+
 static int sys_value_exists(const char *path) {
   const int result = access(path, F_OK);
   return result != -1 ? 1 : 0;
 }
-static void str_compact_spaces(char *s) {
-  char *d = s;
-  if (!*s) {
-    *d = 0;
-    return;
-  }
-  while (*s == ' ') {
-    s++;
+
+static void str_compact_spaces(char *str) {
+  char *d = str;
+  while (*str == ' ') {
+    str++;
   }
   do {
-    *d++ = *s;
-    if (!*s) {
+    *d++ = *str;
+    if (!*str) {
       return;
     }
-    s++;
-    const char is_space = *s == ' ';
-    while (*s == ' ') {
-      s++;
+    str++;
+    const char is_space = *str == ' ';
+    while (*str == ' ') {
+      str++;
     }
-    if (is_space && *s) {
+    if (is_space && *str) {
       *d++ = ' ';
     }
   } while (1);
@@ -106,25 +112,22 @@ static void str_compact_spaces(char *s) {
 
 static void _rend_hr() { dc_draw_hr(dc); }
 
-const char sys_cls_pwr[] = "/sys/class/power_supply/";
-const char *battery_energy_or_charge_prefix = "";
-
 static void _rend_battery() {
   char buf[255] = "";
   const int nchars = snprintf(buf, sizeof(buf), "%s%s/%s_", sys_cls_pwr,
                               sys_cls_pwr_bat, battery_energy_or_charge_prefix);
   if (sizeof(buf) == nchars) {
-    printf("%s %d: probably truncated path: %s\n", __FILE__, __LINE__, buf);
+    return;
   }
   const int maxlen = sizeof(buf) - nchars;
-  char *p = buf + nchars; //? snprintf
+  char *p = buf + nchars;
   strncpy(p, "full", maxlen);
   const long long charge_full = get_sys_value_long(buf);
   strncpy(p, "now", maxlen);
   const long long charge_now = get_sys_value_long(buf);
   if (snprintf(buf, sizeof buf, "%s%s/status", sys_cls_pwr, sys_cls_pwr_bat) ==
       sizeof(buf)) {
-    printf("%s %d: probably truncated path: %s\n", __FILE__, __LINE__, buf);
+    return;
   }
   get_sys_value_str_tolower(buf, buf, sizeof(buf));
   dc_newline(dc);
@@ -132,8 +135,9 @@ static void _rend_battery() {
   snprintf(bbuf, sizeof(bbuf), "battery %s  %lld/%lld mAh", buf,
            charge_now / 1000, charge_full / 1000);
   dc_draw_str(dc, bbuf);
-  if (charge_full)
+  if (charge_full) {
     dc_draw_hr1(dc, WIDTH * charge_now / charge_full);
+  }
 }
 
 static void _rend_cpu_load() {
@@ -171,7 +175,7 @@ static void _rend_cpu_load() {
 static void _rend_hello_clonky() {
   static long long unsigned counter;
   counter++;
-  char bbuf[1024];
+  char bbuf[128];
   snprintf(bbuf, sizeof bbuf, "%llu hello%sclonky", counter,
            counter != 1 ? "s " : " ");
   dc_newline(dc);
@@ -183,18 +187,18 @@ static void _rend_mem_info() {
   if (!file) {
     return;
   }
-  char name[64] = "";
-  char unit[32] = "";
+  char name[32] = "";
+  char unit[16] = "";
   long long mem_total = 0;
   long long mem_avail = 0;
-  char bbuf[1024] = "";
+  char bbuf[256] = "";
   fgets(bbuf, sizeof(bbuf), file); //	MemTotal:        1937372 kB
   sscanf(bbuf, "%63s %lld %31s", name, &mem_total, unit);
   fgets(bbuf, sizeof(bbuf), file); //	MemFree:           99120 kB
   fgets(bbuf, sizeof(bbuf), file); //	MemAvailable:     887512 kB
   fclose(file);
 
-  sscanf(bbuf, "%63s %lld %31s", name, &mem_avail, unit);
+  sscanf(bbuf, "%31s %lld %15s", name, &mem_avail, unit);
   int proc = (mem_total - mem_avail) * 100 / mem_total;
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
@@ -258,7 +262,7 @@ static void _rend_df() {
   if (!f) {
     return;
   }
-  char bbuf[1024] = "";
+  char bbuf[256] = "";
   while (1) {
     if (!fgets(bbuf, sizeof(bbuf), f)) {
       break;
@@ -276,24 +280,27 @@ static void _rend_io_stat() {
   static long long last_kb_read = 0;
   static long long last_kb_written = 0;
 
-  FILE *f = popen("iostat -d", "r");
-  if (!f) {
+  FILE *file = popen("iostat -d", "r");
+  if (!file) {
     return;
   }
   //	Linux 3.11.0-14-generic (vaio) 	03/12/2014 	_x86_64_	(2 CPU)
   //
   //	Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
   //	sda               7.89        25.40        80.46     914108    2896281
-  char bbuf[1024] = "";
-  fgets(bbuf, sizeof(bbuf), f);
-  fgets(bbuf, sizeof(bbuf), f);
-  fgets(bbuf, sizeof(bbuf), f);
-  float tps = 0, kb_read_s = 0, kb_written_s = 0;
-  long long kb_read = 0, kb_written = 0;
-  char dev[64];
-  fscanf(f, "%63s %f %f %f %lld %lld", dev, &tps, &kb_read_s, &kb_written_s,
+  char bbuf[512] = "";
+  fgets(bbuf, sizeof(bbuf), file);
+  fgets(bbuf, sizeof(bbuf), file);
+  fgets(bbuf, sizeof(bbuf), file);
+  float tps = 0;
+  float kb_read_s = 0;
+  float kb_written_s = 0;
+  long long kb_read = 0;
+  long long kb_written = 0;
+  char dev[64] = "";
+  fscanf(file, "%63s %f %f %f %lld %lld", dev, &tps, &kb_read_s, &kb_written_s,
          &kb_read, &kb_written);
-  pclose(f);
+  pclose(file);
   const char *unit = "kB";
   snprintf(bbuf, sizeof(bbuf), "read %lld %s wrote %lld %s",
            kb_read - last_kb_read, unit, kb_written - last_kb_written, unit);
@@ -303,28 +310,29 @@ static void _rend_io_stat() {
 }
 
 static void _rend_dmsg() {
-  FILE *f = popen("journalctl --lines=15 --no-pager", "r");
-  if (!f) {
+  FILE *file = popen("journalctl --lines=15 --no-pager", "r");
+  if (!file) {
     return;
   }
   char bbuf[1024];
   while (1) {
-    if (!fgets(bbuf, sizeof(bbuf), f)) {
+    if (!fgets(bbuf, sizeof(bbuf), file)) {
       break;
     }
     pl(bbuf);
   }
-  pclose(f);
+  pclose(file);
 }
 
 static void _rend_acpi() {
-  FILE *f = popen("acpi -V | grep -vi 'no state information available'", "r");
-  if (!f) {
+  FILE *file =
+      popen("acpi -V | grep -vi 'no state information available'", "r");
+  if (!file) {
     return;
   }
   while (1) {
-    char bbuf[1024];
-    if (!fgets(bbuf, sizeof bbuf, f)) {
+    char bbuf[512];
+    if (!fgets(bbuf, sizeof(bbuf), file)) {
       break;
     }
     for (char *p = bbuf; *p; ++p) {
@@ -332,7 +340,7 @@ static void _rend_acpi() {
     }
     pl(bbuf);
   }
-  pclose(f);
+  pclose(file);
 }
 
 inline static void _rend_date_time() {
@@ -340,34 +348,35 @@ inline static void _rend_date_time() {
   const struct tm *lt = localtime(&t); //? free?
   strb sb;
   strb_init(&sb);
-  if (strb_p(&sb, asctime(lt)))
+  if (strb_p(&sb, asctime(lt))) {
     return;
+  }
   dc_newline(dc);
   dc_draw_str(dc, sb.chars);
 }
 
 static void _rend_cpu_throttles() {
-  FILE *f = fopen("/sys/devices/system/cpu/present", "r");
-  if (!f) {
+  FILE *file = fopen("/sys/devices/system/cpu/present", "r");
+  if (!file) {
     return;
   }
   int min = 0;
   int max = 0;
-  fscanf(f, "%d-%d", &min, &max);
-  fclose(f);
+  fscanf(file, "%d-%d", &min, &max);
+  fclose(file);
 
   strb sb;
   strb_init(&sb);
   if (strb_p(&sb, "throttle "))
     return;
 
-  for (int n = min; n <= max; n++) {
+  for (int i = min; i <= max; i++) {
     char bbuf[512];
     snprintf(bbuf, sizeof bbuf,
-             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", n);
+             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", i);
     const long long max_freq = get_sys_value_long(bbuf);
     snprintf(bbuf, sizeof bbuf,
-             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", n);
+             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", i);
     const long long cur_freq = get_sys_value_long(bbuf);
     strb_p(&sb, " ");
     if (max_freq) {
@@ -384,47 +393,50 @@ static void _rend_cpu_throttles() {
 }
 
 static void _rend_swaps() {
-  FILE *f = fopen("/proc/swaps", "r");
-  if (!f)
+  FILE *file = fopen("/proc/swaps", "r");
+  if (!file)
     return;
   // Filename         Type       Size     Used   Priority
   // /dev/mmcblk0p3   partition  2096124  16568  s-1
   char bbuf[1024];
-  fgets(bbuf, sizeof bbuf, f);
+  fgets(bbuf, sizeof bbuf, file);
   char dev[64] = "";
   char type[32] = "";
-  long long size = 0, used = 0;
-  if (!fscanf(f, "%63s %31s %lld %lld", dev, type, &size, &used)) {
+  long long size = 0;
+  long long used = 0;
+  if (!fscanf(file, "%63s %31s %lld %lld", dev, type, &size, &used)) {
     return;
   }
-  fclose(f);
+  fclose(file);
 
   strb sb;
   strb_init(&sb);
-  if (strb_p(&sb, "swapped "))
+  if (strb_p(&sb, "swapped ")) {
     return;
-  if (strb_fmt_bytes(&sb, used << 10))
+  }
+  if (strb_fmt_bytes(&sb, used << 10)) {
     return;
+  }
   pl(sb.chars);
 }
 
 static void auto_config_battery() {
-  DIR *dp = opendir("/sys/class/power_supply");
-  if (!dp) {
+  DIR *dir = opendir("/sys/class/power_supply");
+  if (!dir) {
     puts("[!] battery: cannot open find dir '/sys/class/power_supply'");
     return;
   }
-  struct dirent *ep;
+  struct dirent *entry;
   *sys_cls_pwr_bat = 0;
-  while ((ep = readdir(dp))) {
-    if (ep->d_name[0] == '.') {
+  while ((entry = readdir(dir))) {
+    if (entry->d_name[0] == '.') {
       // skip hidden files
       continue;
     }
     // find out if type is battery
     char buf[512];
     if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/type",
-                 ep->d_name) == sizeof(buf)) {
+                 entry->d_name) == sizeof(buf)) {
       printf("%s:%d - buffer probably overrun\n", __FILE__, __LINE__);
     }
     get_sys_value_str_tolower(buf, buf, sizeof(buf));
@@ -432,12 +444,12 @@ static void auto_config_battery() {
       continue;
     }
     // found 'battery'
-    strncpy(sys_cls_pwr_bat, ep->d_name, sizeof(sys_cls_pwr_bat));
+    strncpy(sys_cls_pwr_bat, entry->d_name, sizeof(sys_cls_pwr_bat));
 
     //? quirk if it energy_full_design  charge_full_design
     if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
                  sys_cls_pwr_bat) == sizeof(buf)) {
-      printf("%s %d - buffer probably overrun\n", __FILE__, __LINE__);
+      return;
     }
     if (sys_value_exists(buf)) {
       battery_energy_or_charge_prefix = "energy";
@@ -445,7 +457,7 @@ static void auto_config_battery() {
     }
     if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/charge_now",
                  sys_cls_pwr_bat) == sizeof buf) {
-      printf("%s %d - buffer probably overrun\n", __FILE__, __LINE__);
+      return;
     }
     if (sys_value_exists(buf)) {
       battery_energy_or_charge_prefix = "charge";
@@ -454,8 +466,8 @@ static void auto_config_battery() {
     printf("%s %d - energy or charge not resolved\n", __FILE__, __LINE__);
     break;
   }
-  closedir(dp);
-  if (!*sys_cls_pwr_bat) {
+  closedir(dir);
+  if (!sys_cls_pwr_bat[0]) {
     puts("[!] no battery found in /sys/class/power_supply");
   }
   printf("· battery: ");
@@ -464,6 +476,7 @@ static void auto_config_battery() {
 }
 
 static int is_wlan_device(const char *sys_cls_net_wlan) {
+  // build string to file '/sys/class/net/XXX/wireless
   strb sb;
   strb_init(&sb);
   if (strb_p(&sb, "/sys/class/net/")) {
@@ -475,39 +488,39 @@ static int is_wlan_device(const char *sys_cls_net_wlan) {
   if (strb_p(&sb, "/wireless")) {
     return 0;
   }
-  struct stat s;
-  if (stat(sb.chars, &s)) {
+  struct stat st;
+  if (stat(sb.chars, &st)) {
     return 0;
   }
   return 1;
 }
 
 static void auto_config_network_traffic() {
-  DIR *dp = opendir("/sys/class/net");
-  if (!dp) {
+  DIR *dir = opendir("/sys/class/net");
+  if (!dir) {
     puts("[!] wifi: cannot open find dir /sys/class/net");
     return;
   }
-  struct dirent *ep;
+  struct dirent *entry;
   graph_net_device[0] = '\0';
-  while ((ep = readdir(dp))) {
-    if (ep->d_name[0] == '.') {
+  while ((entry = readdir(dir))) {
+    if (entry->d_name[0] == '.') {
       // ignore hidden files
       continue;
     }
-    if (is_wlan_device(ep->d_name)) {
+    if (is_wlan_device(entry->d_name)) {
       // found wlan device (preferred)
-      strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
+      strncpy(graph_net_device, entry->d_name, sizeof(graph_net_device));
       break;
     }
-    if (!strcmp("lo", ep->d_name)) {
+    if (!strcmp("lo", entry->d_name)) {
       // skip loopback
       continue;
     }
     // network device (not preferred)
-    strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
+    strncpy(graph_net_device, entry->d_name, sizeof(graph_net_device));
   }
-  closedir(dp);
+  closedir(dir);
   if (!graph_net_device[0]) {
     puts("[!] no network device found in /sys/class/net");
   }
@@ -577,8 +590,8 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
 
 int _rend_net_callback(struct ifc *ifc) {
   char buf[1024];
-  snprintf(buf, sizeof(buf), "%s  %s  %llu/%llu KB", ifc->name,
-           ifc->hostname ? "up" : "down", ifc->tx_bytes >> 10,
+  snprintf(buf, sizeof(buf), "%s  %s  %llu/%llu MB", ifc->name,
+           ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
            ifc->rx_bytes >> 10);
   dc_newline(dc);
   dc_draw_str(dc, buf);
