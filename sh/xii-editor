@@ -1,1 +1,2 @@
-$XE&
+#!/bin/sh
+leafpad &

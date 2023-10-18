@@ -1,1 +1,2 @@
-$XM&
+#!/bin/sh
+vlc &

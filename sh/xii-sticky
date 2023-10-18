@@ -1,1 +1,2 @@
-$XX &
+#!/bin/sh
+$OSCA/stickyo/stickyo &

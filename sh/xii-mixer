@@ -1,1 +1,3 @@
-$XV&
+#!/bin/sh
+xterm -e alsamixer &
+

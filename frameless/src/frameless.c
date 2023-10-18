@@ -456,10 +456,10 @@ int main(int argc, char **args, char **env) {
         system("xii-screenshot");
         break;
       case 24: // q
-        system("xii-qbin");
+        system("xii-bin");
         break;
       case 31: // i
-        system("xii-browser");
+        system("xii-internet");
         break;
       case 58: // m
         system("xii-media");

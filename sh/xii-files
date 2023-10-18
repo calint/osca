@@ -1,1 +1,2 @@
-$XF&
+#!/bin/sh
+thunar &

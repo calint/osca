@@ -1,0 +1,2 @@
+#!/bin/sh
+$OSCA/menuq/menuq &
