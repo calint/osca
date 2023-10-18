@@ -8,7 +8,7 @@
 #define DELTA_Y_HR 3
 
 // start of clonky outputs
-#define Y_TOP 0
+#define TOP_Y 0
 
 // width of clonky output
 #define WIDTH 150

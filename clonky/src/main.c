@@ -629,7 +629,7 @@ int _rend_net() {
 }
 
 static void draw() {
-  dc_set_y(dc, Y_TOP);
+  dc_set_y(dc, TOP_Y);
   dc_clear(dc);
   _rend_date_time();
   _rend_cpu_load();
