@@ -39,6 +39,7 @@ typedef struct xwin {
   int desk_x;  // x coord of window before folded at desk switch
   char bits;   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
 } xwin;
+
 static xwin wins[WIN_MAX_COUNT];
 static FILE *flog; // log file
 static Display *dpy;
@@ -48,9 +49,15 @@ static unsigned xwin_count;
 static struct scr {
   int id, wi, hi;
 } scr;
+// current key pressed
 static unsigned key_pressed;
+// current focused window
 static xwin *win_focused;
+// dragging state
 static bool is_dragging;
+static int dragging_start_x;
+static int dragging_start_y;
+static int dragging_button;
 // static char *ix_evnames[LASTEvent] = {
 //     "unknown",          "unknown",       // 0
 //     "KeyPress",         "KeyRelease",    // 2
@@ -369,9 +376,6 @@ int main(int argc, char **args, char **env) {
 
   int dsk_prv = 0;
   xwin *xw = NULL;
-  XButtonEvent button_start;
-  memset(&button_start, 0, sizeof(button_start));
-
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
     // fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
@@ -551,14 +555,17 @@ int main(int argc, char **args, char **env) {
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
       xwin_raise(xw);
       xwin_read_geom(xw);
-      button_start = ev.xbutton;
+      dragging_start_x = ev.xbutton.x_root;
+      dragging_start_y = ev.xbutton.y_root;
+      dragging_button = ev.xbutton.button;
       break;
     case MotionNotify:
       while (XCheckTypedEvent(dpy, MotionNotify, &ev))
         ;
-      int xdiff = ev.xbutton.x_root - button_start.x_root;
-      int ydiff = ev.xbutton.y_root - button_start.y_root;
-      button_start = ev.xbutton;
+      int xdiff = ev.xbutton.x_root - dragging_start_x;
+      int ydiff = ev.xbutton.y_root - dragging_start_y;
+      dragging_start_x = ev.xbutton.x_root;
+      dragging_start_y = ev.xbutton.y_root;
       int nx = xw->x + xdiff;
       int nw = xw->wi + xdiff;
       int ny = xw->y + ydiff;
@@ -571,7 +578,7 @@ int main(int argc, char **args, char **env) {
         ny = -WIN_BORDER_WIDTH;
         nh = scr.hi;
       }
-      if (button_start.button == 3) {
+      if (dragging_button == 3) {
         if (nw < 0) {
           nw = 0;
         }
