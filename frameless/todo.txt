@@ -1,3 +1,5 @@
 [ ] gracious handle of max windows reached
 [ ] dynamic allocation of more xwins
+[ ] enable -Wconversion and fix
+--------------------------------------------------------------
 [x] consolidate xwin.vh and bits into one field

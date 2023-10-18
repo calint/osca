@@ -9,6 +9,7 @@ BIN=frameless
 SRC=src/frameless.c
 OPTS="-Os -pedantic-errors -Wfatal-errors"
 WARNINGS="-Wall -Wextra -Wno-unused-result"
+        # -Wconversion 
 LIBS="-lX11"
 
 echo
