@@ -20,37 +20,37 @@ contains:
 ```
 
             lines   words   chars
-   source:    621    1870   16702
-   zipped:     18     102    4102
+   source:    652    1898   17213
+   zipped:     15      92    4146
 
--rwxrwxr-x 1 c 21952 okt 18 02:40 frameless
+-rwxrwxr-x 1 c 22112 okt 18 04:36 frameless
 
 
             lines   words   chars
-   source:   1031    3434   27806
-   zipped:     32     167    7286
+   source:   1030    3436   27793
+   zipped:     24     176    7289
 
--rwxrwxr-x 1 c 37384 okt 18 02:40 clonky
+-rwxrwxr-x 1 c 37384 okt 18 04:36 clonky
 
 
             lines   words   chars
    source:    122     429    3744
-wc zipped:      1      25    1227
+   zipped:      1      25    1227
 
--rwxrwxr-x 1 c 16544 okt 18 02:40 menuq
+-rwxrwxr-x 1 c 16544 okt 18 04:36 menuq
 
 
             lines   words   chars
    source:     54     128    1748
    zipped:      2      19     821
 
--rwxrwxr-x 1 c 16960 okt 18 02:40 stickyo
+-rwxrwxr-x 1 c 16960 okt 18 04:36 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 18 02:40 snap
+-rwxrwxr-x 1 c 16144 okt 18 04:36 snap
 
 ```
