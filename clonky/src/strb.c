@@ -11,22 +11,24 @@ inline size_t strb_rem(strb *o) {
 inline int strb_p(strb *o, const char *str) {
   const size_t remaining = strb_rem(o);
   const int n = snprintf(o->chars + o->index, remaining, "%s", str);
-  if (n < 0)
+  if (n < 0) {
     return -1;
+  }
   o->index += n;
   const size_t remaining2 = strb_rem(o);
-  if (remaining2 < 1)
+  if (remaining2 < 1) {
     return -2;
-  //	printf("index:%zd  remaining:%zd
-  // string:'%s'\n",o->index,remaining2,o->chars);
+  }
   return 0;
 }
+
 inline int strb_fmt_long(strb *o, const long long n) {
   char s[32];
   snprintf(s, sizeof s, "%lld", n);
   strb_p(o, s);
   return 0;
 }
+
 int strb_fmt_bytes(strb *o, long long bytes) {
   const long long kb = bytes >> 10;
   if (kb == 0) {

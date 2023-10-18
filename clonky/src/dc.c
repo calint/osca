@@ -51,6 +51,7 @@ struct dc *dc_new() {
   return this;
 }
 void dc_del(struct dc *this) {
+  puts("· deleting dc");
   XftDrawDestroy(this->draw);
   XftFontClose(this->dpy, this->font);
   XFree(this->gc);

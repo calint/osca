@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "ifaddrs.h": "c",
+        "dirent.h": "c",
+        "if_link.h": "c",
+        "netdb.h": "c",
+        "time.h": "c"
     }
 }

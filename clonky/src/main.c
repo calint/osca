@@ -1,16 +1,22 @@
 #define _XOPEN_SOURCE 500
+#define _GNU_SOURCE /* To get defns of NI_MAXSERV and NI_MAXHOST */
+
 #include "dc.h"
 #include "graph.h"
 #include "graphd.h"
 #include "main-cfg.h"
-#include "net.h"
 #include "strb.h"
+#include <arpa/inet.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <ifaddrs.h>
+#include <linux/if_link.h>
+#include <netdb.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
@@ -19,9 +25,9 @@
 #define APP_NAME "clonky system overview"
 
 static struct dc *dc;
-static struct graph *graphcpu;
-static struct graph *graphmem;
-static struct graphd *graphwifi;
+static struct graph *graph_cpu;
+static struct graph *graph_mem;
+static struct graphd *graph_wifi;
 
 static char sys_cls_pwr_bat[64];
 static char sys_cls_net_wlan[64];
@@ -151,10 +157,10 @@ static void _rend_cpu_load() {
   const int dusage = usage - cpu_usage_last;
   cpu_usage_last = usage;
   const int usagepercent = dusage * 100 / dtotal;
-  graph_add_value(graphcpu, usagepercent);
+  graph_add_value(graph_cpu, usagepercent);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
-  graph_draw2(graphcpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
+  graph_draw2(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
 
 static void _rend_hello_clonky() {
@@ -183,10 +189,10 @@ static void _rend_mem_info() {
 
   sscanf(bbuf, "%64s %lld %32s", name, &mem_avail, unit);
   int proc = (mem_total - mem_avail) * 100 / mem_total;
-  graph_add_value(graphmem, proc);
+  graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
-  graph_draw(graphmem, dc, 2);
+  graph_draw(graph_mem, dc, 2);
   if (mem_avail >> 10 != 0) {
     mem_avail >>= 10;
     mem_total >>= 10;
@@ -201,14 +207,14 @@ static void _rend_mem_info() {
 static void _rend_wifi_traffic() {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
   char bbuf[1024];
-  snprintf(bbuf, sizeof bbuf, "/sys/class/net/%s/statistics/tx_bytes",
+  snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
            sys_cls_net_wlan);
   long long wifi_tx = get_sys_value_long(bbuf);
-  snprintf(bbuf, sizeof bbuf, "/sys/class/net/%s/statistics/rx_bytes",
+  snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
            sys_cls_net_wlan);
   long long wifi_rx = get_sys_value_long(bbuf);
-  graphd_add_value(graphwifi, wifi_tx + wifi_rx);
-  graphd_draw(graphwifi, dc, DEFAULT_GRAPH_HEIGHT, WIFI_GRAPH_MAX);
+  graphd_add_value(graph_wifi, wifi_tx + wifi_rx);
+  graphd_draw(graph_wifi, dc, DEFAULT_GRAPH_HEIGHT, WIFI_GRAPH_MAX);
 }
 
 static void pl(const char *str) {
@@ -232,11 +238,11 @@ static void _rend_cheetsheet() {
       "+4           full height", "+5            full width",
       "+6   i-am-bored-surprise", "...                  ...", NULL};
 
-  char **strptr = keysheet;
-  while (*strptr) {
+  char **str_ptr = keysheet;
+  while (*str_ptr) {
     dc_newline(dc);
-    dc_draw_str(dc, *strptr);
-    strptr++;
+    dc_draw_str(dc, *str_ptr);
+    str_ptr++;
   }
 }
 
@@ -495,6 +501,113 @@ static void auto_config() {
   auto_config_wifi();
 }
 
+static struct ifc {
+  /*ref*/ const char *name;
+  unsigned long long rx_bytes, tx_bytes;
+  /*own*/ char *hostname;
+  /*ref*/ struct ifc *next;
+} *ifcs;
+
+// static struct ifc*ifcs;
+static void ifcs_delete() {
+  struct ifc *ifc = ifcs;
+  while (ifc != NULL) {
+    free(ifc->hostname);
+    struct ifc *nxt = ifc->next;
+    free(ifc);
+    ifc = nxt;
+  }
+  ifcs = NULL;
+}
+
+static void ifcs_for_each(int f(struct ifc *)) {
+  struct ifc *ifc = ifcs;
+  while (ifc != NULL) {
+    const int ret = f(ifc);
+    if (ret) {
+      break;
+    }
+    ifc = ifc->next;
+  }
+}
+
+static void ifcs_add_first(/*takes*/ struct ifc *ifc) {
+  if (ifcs) {
+    ifc->next = ifcs;
+    ifcs = ifc;
+    return;
+  }
+  ifcs = ifc;
+  ifc->next = NULL;
+}
+
+static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
+  struct ifc *ifc = ifcs;
+  while (ifc != NULL) {
+    if (!strncmp(ifc->name, name, NI_MAXHOST)) {
+      return ifc;
+    }
+    ifc = ifc->next;
+  }
+  ifc = (struct ifc *)calloc(1, sizeof(struct ifc));
+  ifc->name = name;
+  ifcs_add_first(/*give*/ ifc);
+  return ifc;
+}
+
+int _rend_net_callback(struct ifc *ifc) {
+  char buf[1024];
+  snprintf(buf, sizeof(buf), "%s  %s  %llu/%llu KB", ifc->name,
+           ifc->hostname ? "up" : "down", ifc->tx_bytes >> 10,
+           ifc->rx_bytes >> 10);
+  dc_newline(dc);
+  dc_draw_str(dc, buf);
+  return 0;
+}
+
+int _rend_net() {
+  struct ifaddrs *ifas, *ifa;
+  if (getifaddrs(&ifas) == -1) {
+    perror("getifaddrs");
+    return -1;
+  }
+  ifa = ifas;
+  int ret = 0;
+  for (int i = 0; ifa != NULL; ifa = ifa->ifa_next, i++) {
+    if (ifa->ifa_addr == NULL) {
+      continue;
+    }
+    const int family = ifa->ifa_addr->sa_family;
+    const char *name = ifa->ifa_name;
+    struct ifc *ifc = ifcs_get_by_name(name);
+    if (family == AF_PACKET && ifa->ifa_data != NULL) {
+      struct rtnl_link_stats *stats = ifa->ifa_data;
+      ifc->rx_bytes = stats->rx_bytes;
+      ifc->tx_bytes = stats->tx_bytes;
+    }
+    //		if(family==AF_INET||family==AF_INET6){
+    if (family == AF_INET) {
+      ifc->hostname = malloc(NI_MAXHOST);
+      const int name_info =
+          getnameinfo(ifa->ifa_addr,
+                      family == AF_INET ? sizeof(struct sockaddr_in)
+                                        : sizeof(struct sockaddr_in6),
+                      ifc->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+      if (name_info != 0) {
+        //				printf("%s",gai_strerror(s));
+        //				ret=-2;
+        //				goto cleanup;
+        continue;
+      }
+    }
+  }
+  ifcs_for_each(_rend_net_callback);
+  // cleanup:
+  freeifaddrs(ifas);
+  ifcs_delete();
+  return ret;
+}
+
 static void on_draw() {
   dc_set_y(dc, Y_TOP);
   dc_clear(dc);
@@ -504,7 +617,7 @@ static void on_draw() {
   _rend_mem_info();
   _rend_swaps();
   _rend_wifi_traffic();
-  net_main(dc);
+  _rend_net();
   _rend_hr();
   _rend_io_stat();
   _rend_df();
@@ -526,14 +639,14 @@ static void on_draw() {
 static void signal_exit(int i) {
   puts("exiting");
   dc_del(dc);
-  if (graphcpu) {
-    graph_del(graphcpu);
+  if (graph_cpu) {
+    graph_del(graph_cpu);
   }
-  if (graphmem) {
-    graph_del(graphmem);
+  if (graph_mem) {
+    graph_del(graph_mem);
   }
-  if (graphwifi) {
-    graphd_del(graphwifi);
+  if (graph_wifi) {
+    graphd_del(graph_wifi);
   }
   signal(SIGINT, SIG_DFL);
   kill(getpid(), SIGINT);
@@ -552,9 +665,9 @@ int main() {
   if (ALIGN == 1) {
     dc_set_left_x(dc, dc_get_screen_width(dc) - WIDTH);
   }
-  graphcpu = graph_new(WIDTH);
-  graphmem = graph_new(WIDTH);
-  graphwifi = graphd_new(WIDTH);
+  graph_cpu = graph_new(WIDTH);
+  graph_mem = graph_new(WIDTH);
+  graph_wifi = graphd_new(WIDTH);
 
   auto_config();
 
