@@ -455,7 +455,7 @@ int main(int argc, char **args, char **env) {
       case 26: // e
         system("xii-editor");
         break;
-      case 72: // F6 toggle mute
+      case 72: // F6
         system("xii-vol-toggle");
         break;
       case 68: // F2
@@ -510,7 +510,6 @@ int main(int argc, char **args, char **env) {
       case 16: // 7
         system("xii-ide");
         break;
-        //			case 27://r
       case 113: // left
         focus_prev_win();
         break;
