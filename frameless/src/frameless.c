@@ -27,6 +27,7 @@
 #define XWIN_BIT_FULL_WIDTH 2
 #define XWIN_BIT_ALLOCATED 4
 #define XWIN_BITS_FULL_SCREEN 3
+#define XWIN_MIN_WIDTH_HEIGHT 4
 
 typedef struct xwin {
   Window win;  // x11 window handle
@@ -178,8 +179,8 @@ static void xwin_thinner(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
   this->wi = ((this->wi << 1) + this->wi) >> 2;
-  if (this->wi < 4) {
-    this->wi = 4;
+  if (this->wi < XWIN_MIN_WIDTH_HEIGHT) {
+    this->wi = XWIN_MIN_WIDTH_HEIGHT;
   }
   printf("*** %d\n", this->wi);
   this->x = this->x - ((this->wi - wi_prv) >> 1);
@@ -609,11 +610,11 @@ int main(int argc, char **args, char **env) {
         new_hi = scr.hi;
       }
       if (dragging_button == 3) {
-        if (new_wi < 1) {
-          new_wi = 1;
+        if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
+          new_wi = XWIN_MIN_WIDTH_HEIGHT;
         }
-        if (new_hi < 1) {
-          new_hi = 1;
+        if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
+          new_hi = XWIN_MIN_WIDTH_HEIGHT;
         }
         xw->wi = new_wi;
         xw->hi = new_hi;
