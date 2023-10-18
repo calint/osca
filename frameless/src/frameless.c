@@ -99,17 +99,6 @@ static void xwin_focus(xwin *this) {
   win_focused = this;
 }
 static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
-static void xwin_focus_first_on_desk() {
-  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    xwin *w = &wins[i];
-    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
-      xwin_raise(w);
-      xwin_focus(w);
-      return;
-    }
-  }
-  win_focused = NULL;
-}
 static xwin *_win_find(Window w) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].win == w)
@@ -264,7 +253,38 @@ static int _focus_try(unsigned ix) {
   }
   return 0;
 }
-static void xwin_focus_next() {
+static void desk_show(int dsk, int dskprv) {
+  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+    xwin *xw = &wins[i];
+    if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
+      continue;
+    }
+    if (xw->win == 0) {
+      continue;
+    }
+    if (xw->win == root) {
+      continue;
+    }
+    if (xw->desk == dskprv) {
+      xwin_hide(xw);
+    }
+    if (xw->desk == dsk) {
+      xwin_show(xw);
+    }
+  }
+}
+static void focus_first_win_on_desk() {
+  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+    xwin *w = &wins[i];
+    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
+      xwin_raise(w);
+      xwin_focus(w);
+      return;
+    }
+  }
+  win_focused = NULL;
+}
+static void focus_next_win() {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
@@ -279,9 +299,9 @@ static void xwin_focus_next() {
     }
     i++;
   }
-  xwin_focus_first_on_desk();
+  focus_first_win_on_desk();
 }
-static void xwin_focus_prev() {
+static void focus_prev_win() {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (--i >= 0) {
@@ -295,7 +315,7 @@ static void xwin_focus_prev() {
       return;
     }
   }
-  xwin_focus_first_on_desk();
+  focus_first_win_on_desk();
 }
 static void toggle_fullscreen() {
   if (!win_focused) {
@@ -314,27 +334,6 @@ static void toggle_fullwidth() {
     return;
   }
   xwin_toggle_fullwidth(win_focused);
-}
-static void desk_show(int dsk, int dskprv) {
-  int n;
-  for (n = 0; n < WIN_MAX_COUNT; n++) {
-    xwin *xw = &wins[n];
-    if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
-      continue;
-    }
-    if (xw->win == 0) {
-      continue;
-    }
-    if (xw->win == root) {
-      continue;
-    }
-    if (xw->desk == dskprv) {
-      xwin_hide(xw);
-    }
-    if (xw->desk == dsk) {
-      xwin_show(xw);
-    }
-  }
 }
 static int error_handler(Display *d, XErrorEvent *e) {
   char buffer_return[1024] = "";
@@ -493,11 +492,11 @@ int main(int argc, char **args, char **env) {
         break;
         //			case 27://r
       case 113: // left
-        xwin_focus_prev();
+        focus_prev_win();
         break;
       case 52:  // z
       case 114: // right
-        xwin_focus_next();
+        focus_next_win();
         break;
       case 119: // del
         XKillClient(dpy, ev.xkey.subwindow);
