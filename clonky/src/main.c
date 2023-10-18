@@ -110,9 +110,9 @@ static void str_compact_spaces(char *str) {
   *d = 0;
 }
 
-static void _rend_hr() { dc_draw_hr(dc); }
+static void render_hr() { dc_draw_hr(dc); }
 
-static void _rend_battery() {
+static void render_battery() {
   char buf[255] = "";
   const int nchars = snprintf(buf, sizeof(buf), "%s%s/%s_", sys_cls_pwr,
                               sys_cls_pwr_bat, battery_energy_or_charge_prefix);
@@ -140,7 +140,7 @@ static void _rend_battery() {
   }
 }
 
-static void _rend_cpu_load() {
+static void render_cpu_load() {
   static int cpu_total_last = 0;
   static int cpu_usage_last = 0;
 
@@ -172,7 +172,7 @@ static void _rend_cpu_load() {
   graph_draw2(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
 
-static void _rend_hello_clonky() {
+static void render_hello_clonky() {
   static long long unsigned counter;
   counter++;
   char bbuf[128];
@@ -182,7 +182,7 @@ static void _rend_hello_clonky() {
   dc_draw_str(dc, bbuf);
 }
 
-static void _rend_mem_info() {
+static void render_mem_info() {
   FILE *file = fopen("/proc/meminfo", "r");
   if (!file) {
     return;
@@ -215,7 +215,7 @@ static void _rend_mem_info() {
   dc_draw_str(dc, bbuf);
 }
 
-static void _rend_net_traffic() {
+static void render_net_traffic() {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
   char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
@@ -233,7 +233,7 @@ static void pl(const char *str) {
   dc_draw_str(dc, str);
 }
 
-static void _rend_cheetsheet() {
+static void render_cheetsheet() {
   static char *keysheet[] = {
       "ĸey", "+c               console", "+f                 files",
       "+e                editor", "+m                 media",
@@ -257,7 +257,7 @@ static void _rend_cheetsheet() {
   }
 }
 
-static void _rend_df() {
+static void render_df() {
   FILE *f = popen("df -h 2>/dev/null", "r");
   if (!f) {
     return;
@@ -276,7 +276,7 @@ static void _rend_df() {
   pclose(f);
 }
 
-static void _rend_io_stat() {
+static void render_io_stat() {
   static long long last_kb_read = 0;
   static long long last_kb_written = 0;
 
@@ -309,7 +309,7 @@ static void _rend_io_stat() {
   last_kb_written = kb_written;
 }
 
-static void _rend_dmsg() {
+static void render_dmsg() {
   FILE *file = popen("journalctl --lines=15 --no-pager", "r");
   if (!file) {
     return;
@@ -324,7 +324,7 @@ static void _rend_dmsg() {
   pclose(file);
 }
 
-static void _rend_acpi() {
+static void render_acpi() {
   FILE *file =
       popen("acpi -V | grep -vi 'no state information available'", "r");
   if (!file) {
@@ -343,7 +343,7 @@ static void _rend_acpi() {
   pclose(file);
 }
 
-inline static void _rend_date_time() {
+inline static void render_date_time() {
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t); //? free?
   strb sb;
@@ -355,7 +355,7 @@ inline static void _rend_date_time() {
   dc_draw_str(dc, sb.chars);
 }
 
-static void _rend_cpu_throttles() {
+static void render_cpu_throttles() {
   FILE *file = fopen("/sys/devices/system/cpu/present", "r");
   if (!file) {
     return;
@@ -392,7 +392,7 @@ static void _rend_cpu_throttles() {
   pl(sb.chars);
 }
 
-static void _rend_swaps() {
+static void render_swaps() {
   FILE *file = fopen("/proc/swaps", "r");
   if (!file)
     return;
@@ -598,7 +598,7 @@ int _rend_net_callback(struct ifc *ifc) {
   return 0;
 }
 
-int _rend_net() {
+int render_net() {
   struct ifaddrs *ifas, *ifa;
   if (getifaddrs(&ifas) == -1) {
     perror("getifaddrs");
@@ -644,28 +644,28 @@ int _rend_net() {
 static void draw() {
   dc_set_y(dc, TOP_Y);
   dc_clear(dc);
-  _rend_date_time();
-  _rend_cpu_load();
-  _rend_hello_clonky();
-  _rend_mem_info();
-  _rend_swaps();
-  _rend_net_traffic();
-  _rend_net();
-  _rend_hr();
-  _rend_io_stat();
-  _rend_df();
-  _rend_hr();
-  _rend_cpu_throttles();
-  _rend_battery();
-  _rend_hr();
-  _rend_acpi(dc);
-  _rend_hr();
-  _rend_dmsg();
-  _rend_hr();
-  _rend_hr();
-  _rend_cheetsheet();
-  _rend_hr();
-  _rend_hr();
+  render_date_time();
+  render_cpu_load();
+  render_hello_clonky();
+  render_mem_info();
+  render_swaps();
+  render_net_traffic();
+  render_net();
+  render_hr();
+  render_io_stat();
+  render_df();
+  render_hr();
+  render_cpu_throttles();
+  render_battery();
+  render_hr();
+  render_acpi(dc);
+  render_hr();
+  render_dmsg();
+  render_hr();
+  render_hr();
+  render_cheetsheet();
+  render_hr();
+  render_hr();
   dc_flush(dc);
 }
 
