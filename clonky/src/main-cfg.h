@@ -1,12 +1,22 @@
 #ifndef CLONKY_CFG_H
 #define CLONKY_CFG_H
 
-#define WIFI_GRAPH_MAX 128 * 1024
+// the y-values of the graph 1 MB
+#define NET_GRAPH_MAX 1024 * 1024
+
+// the size of a separator
 #define DELTA_Y_HR 3
+
+// start of clonky outputs
 #define Y_TOP 0
+
+// width of clonky output
 #define WIDTH 150
+
 // align left (0) or right (1) of the screen
 #define ALIGN 0
+
+// pixels of default graphs
 #define DEFAULT_GRAPH_HEIGHT 25
 
 #endif

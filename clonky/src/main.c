@@ -221,7 +221,7 @@ static void _rend_net_traffic() {
            graph_net_device);
   long long wifi_rx = get_sys_value_long(bbuf);
   graphd_add_value(graph_net, wifi_tx + wifi_rx);
-  graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, WIFI_GRAPH_MAX);
+  graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
 
 static void pl(const char *str) {
