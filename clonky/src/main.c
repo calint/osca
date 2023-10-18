@@ -365,10 +365,15 @@ static void _rend_cpu_throttles() {
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", n);
     const long long cur_freq = get_sys_value_long(bbuf);
     strb_p(&sb, " ");
-    const long long proc = max_freq == 0 ? 0 : (cur_freq * 100) / max_freq;
-    strb_fmt_long(&sb, proc);
-    strb_p(&sb, "%");
-    //		printf("%d  %lld    %lld   %lld\n",n,proc,cur_freq,max_freq);
+    if (max_freq) {
+      // if available render percent of max frequency
+      const long long proc = (cur_freq * 100) / max_freq;
+      strb_fmt_long(&sb, proc);
+      strb_p(&sb, "%");
+    } else {
+      // max frequency not available
+      strb_p(&sb, "n/a");
+    }
   }
   pl(sb.chars);
 }
@@ -377,9 +382,8 @@ static void _rend_swaps() {
   FILE *f = fopen("/proc/swaps", "r");
   if (!f)
     return;
-  //	Filename				Type		Size	Used
-  // Priority 	/dev/mmcblk0p3                          partition	2096124
-  // 16568 -1
+  // Filename         Type       Size     Used   Priority
+  // /dev/mmcblk0p3   partition  2096124  16568  s-1
   char bbuf[1024];
   fgets(bbuf, sizeof bbuf, f);
   char dev[64], type[32];
