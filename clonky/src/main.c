@@ -87,25 +87,28 @@ static int sys_value_exists(const char *path) {
 }
 
 static void str_compact_spaces(char *str) {
-  char *d = str;
+  // "   a  b c  "
+  char *dst = str;
   while (*str == ' ') {
     str++;
   }
-  do {
-    *d++ = *str;
+  // "a  b c  "
+  while (1) {
+    *dst++ = *str;
     if (!*str) {
+      // "a b c "
       return;
     }
     str++;
-    const char is_space = *str == ' ';
+    int is_spc = 0;
     while (*str == ' ') {
       str++;
+      is_spc++;
     }
-    if (is_space && *str) {
-      *d++ = ' ';
+    if (is_spc) {
+      *dst++ = ' ';
     }
-  } while (1);
-  *d = '\0';
+  }
 }
 
 static void render_hr() { dc_draw_hr(dc); }
@@ -593,6 +596,7 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
 
 int render_net_callback(struct ifc *ifc) {
   char buf[1024];
+  // >> 20 to convert bytes to MB
   snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
            ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
            ifc->rx_bytes >> 20);
@@ -644,6 +648,21 @@ int render_net() {
   return ret;
 }
 
+static void signal_exit(int i) {
+  puts("\nexiting");
+  dc_del(dc);
+  if (graph_cpu) {
+    graph_del(graph_cpu);
+  }
+  if (graph_mem) {
+    graph_del(graph_mem);
+  }
+  if (graph_net) {
+    graphd_del(graph_net);
+  }
+  exit(i);
+}
+
 static void draw() {
   dc_set_y(dc, TOP_Y);
   dc_clear(dc);
@@ -670,21 +689,6 @@ static void draw() {
   render_hr();
   render_hr();
   dc_flush(dc);
-}
-
-static void signal_exit(int i) {
-  puts("\nexiting");
-  dc_del(dc);
-  if (graph_cpu) {
-    graph_del(graph_cpu);
-  }
-  if (graph_mem) {
-    graph_del(graph_mem);
-  }
-  if (graph_net) {
-    graphd_del(graph_net);
-  }
-  exit(i);
 }
 
 int main() {
