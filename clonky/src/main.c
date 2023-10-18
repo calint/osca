@@ -332,7 +332,7 @@ static void _rend_acpi() {
   pclose(f);
 }
 
-inline static void _rend_datetime() {
+inline static void _rend_date_time() {
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t); //? free?
   strb sb;
@@ -489,7 +489,7 @@ static void auto_config_network_traffic() {
       strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
       break;
     }
-    if (strcmp("lo", ep->d_name)) {
+    if (!strcmp("lo", ep->d_name)) {
       // skip loopback
       continue;
     }
@@ -620,7 +620,7 @@ int _rend_net() {
 static void draw() {
   dc_set_y(dc, Y_TOP);
   dc_clear(dc);
-  _rend_datetime();
+  _rend_date_time();
   _rend_cpu_load();
   _rend_hello_clonky();
   _rend_mem_info();
