@@ -15,7 +15,7 @@ echo
 echo    "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
-echo -n "wc zipped:"
+echo -n "   zipped:"
 cat $SRC | gzip | wc
 echo && ls -o $BIN
 echo

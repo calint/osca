@@ -1,6 +1,4 @@
-#define APP "clonky system overview"
 #define _XOPEN_SOURCE 500
-// #include"tmr.h"
 #include "dc.h"
 #include "graph.h"
 #include "graphd.h"
@@ -15,6 +13,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#define APP "clonky system overview"
 static struct dc *dc;
 static struct graph *graphcpu;
 static struct graph *graphmem;
@@ -119,13 +118,13 @@ static void strcompactspaces(char *s) {
 //
 //	if(!strcmp(operstate,"up")){
 //		snprintf(bbuf,bbuf_len,"%s %s %lld/%lld
-//KB",filename,operstate,tx>>10,rx>>10); 	}else if(!strcmp(operstate,"dormant")){
-//		snprintf(bbuf,bbuf_len,"%s %s",filename,operstate);
-//	}else if(!strcmp(operstate,"down")){
+// KB",filename,operstate,tx>>10,rx>>10); 	}else
+// if(!strcmp(operstate,"dormant")){ 		snprintf(bbuf,bbuf_len,"%s
+//%s",filename,operstate); 	}else if(!strcmp(operstate,"down")){
 //		snprintf(bbuf,bbuf_len,"%s %s",filename,operstate);
 //	}else if(!strcmp(operstate,"unknown")){
 //		snprintf(bbuf,bbuf_len,"%s %s %lld/%lld
-//KB",filename,operstate,tx>>10,rx>>10);
+// KB",filename,operstate,tx>>10,rx>>10);
 //	}
 //	dccr(dc);
 //	dcdrwstr(dc,bbuf);
@@ -351,7 +350,7 @@ static void _renddmsg() {
 }
 static void _rendacpi() {
   //	FILE*f=popen("acpi -batc|grep -vi 'no state information
-  //available'","r");
+  // available'","r");
   FILE *f = popen("acpi -V|grep -vi 'no state information available'", "r");
   if (!f)
     return;
@@ -413,8 +412,8 @@ static void _rendswaps() {
   if (!f)
     return;
   //	Filename				Type		Size	Used
-  //Priority 	/dev/mmcblk0p3                          partition	2096124	16568
-  //-1
+  // Priority 	/dev/mmcblk0p3                          partition	2096124
+  // 16568 -1
   char bbuf[1024];
   fgets(bbuf, sizeof bbuf, f);
   char dev[64], type[32];
