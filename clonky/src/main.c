@@ -350,6 +350,7 @@ inline static void render_date_time() {
   if (strb_p(&sb, asctime(lt))) {
     return;
   }
+  // delete the '\n' that asctime writes at the end of the string
   strb_back(&sb);
   dc_newline(dc);
   dc_draw_str(dc, sb.chars);
@@ -367,8 +368,9 @@ static void render_cpu_throttles() {
 
   strb sb;
   strb_init(&sb);
-  if (strb_p(&sb, "throttle "))
+  if (strb_p(&sb, "throttle ")) {
     return;
+  }
 
   for (int i = min; i <= max; i++) {
     char bbuf[512];
