@@ -435,7 +435,7 @@ int main(int argc, char **args, char **env) {
         system("xii-term");
         break;
       case 33: // p
-        system("xii-screnshot");
+        system("xii-screenshot");
         break;
       case 24: // q
         system("xii-qbin");
