@@ -578,8 +578,11 @@ int main(int argc, char **args, char **env) {
     case MotionNotify:
       while (XCheckTypedEvent(dpy, MotionNotify, &ev))
         ;
+      printf("  ev x=%d  y=%d    evstrt x=%d  y=%d\n", ev.xbutton.x_root,
+             ev.xbutton.y_root, buttonevstart.x_root, buttonevstart.y_root);
       int xdiff = ev.xbutton.x_root - buttonevstart.x_root;
       int ydiff = ev.xbutton.y_root - buttonevstart.y_root;
+      buttonevstart = ev.xbutton;
       int nx = xw->x + xdiff;
       int nw = xw->wi + xdiff;
       int ny = xw->y + ydiff;
