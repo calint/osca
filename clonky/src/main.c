@@ -590,7 +590,7 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
 
 int _rend_net_callback(struct ifc *ifc) {
   char buf[1024];
-  snprintf(buf, sizeof(buf), "%s  %s  %llu/%llu MB", ifc->name,
+  snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
            ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
            ifc->rx_bytes >> 20);
   dc_newline(dc);
