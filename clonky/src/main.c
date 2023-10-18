@@ -592,7 +592,7 @@ int _rend_net_callback(struct ifc *ifc) {
   char buf[1024];
   snprintf(buf, sizeof(buf), "%s  %s  %llu/%llu MB", ifc->name,
            ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
-           ifc->rx_bytes >> 10);
+           ifc->rx_bytes >> 20);
   dc_newline(dc);
   dc_draw_str(dc, buf);
   return 0;
