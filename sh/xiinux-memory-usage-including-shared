@@ -1,2 +1,0 @@
-#!/bin/sh
-pmap -x $(xiinux-pid)|tail -n1|awk '{print $4 "kB"}'

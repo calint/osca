@@ -1,9 +1,0 @@
-. $OSCA/sh/xwd-env &&
-FPS=${1-2} &&
-OPTS=${2-q} &&
-FN=$XWD_MP4${3-$(date +%Y-%m-%d--%H-%M-%S).mp4} &&
-pl "$0 FPS=arg1:$FPS OPTS=arg2:$OPTS FILE=arg3:$FN" &&
-mkdir -p $XWD_PNG && cd $XWD_PNG &&
-LOGL="$([[ $OPTS = *q* ]] && p -loglevel quiet)"
-mkdir -p $(dirname $FN) && cat * | ffmpeg $LOGL -f image2pipe -c:v png -r $FPS -i - $FN &&
-pl "$0 done in $FN"

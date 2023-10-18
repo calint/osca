@@ -1,2 +1,0 @@
-#!/bin/sh
-cat /proc/$(xiinux-pid)/status|grep VmHWM|awk '{print $2 $3}'

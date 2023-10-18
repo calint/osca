@@ -1,2 +1,0 @@
-#!/bin/sh
-ps a|awk '{print $1 "\t" $5}'|grep xiinux|awk '{print $1}'

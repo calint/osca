@@ -5,11 +5,16 @@
 #include <string.h>
 
 #define APP_NAME "window manager frameless"
-#define WIN_MAX_COUNT 128  // maximum number of windows
-#define WIN_SLIP_DX 13     // pixels to show of a window folded to the right
-#define WIN_SLIP 7         // random pixels relative to WIN_SLIP_DX
-#define WIN_BORDER_WIDTH 1 // window border width
-#define WIN_BUMP 59        // pixels to 'bump' a window
+// maximum number of windows
+#define WIN_MAX_COUNT 128
+// pixels to show of a window folded to the right
+#define WIN_SLIP_DX 13
+// random pixels relative to WIN_SLIP_DX
+#define WIN_SLIP 7
+// window border width
+#define WIN_BORDER_WIDTH 1
+// pixels to 'bump' a window
+#define WIN_BUMP 59
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
 #define XWIN_BIT_FULL_HEIGHT 1
@@ -65,23 +70,23 @@ static bool is_dragging;
 
 static xwin *xwin_get(Window w) {
   xwin *xw = NULL;
-  int firstavail = -1;
+  int first_avail = -1;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].bits & XWIN_BIT_ALLOCATED) {
       if (wins[i].win == w) {
         return &wins[i];
       }
     } else {
-      if (firstavail == -1) {
-        firstavail = i;
+      if (first_avail == -1) {
+        first_avail = i;
       }
     }
   }
-  if (firstavail == -1) {
+  if (first_avail == -1) {
     fprintf(flog, "!!! no free windows\n");
     exit(-1);
   }
-  xw = &wins[firstavail];
+  xw = &wins[first_avail];
   xw->bits = XWIN_BIT_ALLOCATED;
   xwin_count++;
   // fprintf(flog, "windows allocated: %d\n", wincount);
@@ -107,16 +112,16 @@ static xwin *_win_find(Window w) {
   return NULL;
 }
 static void xwin_free(Window w) {
-  xwin *xw = _win_find(w);
-  if (!xw) {
+  xwin *win = _win_find(w);
+  if (!win) {
     return;
   }
-  if (xw->bits & XWIN_BIT_ALLOCATED) {
-    xw->bits = 0; // mark free
+  if (win->bits & XWIN_BIT_ALLOCATED) {
+    win->bits = 0; // mark free
     xwin_count--;
     // fprintf(flog, "windows allocated: %d\n", wincount);
   }
-  if (win_focused == xw) {
+  if (win_focused == win) {
     win_focused = NULL;
   }
 }
@@ -227,10 +232,10 @@ static void xwin_show(xwin *this) {
   this->x = this->desk_x;
   xwin_set_geom(this);
 }
-static void xwin_bump(xwin *this, int r) {
+static void xwin_bump(xwin *this, int rand_amt) {
   xwin_read_geom(this);
-  this->x += (rand() % r) - (r >> 1);
-  this->y += (rand() % r) - (r >> 1);
+  this->x += (rand() % rand_amt) - (rand_amt >> 1);
+  this->y += (rand() % rand_amt) - (rand_amt >> 1);
   xwin_set_geom(this);
 }
 static int _xwin_ix(xwin *this) {
@@ -430,7 +435,7 @@ int main(int argc, char **args, char **env) {
         system("xii-term");
         break;
       case 33: // p
-        system("xii-scrsht");
+        system("xii-screnshot");
         break;
       case 24: // q
         system("xii-qbin");
@@ -449,6 +454,21 @@ int main(int argc, char **args, char **env) {
         break;
       case 26: // e
         system("xii-editor");
+        break;
+      case 72: // toggle mute
+        system("xii-vol-toggle");
+        break;
+      case 68: // F2   screen brightness down
+        system("xii-decrease-screen-brightness");
+        break;
+      case 69: // F3   screen brightness up
+        system("xii-increase-screen-brightness");
+        break;
+      case 73: // F8   volume down
+        system("xii-vol-down");
+        break;
+      case 74: // F9   volume up
+        system("xii-vol-up");
         break;
       case 9:  // esc
       case 49: // §
@@ -500,21 +520,6 @@ int main(int argc, char **args, char **env) {
         break;
       case 119: // del
         XKillClient(dpy, ev.xkey.subwindow);
-        break;
-      case 72: // toggle mute
-        system("xii-vol-toggle");
-        break;
-      case 68: // F2   screen brightness down
-        system("xii-decrease-screen-brightness");
-        break;
-      case 69: // F3   screen brightness up
-        system("xii-increase-screen-brightness");
-        break;
-      case 73: // F8   volume down
-        system("xii-vol-down");
-        break;
-      case 74: // F9   volume up
-        system("xii-vol-up");
         break;
       case 38:  // a
       case 111: // up
