@@ -479,7 +479,7 @@ int main(int argc, char **args, char **env) {
         }
         break;
       case 12: // 3
-        if (!win_focused) {
+        if (win_focused) {
           xwin_toggle_fullscreen(win_focused);
         }
         break;
