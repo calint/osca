@@ -69,7 +69,7 @@ static char *ix_evnames[LASTEvent] = {
     "ColormapNotify",   "ClientMessage",    "MappingNotify",
     "GenericEvent"};
 
-static xwin *xwinget(Window w) {
+static xwin *xwin_get(Window w) {
   xwin *xw = NULL;
   int firstavail = -1;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
@@ -87,7 +87,7 @@ static xwin *xwinget(Window w) {
     fprintf(flog, "!!! no free windows\n");
     fflush(flog);
     sleep(5);
-    return xwinget(w);
+    return xwin_get(w);
   }
   xw = &wins[firstavail];
   xw->bits = XWIN_BIT_ALLOCATED;
@@ -98,7 +98,7 @@ static xwin *xwinget(Window w) {
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
   return xw;
 }
-static void xwinfocus(xwin *this) {
+static void xwin_focus(xwin *this) {
   if (winfocused) {
     XSetWindowBorder(dpy, winfocused->win, WIN_BORDER_INACTIVE_COLOR);
   }
@@ -106,27 +106,27 @@ static void xwinfocus(xwin *this) {
   XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
   winfocused = this;
 }
-static void xwinraise(xwin *this) { XRaiseWindow(dpy, this->win); }
-static void focusfirstondesk() {
+static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
+static void xwin_focus_first_on_desk() {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *w = &wins[i];
     if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
-      xwinraise(w);
-      xwinfocus(w);
+      xwin_raise(w);
+      xwin_focus(w);
       return;
     }
   }
   winfocused = NULL;
 }
-static xwin *_winfind(Window w) {
+static xwin *_win_find(Window w) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].win == w)
       return &wins[i];
   }
   return NULL;
 }
-static void xwinfree(Window w) {
-  xwin *xw = _winfind(w);
+static void xwin_free(Window w) {
+  xwin *xw = _win_find(w);
   if (!xw) {
     return;
   }
@@ -139,37 +139,36 @@ static void xwinfree(Window w) {
     winfocused = NULL;
   }
 }
-static void xwingeom(xwin *this) {
+static void xwin_read_geom(xwin *this) {
   Window wsink;
   unsigned dummy;
   XGetGeometry(dpy, this->win, &wsink, &this->x, &this->y, &this->wi, &this->hi,
                &dummy, &dummy);
 }
-static void xwingeomset(xwin *this, int x, int y, int w, int h) {
-  XMoveResizeWindow(dpy, this->win, x, y, w, h);
-}
-static void xwingeomset2(xwin *this) {
+static void xwin_set_geom(xwin *this) {
   XMoveResizeWindow(dpy, this->win, this->x, this->y, this->wi, this->hi);
 }
-static void xwingeomcenter(xwin *this) {
-  xwingeom(this);
-  int nx = (scr.wi - this->wi) >> 1;
-  int ny = (scr.hi - this->hi) >> 1;
-  xwingeomset(this, nx, ny, this->wi, this->hi);
+static void xwin_center(xwin *this) {
+  xwin_read_geom(this);
+  this->x = (scr.wi - this->wi) >> 1;
+  this->y = (scr.hi - this->hi) >> 1;
+  xwin_set_geom(this);
 }
-static void xwingeomwider(xwin *this) {
-  xwingeom(this);
-  int nw = ((this->wi << 2) + this->wi) >> 2;
-  int nx = this->x - ((nw - this->wi) >> 1);
-  xwingeomset(this, nx, this->y, nw, this->hi);
+static void xwin_wider(xwin *this) {
+  xwin_read_geom(this);
+  unsigned wi_prv = this->wi;
+  this->wi = ((this->wi << 2) + this->wi) >> 2;
+  this->x = this->x - ((this->wi - wi_prv) >> 1);
+  xwin_set_geom(this);
 }
-static void xwingeomthinner(xwin *this) {
-  xwingeom(this);
-  int nw = ((this->wi << 1) + this->wi) >> 2;
-  int nx = this->x - ((nw - this->wi) >> 1);
-  xwingeomset(this, nx, this->y, nw, this->hi);
+static void xwin_thinner(xwin *this) {
+  xwin_read_geom(this);
+  unsigned wi_prv = this->wi;
+  this->wi = ((this->wi << 1) + this->wi) >> 2;
+  this->x = this->x - ((this->wi - wi_prv) >> 1);
+  xwin_set_geom(this);
 }
-static void xwinclose(xwin *this) {
+static void xwin_close(xwin *this) {
   XEvent ke;
   ke.type = ClientMessage;
   ke.xclient.window = this->win;
@@ -179,19 +178,19 @@ static void xwinclose(xwin *this) {
   ke.xclient.data.l[1] = CurrentTime;
   XSendEvent(dpy, this->win, False, NoEventMask, &ke);
 }
-static void xwintogglefullscreen(xwin *this) {
+static void xwin_toggle_fullscreen(xwin *this) {
   if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
     // toggle from fullscreen
-    xwingeom(this);
+    xwin_read_geom(this);
     this->x = this->x_pf;
     this->y = this->y_pf;
     this->wi = this->wi_pf;
     this->hi = this->hi_pf;
-    xwingeomset2(this);
+    xwin_set_geom(this);
     this->bits &= ~XWIN_BITS_FULL_SCREEN;
   } else {
     // toggle to fullscreen
-    xwingeom(this);
+    xwin_read_geom(this);
     this->x_pf = this->x;
     this->y_pf = this->y;
     this->wi_pf = this->wi;
@@ -200,64 +199,64 @@ static void xwintogglefullscreen(xwin *this) {
     this->y = -WIN_BORDER_WIDTH;
     this->wi = scr.wi;
     this->hi = scr.hi;
-    xwingeomset2(this);
+    xwin_set_geom(this);
     this->bits |= XWIN_BITS_FULL_SCREEN;
   }
 }
-static void xwintogglefullheight(xwin *this) {
+static void xwin_toggle_fullheight(xwin *this) {
   fprintf(flog, "  pre toggle full height x=%d  y=%d  wi=%d  hi=%d\n", this->x,
           this->y, this->wi, this->hi);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
-    xwingeom(this);
+    xwin_read_geom(this);
     this->y = this->y_pf;
     this->hi = this->hi_pf;
-    xwingeomset2(this);
+    xwin_set_geom(this);
   } else {
-    xwingeom(this);
+    xwin_read_geom(this);
     this->y_pf = this->y;
     this->hi_pf = this->hi;
     this->y = -WIN_BORDER_WIDTH;
     this->hi = scr.hi;
-    xwingeomset2(this);
+    xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
   fprintf(flog, "  after toggle full height x=%d  y=%d  wi=%d  hi=%d\n",
           this->x, this->y, this->wi, this->hi);
 }
-static void xwintogglefullwidth(xwin *this) {
+static void xwin_toggle_fullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
-    xwingeom(this);
+    xwin_read_geom(this);
     this->x = this->x_pf;
     this->wi = this->wi_pf;
-    xwingeomset2(this);
+    xwin_set_geom(this);
   } else {
-    xwingeom(this);
+    xwin_read_geom(this);
     this->x_pf = this->x;
     this->wi_pf = this->wi;
     this->x = -WIN_BORDER_WIDTH;
     this->wi = scr.wi;
-    xwingeomset2(this);
+    xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_WIDTH;
 }
-static void xwinhide(xwin *this) {
-  xwingeom(this);
+static void xwin_hide(xwin *this) {
+  xwin_read_geom(this);
   this->desk_x = this->x;
   int slip = rand() % WIN_SLIP;
   this->x = (scr.wi - WIN_SLIP_DX + slip);
-  xwingeomset2(this);
+  xwin_set_geom(this);
 }
-static void xwinshow(xwin *this) {
+static void xwin_show(xwin *this) {
   this->x = this->desk_x;
-  xwingeomset2(this);
+  xwin_set_geom(this);
 }
-static void xwinbump(xwin *this, int r) {
-  xwingeom(this);
+static void xwin_bump(xwin *this, int r) {
+  xwin_read_geom(this);
   this->x += (rand() % r) - (r >> 1);
   this->y += (rand() % r) - (r >> 1);
-  xwingeomset2(this);
+  xwin_set_geom(this);
 }
-static int _xwinix(xwin *this) {
+static int _xwin_ix(xwin *this) {
   if (this == NULL) {
     return -1;
   }
@@ -268,67 +267,67 @@ static int _xwinix(xwin *this) {
   }
   return -1;
 }
-static int _focustry(int k) {
-  xwin *w = &wins[k];
+static int _focus_try(unsigned ix) {
+  xwin *w = &wins[ix];
   if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
-    xwinraise(w);
-    xwinfocus(w);
+    xwin_raise(w);
+    xwin_focus(w);
     return 1;
   }
   return 0;
 }
-static void focusnext() {
-  int i0 = _xwinix(winfocused);
+static void xwin_focus_next() {
+  int i0 = _xwin_ix(winfocused);
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
-    if (_focustry(i)) {
+    if (_focus_try(i)) {
       return;
     }
   }
   i = 0;
   while (i <= i0) {
-    if (_focustry(i)) {
+    if (_focus_try(i)) {
       return;
     }
     i++;
   }
-  focusfirstondesk();
+  xwin_focus_first_on_desk();
 }
-static void focusprev() {
-  int i0 = _xwinix(winfocused);
+static void xwin_focus_prev() {
+  int i0 = _xwin_ix(winfocused);
   int i = i0;
   while (--i >= 0) {
-    if (_focustry(i)) {
+    if (_focus_try(i)) {
       return;
     }
   }
   i = WIN_MAX_COUNT;
   while (--i >= 0) {
-    if (_focustry(i)) {
+    if (_focus_try(i)) {
       return;
     }
   }
-  focusfirstondesk();
+  xwin_focus_first_on_desk();
 }
-static void togglefullscreen() {
+static void toggle_fullscreen() {
   if (!winfocused) {
     return;
   }
-  xwintogglefullscreen(winfocused);
+  xwin_toggle_fullscreen(winfocused);
 }
-static void togglefullheight() {
+static void toggle_fullheight() {
   if (!winfocused) {
     return;
   }
-  xwintogglefullheight(winfocused);
+  xwin_toggle_fullheight(winfocused);
 }
-static void togglefullwidth() {
+static void toggle_fullwidth() {
   if (!winfocused) {
     return;
   }
-  xwintogglefullwidth(winfocused);
+  xwin_toggle_fullwidth(winfocused);
 }
-static void deskshow(int dsk, int dskprv) {
+static void desk_show(int dsk, int dskprv) {
   int n;
   for (n = 0; n < WIN_MAX_COUNT; n++) {
     xwin *xw = &wins[n];
@@ -342,14 +341,14 @@ static void deskshow(int dsk, int dskprv) {
       continue;
     }
     if (xw->desk == dskprv) {
-      xwinhide(xw);
+      xwin_hide(xw);
     }
     if (xw->desk == dsk) {
-      xwinshow(xw);
+      xwin_show(xw);
     }
   }
 }
-static int errorhandler(Display *d, XErrorEvent *e) {
+static int error_handler(Display *d, XErrorEvent *e) {
   char buffer_return[1024] = "";
   XGetErrorText(d, e->error_code, buffer_return, sizeof(buffer_return));
   fprintf(flog, "!!! x11 error\n");
@@ -369,7 +368,7 @@ int main(int argc, char **args, char **env) {
   }
   puts(APP_NAME);
   srand(0);
-  XSetErrorHandler(errorhandler);
+  XSetErrorHandler(error_handler);
   flog = stdout; // fopen(logfile,"a");
   if (!flog) {
     exit(1);
@@ -412,9 +411,9 @@ int main(int argc, char **args, char **env) {
           ev.xmap.override_redirect) {
         break;
       }
-      xw = xwinget(ev.xmap.window);
-      xwingeomcenter(xw);
-      xwinfocus(xw);
+      xw = xwin_get(ev.xmap.window);
+      xwin_center(xw);
+      xwin_focus(xw);
       XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
                   GrabModeAsync, GrabModeAsync, None, None);
       XSelectInput(dpy, xw->win, EnterWindowMask);
@@ -424,18 +423,18 @@ int main(int argc, char **args, char **env) {
           ev.xmap.override_redirect) {
         break;
       }
-      xwinfree(ev.xmap.window);
+      xwin_free(ev.xmap.window);
       break;
     case EnterNotify:
       if (dragging)
         break;
-      xw = xwinget(ev.xcrossing.window);
-      xwinfocus(xw);
+      xw = xwin_get(ev.xcrossing.window);
+      xwin_focus(xw);
       break;
     case KeyPress:
       key = ev.xkey.keycode;
       if (ev.xkey.subwindow) {
-        xw = xwinget(ev.xkey.subwindow);
+        xw = xwin_get(ev.xkey.subwindow);
       }
       switch (key) {
       case 53: // x
@@ -468,50 +467,50 @@ int main(int argc, char **args, char **env) {
       case 9:  // esc
       case 49: // §
         if (winfocused) {
-          xwinclose(winfocused);
+          xwin_close(winfocused);
         }
         break;
       case 39: // s
         if (winfocused) {
-          xwingeomcenter(winfocused);
+          xwin_center(winfocused);
         }
         break;
       case 25: // w
         if (winfocused) {
           if (ev.xkey.state & ShiftMask) {
-            xwingeomthinner(winfocused);
+            xwin_thinner(winfocused);
           } else {
-            xwingeomwider(winfocused);
+            xwin_wider(winfocused);
           }
         }
         break;
       case 56: // b
         if (winfocused) {
-          xwinbump(winfocused, WIN_BUMP);
+          xwin_bump(winfocused, WIN_BUMP);
         }
         break;
       case 12: // 3
-        togglefullscreen();
+        toggle_fullscreen();
         break;
       case 13: // 4
-        togglefullheight();
+        toggle_fullheight();
         break;
       case 14: // 5
-        togglefullwidth();
+        toggle_fullwidth();
         break;
       case 15: // 6
-        xwinbump(winfocused, 200);
+        xwin_bump(winfocused, 200);
         break;
       case 16: // 7
         system("xii-ide");
         break;
         //			case 27://r
       case 113: // left
-        focusprev();
+        xwin_focus_prev();
         break;
       case 52:  // z
       case 114: // right
-        focusnext();
+        xwin_focus_next();
         break;
       case 119: // del
         XKillClient(dpy, ev.xkey.subwindow);
@@ -538,12 +537,12 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (winfocused) {
             winfocused->desk = dsk;
-            xwingeom(winfocused);
+            xwin_read_geom(winfocused);
             winfocused->desk_x = winfocused->x;
-            xwinraise(winfocused);
+            xwin_raise(winfocused);
           }
         }
-        deskshow(dsk, dskprv);
+        desk_show(dsk, dskprv);
         break;
       case 40:  // d
       case 116: // down
@@ -552,12 +551,12 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (winfocused) {
             winfocused->desk = dsk;
-            xwingeom(winfocused);
+            xwin_read_geom(winfocused);
             winfocused->desk_x = winfocused->x;
-            xwinraise(winfocused);
+            xwin_raise(winfocused);
           }
         }
-        deskshow(dsk, dskprv);
+        desk_show(dsk, dskprv);
         break;
       }
       break;
@@ -568,12 +567,12 @@ int main(int argc, char **args, char **env) {
       break;
     case ButtonPress:
       dragging = True;
-      xw = xwinget(ev.xbutton.window);
-      xwinfocus(xw);
+      xw = xwin_get(ev.xbutton.window);
+      xwin_focus(xw);
       XGrabPointer(dpy, xw->win, True, PointerMotionMask | ButtonReleaseMask,
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
-      xwinraise(xw);
-      xwingeom(xw);
+      xwin_raise(xw);
+      xwin_read_geom(xw);
       buttonevstart = ev.xbutton;
       break;
     case MotionNotify:
@@ -600,12 +599,16 @@ int main(int argc, char **args, char **env) {
         if (nh < 0) {
           nh = 0;
         }
-        xwingeomset(xw, xw->x, xw->y, nw, nh);
+        xw->wi = nw;
+        xw->hi = nh;
+        xwin_set_geom(xw);
         break;
       }
       switch (key) {
       default:
-        xwingeomset(xw, nx, ny, xw->wi, xw->hi);
+        xw->x = nx;
+        xw->y = ny;
+        xwin_set_geom(xw);
         fprintf(flog, "  move x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y, xw->wi,
                 xw->hi);
         break;
@@ -616,7 +619,9 @@ int main(int argc, char **args, char **env) {
         if (nh < 0) {
           nh = 0;
         }
-        xwingeomset(xw, xw->x, xw->y, nw, nh);
+        xw->wi = nw;
+        xw->hi = nh;
+        xwin_set_geom(xw);
         fprintf(flog, "  resize x=%d  y=%d  wi=%d  hi=%d\n", xw->x, xw->y,
                 xw->wi, xw->hi);
         break;
@@ -624,7 +629,7 @@ int main(int argc, char **args, char **env) {
       break;
     case ButtonRelease:
       dragging = False;
-      xw = xwinget(ev.xbutton.window);
+      xw = xwin_get(ev.xbutton.window);
       xw->desk = dsk;
       XUngrabPointer(dpy, CurrentTime);
       break;
