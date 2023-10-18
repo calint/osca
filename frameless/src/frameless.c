@@ -16,11 +16,11 @@
 // window border width
 #define WIN_BORDER_WIDTH 1
 
-// pixels to 'bump' a window
-#define WIN_BUMP 59
-
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
+
+// pixels to 'bump' a window
+#define WIN_BUMP_PX 200
 
 // xwin.bits
 #define XWIN_BIT_FULL_HEIGHT 1
@@ -510,7 +510,7 @@ int main(int argc, char **args, char **env) {
         break;
       case 56: // b
         if (win_focused) {
-          xwin_bump(win_focused, WIN_BUMP);
+          xwin_bump(win_focused, WIN_BUMP_PX);
         }
         break;
       case 12: // 3
@@ -530,7 +530,7 @@ int main(int argc, char **args, char **env) {
         break;
       case 15: // 6
         if (win_focused) {
-          xwin_bump(win_focused, 200);
+          xwin_bump(win_focused, WIN_BUMP_PX);
         }
         break;
       case 113: // left
