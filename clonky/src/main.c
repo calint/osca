@@ -508,7 +508,7 @@ static void auto_config_network_traffic() {
     strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
   }
   closedir(dp);
-  if (!*graph_net_device) {
+  if (!graph_net_device[0]) {
     puts("[!] no network device found in /sys/class/net");
   }
   printf("· network device: ");

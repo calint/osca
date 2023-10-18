@@ -2,5 +2,7 @@
 [ ] frameless: dynamic allocation of more xwins
 [ ] frameless: enable -Wconversion and fix
 [ ] gtk.css: export GTK_DEBUG=interactive
+[ ] clonky: throttle percentage display not same as in htop
+[ ] clonky: net up/down in KB/s instead of total
 --------------------------------------------------------------
 [x] frameless: consolidate xwin.vh and bits into one field
