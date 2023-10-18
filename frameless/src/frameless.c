@@ -628,11 +628,11 @@ int main(int argc, char **args, char **env) {
         xwin_set_geom(xw);
         break;
       case 27: // r
-        if (new_wi < 1) {
-          new_wi = 1;
+        if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
+          new_wi = XWIN_MIN_WIDTH_HEIGHT;
         }
-        if (new_hi < 1) {
-          new_hi = 1;
+        if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
+          new_hi = XWIN_MIN_WIDTH_HEIGHT;
         }
         xw->wi = new_wi;
         xw->hi = new_hi;
