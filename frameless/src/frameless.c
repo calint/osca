@@ -455,19 +455,19 @@ int main(int argc, char **args, char **env) {
       case 26: // e
         system("xii-editor");
         break;
-      case 72: // toggle mute
+      case 72: // F6 toggle mute
         system("xii-vol-toggle");
         break;
-      case 68: // F2   screen brightness down
+      case 68: // F2
         system("xii-decrease-screen-brightness");
         break;
-      case 69: // F3   screen brightness up
+      case 69: // F3
         system("xii-increase-screen-brightness");
         break;
-      case 73: // F8   volume down
+      case 73: // F7
         system("xii-vol-down");
         break;
-      case 74: // F9   volume up
+      case 74: // F8
         system("xii-vol-up");
         break;
       case 9:  // esc
