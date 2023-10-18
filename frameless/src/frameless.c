@@ -38,7 +38,7 @@ typedef struct xwin {
   int y_pf;    // y pre full width / height / screen
   int wi_pf;   // wi pre full width / height / screen
   int hi_pf;   // hi pre full width / height / screen
-  int desk;  // desk the window is on
+  int desk;    // desk the window is on
   int desk_x;  // x coord of window before folded at desk switch
   char bits;   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
 } xwin;
@@ -97,7 +97,6 @@ static int dragging_button;
 //     "GenericEvent"};
 
 static xwin *xwin_get(Window w) {
-  xwin *xw = NULL;
   int first_avail = -1;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].bits & XWIN_BIT_ALLOCATED) {
@@ -114,7 +113,7 @@ static xwin *xwin_get(Window w) {
     fprintf(flog, "!!! no free windows\n");
     exit(-1);
   }
-  xw = &wins[first_avail];
+  xwin *xw = &wins[first_avail];
   xw->bits = XWIN_BIT_ALLOCATED;
   xwin_count++;
   // fprintf(flog, "windows allocated: %d\n", wincount);
@@ -357,7 +356,7 @@ static int error_handler(Display *d, XErrorEvent *e) {
   fprintf(flog, "!!!       text: %s\n", buffer_return);
   fprintf(flog, "!!!       type: %d\n", e->type);
   fprintf(flog, "!!! resourceid: %p\n", (void *)e->resourceid);
-  fprintf(flog, "!!! error code: %d\n", (unsigned int)e->error_code);
+  fprintf(flog, "!!! error code: %d\n", (unsigned)e->error_code);
   fflush(flog);
   return 0;
 }
@@ -368,6 +367,7 @@ int main(int argc, char **args, char **env) {
   while (*env) {
     puts(*env++);
   }
+
   puts("frameless window manager");
 
   XSetErrorHandler(error_handler);
@@ -392,12 +392,14 @@ int main(int argc, char **args, char **env) {
   XGrabKey(dpy, AnyKey, Mod4Mask, root, True, GrabModeAsync, GrabModeAsync);
   XGrabKey(dpy, AnyKey, Mod4Mask + ShiftMask, root, True, GrabModeAsync,
            GrabModeAsync);
-  XGrabKey(dpy, 122, 0, root, True, GrabModeAsync, GrabModeAsync); // voldown
-  XGrabKey(dpy, 123, 0, root, True, GrabModeAsync, GrabModeAsync); // volup
-  XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync); // print
+  // XGrabKey(dpy, 122, 0, root, True, GrabModeAsync, GrabModeAsync); // volume down
+  // XGrabKey(dpy, 123, 0, root, True, GrabModeAsync, GrabModeAsync); // volume sup
+  // XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync); // print
   XSelectInput(dpy, root, SubstructureNotifyMask);
 
+  // previous desk
   int dsk_prv = 0;
+  // temporary
   xwin *xw = NULL;
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
@@ -589,45 +591,45 @@ int main(int argc, char **args, char **env) {
       int ydiff = ev.xbutton.y_root - dragging_start_y;
       dragging_start_x = ev.xbutton.x_root;
       dragging_start_y = ev.xbutton.y_root;
-      int nx = xw->x + xdiff;
-      int nw = xw->wi + xdiff;
-      int ny = xw->y + ydiff;
-      int nh = xw->hi + ydiff;
+      int new_x = xw->x + xdiff;
+      int new_wi = xw->wi + xdiff;
+      int new_y = xw->y + ydiff;
+      int new_hi = xw->hi + ydiff;
       if (xw->bits & XWIN_BIT_FULL_WIDTH) {
-        nx = -WIN_BORDER_WIDTH;
-        nw = scr.wi;
+        new_x = -WIN_BORDER_WIDTH;
+        new_wi = scr.wi;
       }
       if (xw->bits & XWIN_BIT_FULL_HEIGHT) {
-        ny = -WIN_BORDER_WIDTH;
-        nh = scr.hi;
+        new_y = -WIN_BORDER_WIDTH;
+        new_hi = scr.hi;
       }
       if (dragging_button == 3) {
-        if (nw < 0) {
-          nw = 0;
+        if (new_wi < 0) {
+          new_wi = 0;
         }
-        if (nh < 0) {
-          nh = 0;
+        if (new_hi < 0) {
+          new_hi = 0;
         }
-        xw->wi = nw;
-        xw->hi = nh;
+        xw->wi = new_wi;
+        xw->hi = new_hi;
         xwin_set_geom(xw);
         break;
       }
       switch (key_pressed) {
       default:
-        xw->x = nx;
-        xw->y = ny;
+        xw->x = new_x;
+        xw->y = new_y;
         xwin_set_geom(xw);
         break;
       case 27: // r
-        if (nw < 0) {
-          nw = 0;
+        if (new_wi < 0) {
+          new_wi = 0;
         }
-        if (nh < 0) {
-          nh = 0;
+        if (new_hi < 0) {
+          new_hi = 0;
         }
-        xw->wi = nw;
-        xw->hi = nh;
+        xw->wi = new_wi;
+        xw->hi = new_hi;
         xwin_set_geom(xw);
         break;
       }
@@ -640,5 +642,6 @@ int main(int argc, char **args, char **env) {
       break;
     }
   }
+  //? clean-up cursor
   return 0;
 }
