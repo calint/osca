@@ -1,14 +1,8 @@
-// todo: make windows count dynamic
-// todo: when window dimensions equal screen dimensions consider window
-// maximized
-// todo: consolidate xwin.vh and bits into one field
-
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define APP_NAME "window manager frameless"
 #define WIN_MAX_COUNT 128  // maximum number of windows
@@ -85,9 +79,7 @@ static xwin *xwin_get(Window w) {
   }
   if (firstavail == -1) {
     fprintf(flog, "!!! no free windows\n");
-    fflush(flog);
-    sleep(5);
-    return xwin_get(w);
+    exit(-1);
   }
   xw = &wins[firstavail];
   xw->bits = XWIN_BIT_ALLOCATED;
