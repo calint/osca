@@ -580,15 +580,15 @@ int main(int argc, char **args, char **env) {
       break;
     case ButtonPress:
       is_dragging = True;
+      dragging_start_x = ev.xbutton.x_root;
+      dragging_start_y = ev.xbutton.y_root;
+      dragging_button = ev.xbutton.button;
       xw = xwin_get(ev.xbutton.window);
       xwin_focus(xw);
       XGrabPointer(dpy, xw->win, True, PointerMotionMask | ButtonReleaseMask,
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
       xwin_raise(xw);
       xwin_read_geom(xw);
-      dragging_start_x = ev.xbutton.x_root;
-      dragging_start_y = ev.xbutton.y_root;
-      dragging_button = ev.xbutton.button;
       break;
     case MotionNotify:
       while (XCheckTypedEvent(dpy, MotionNotify, &ev))
@@ -642,6 +642,7 @@ int main(int argc, char **args, char **env) {
       break;
     case ButtonRelease:
       is_dragging = False;
+      dragging_button = 0;
       xw = xwin_get(ev.xbutton.window);
       xw->desk = dsk;
       XUngrabPointer(dpy, CurrentTime);
