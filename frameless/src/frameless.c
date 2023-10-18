@@ -384,7 +384,7 @@ int main(int argc, char **args, char **env) {
   XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync); // print
   XSelectInput(dpy, root, SubstructureNotifyMask);
 
-  int dskprv = 0;
+  int dsk_prv = 0;
   xwin *xw = NULL;
   XButtonEvent button_start;
   memset(&button_start, 0, sizeof(button_start));
@@ -455,14 +455,14 @@ int main(int argc, char **args, char **env) {
       case 26: // e
         system("xii-editor");
         break;
-      case 72: // F6
-        system("xii-vol-toggle");
-        break;
       case 68: // F2
         system("xii-decrease-screen-brightness");
         break;
       case 69: // F3
         system("xii-increase-screen-brightness");
+        break;
+      case 72: // F6
+        system("xii-vol-toggle");
         break;
       case 73: // F7
         system("xii-vol-down");
@@ -505,7 +505,9 @@ int main(int argc, char **args, char **env) {
         toggle_fullwidth();
         break;
       case 15: // 6
-        xwin_bump(win_focused, 200);
+        if (win_focused) {
+          xwin_bump(win_focused, 200);
+        }
         break;
       case 16: // 7
         system("xii-ide");
@@ -522,7 +524,7 @@ int main(int argc, char **args, char **env) {
         break;
       case 38:  // a
       case 111: // up
-        dskprv = dsk;
+        dsk_prv = dsk;
         dsk++;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
@@ -532,11 +534,11 @@ int main(int argc, char **args, char **env) {
             xwin_raise(win_focused);
           }
         }
-        desk_show(dsk, dskprv);
+        desk_show(dsk, dsk_prv);
         break;
       case 40:  // d
       case 116: // down
-        dskprv = dsk;
+        dsk_prv = dsk;
         dsk--;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
@@ -546,7 +548,7 @@ int main(int argc, char **args, char **env) {
             xwin_raise(win_focused);
           }
         }
-        desk_show(dsk, dskprv);
+        desk_show(dsk, dsk_prv);
         break;
       }
       break;
