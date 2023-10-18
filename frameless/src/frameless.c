@@ -178,6 +178,9 @@ static void xwin_thinner(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
   this->wi = ((this->wi << 1) + this->wi) >> 2;
+  if (this->wi < 1) {
+    this->wi = 1;
+  }
   this->x = this->x - ((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
 }
