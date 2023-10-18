@@ -1,0 +1,14 @@
+* {
+    padding: 5px;
+    margin: 5px;
+}
+
+* {
+    font-family: "Monospace";
+    font-size: 12pt;
+}
+
+button {
+    background-color: #FF0000;
+    color: #FFFFFF;
+}

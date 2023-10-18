@@ -1,0 +1,5 @@
+[ ] frameless: gracious handle of max windows reached
+[ ] frameless: dynamic allocation of more xwins
+[ ] frameless: enable -Wconversion and fix
+--------------------------------------------------------------
+[x] frameless: consolidate xwin.vh and bits into one field
