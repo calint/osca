@@ -4,27 +4,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define APP_NAME "window manager frameless"
 // maximum number of windows
 #define WIN_MAX_COUNT 128
+
 // pixels to show of a window folded to the right
 #define WIN_SLIP_DX 13
+
 // random pixels relative to WIN_SLIP_DX
 #define WIN_SLIP 7
+
 // window border width
 #define WIN_BORDER_WIDTH 1
+
 // pixels to 'bump' a window
 #define WIN_BUMP 59
+
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
+
 // xwin.bits
 #define XWIN_BIT_FULL_HEIGHT 1
 #define XWIN_BIT_FULL_WIDTH 2
 #define XWIN_BIT_ALLOCATED 4
 #define XWIN_BITS_FULL_SCREEN 3
 
-typedef int xdesk;
-typedef char bool;
 typedef struct xwin {
   Window win;  // x11 window handle
   int x;       // position x
@@ -35,29 +38,46 @@ typedef struct xwin {
   int y_pf;    // y pre full width / height / screen
   int wi_pf;   // wi pre full width / height / screen
   int hi_pf;   // hi pre full width / height / screen
-  xdesk desk;  // desk the window is on
+  int desk;  // desk the window is on
   int desk_x;  // x coord of window before folded at desk switch
   char bits;   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
 } xwin;
 
+// mapped xwin to X11 Window
 static xwin wins[WIN_MAX_COUNT];
-static FILE *flog; // log file
+
+// log file
+static FILE *flog;
+
+// default display
 static Display *dpy;
+
+// root window
 static Window root;
-static xdesk dsk;
+
+// current desk
+static int dsk;
+
+// number of windows mapped
 static unsigned xwin_count;
+
+// default screen info
 static struct scr {
   int id, wi, hi;
 } scr;
+
 // current key pressed
 static unsigned key_pressed;
+
 // current focused window
 static xwin *win_focused;
+
 // dragging state
-static bool is_dragging;
+static char is_dragging;
 static int dragging_start_x;
 static int dragging_start_y;
 static int dragging_button;
+
 // static char *ix_evnames[LASTEvent] = {
 //     "unknown",          "unknown",       // 0
 //     "KeyPress",         "KeyRelease",    // 2
@@ -257,7 +277,7 @@ static int _xwin_ix(xwin *this) {
   }
   return -1;
 }
-static bool _focus_try(unsigned ix) {
+static char _focus_try(unsigned ix) {
   xwin *w = &wins[ix];
   if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
     xwin_raise(w);
@@ -348,17 +368,20 @@ int main(int argc, char **args, char **env) {
   while (*env) {
     puts(*env++);
   }
-  puts(APP_NAME);
-  srand(0);
+  puts("frameless window manager");
+
   XSetErrorHandler(error_handler);
+
   flog = stdout; // fopen(logfile,"a");
   if (!flog) {
     exit(1);
   }
+
   dpy = XOpenDisplay(NULL);
   if (!dpy) {
     exit(2);
   }
+
   scr.id = DefaultScreen(dpy);
   scr.wi = DisplayWidth(dpy, scr.id);
   scr.hi = DisplayHeight(dpy, scr.id);
