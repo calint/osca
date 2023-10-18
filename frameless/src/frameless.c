@@ -392,9 +392,10 @@ int main(int argc, char **args, char **env) {
   XGrabKey(dpy, AnyKey, Mod4Mask, root, True, GrabModeAsync, GrabModeAsync);
   XGrabKey(dpy, AnyKey, Mod4Mask + ShiftMask, root, True, GrabModeAsync,
            GrabModeAsync);
-  // XGrabKey(dpy, 122, 0, root, True, GrabModeAsync, GrabModeAsync); // volume down
-  // XGrabKey(dpy, 123, 0, root, True, GrabModeAsync, GrabModeAsync); // volume sup
-  // XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync); // print
+  // XGrabKey(dpy, 122, 0, root, True, GrabModeAsync, GrabModeAsync); // volume
+  // down XGrabKey(dpy, 123, 0, root, True, GrabModeAsync, GrabModeAsync); //
+  // volume sup XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync);
+  // // print
   XSelectInput(dpy, root, SubstructureNotifyMask);
 
   // previous desk
@@ -604,11 +605,11 @@ int main(int argc, char **args, char **env) {
         new_hi = scr.hi;
       }
       if (dragging_button == 3) {
-        if (new_wi < 0) {
-          new_wi = 0;
+        if (new_wi < 1) {
+          new_wi = 1;
         }
-        if (new_hi < 0) {
-          new_hi = 0;
+        if (new_hi < 1) {
+          new_hi = 1;
         }
         xw->wi = new_wi;
         xw->hi = new_hi;
@@ -622,11 +623,11 @@ int main(int argc, char **args, char **env) {
         xwin_set_geom(xw);
         break;
       case 27: // r
-        if (new_wi < 0) {
-          new_wi = 0;
+        if (new_wi < 1) {
+          new_wi = 1;
         }
-        if (new_hi < 0) {
-          new_hi = 0;
+        if (new_hi < 1) {
+          new_hi = 1;
         }
         xw->wi = new_wi;
         xw->hi = new_hi;
