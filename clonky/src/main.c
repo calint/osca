@@ -27,10 +27,14 @@
 static struct dc *dc;
 static struct graph *graph_cpu;
 static struct graph *graph_mem;
-static struct graphd *graph_wifi;
+static struct graphd *graph_net;
 
+// auto_config_battery() copies the battery entry in '/sys/class/power_supply'I
 static char sys_cls_pwr_bat[64];
-static char sys_cls_net_wlan[64];
+
+// auto_config_network_traffic() copies the device name found in
+// '/sys/class/net/' preferring wlan otherwise fallback on non loop-back device
+static char graph_net_device[64];
 
 static void get_sys_value_str_tolower(const char *path, char *value,
                                       const int size) {
@@ -204,17 +208,17 @@ static void _rend_mem_info() {
   dc_draw_str(dc, bbuf);
 }
 
-static void _rend_wifi_traffic() {
+static void _rend_net_traffic() {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
   char bbuf[1024];
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
-           sys_cls_net_wlan);
+           graph_net_device);
   long long wifi_tx = get_sys_value_long(bbuf);
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
-           sys_cls_net_wlan);
+           graph_net_device);
   long long wifi_rx = get_sys_value_long(bbuf);
-  graphd_add_value(graph_wifi, wifi_tx + wifi_rx);
-  graphd_draw(graph_wifi, dc, DEFAULT_GRAPH_HEIGHT, WIFI_GRAPH_MAX);
+  graphd_add_value(graph_net, wifi_tx + wifi_rx);
+  graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, WIFI_GRAPH_MAX);
 }
 
 static void pl(const char *str) {
@@ -393,7 +397,7 @@ static void _rend_swaps() {
   pl(sb.chars);
 }
 
-static void auto_config_bat() {
+static void auto_config_battery() {
   DIR *dp = opendir("/sys/class/power_supply");
   if (!dp) {
     puts("[!] battery: cannot open find dir '/sys/class/power_supply'");
@@ -443,7 +447,7 @@ static void auto_config_bat() {
   if (!*sys_cls_pwr_bat) {
     puts("[!] no battery found in /sys/class/power_supply");
   }
-  printf("· graphs battery: ");
+  printf("· battery: ");
   puts(sys_cls_pwr_bat);
   return;
 }
@@ -467,38 +471,43 @@ static int is_wlan_device(const char *sys_cls_net_wlan) {
   return 1;
 }
 
-static void auto_config_wifi() {
+static void auto_config_network_traffic() {
   DIR *dp = opendir("/sys/class/net");
   if (!dp) {
     puts("[!] wifi: cannot open find dir /sys/class/net");
     return;
   }
   struct dirent *ep;
-  *sys_cls_net_wlan = 0;
+  graph_net_device[0] = '\0';
   while ((ep = readdir(dp))) {
     if (ep->d_name[0] == '.') {
       // ignore hidden files
       continue;
     }
-    if (!is_wlan_device(ep->d_name)) {
+    if (is_wlan_device(ep->d_name)) {
+      // found wlan device (preferred)
+      strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
+      break;
+    }
+    if (strcmp("lo", ep->d_name)) {
+      // skip loopback
       continue;
     }
-    // found wlan device
-    strncpy(sys_cls_net_wlan, ep->d_name, sizeof(sys_cls_net_wlan));
-    break;
+    // network device (not preferred)
+    strncpy(graph_net_device, ep->d_name, sizeof(graph_net_device));
   }
   closedir(dp);
-  if (!*sys_cls_net_wlan) {
-    puts("[!] no wireless device found in /sys/class/net");
+  if (!*graph_net_device) {
+    puts("[!] no network device found in /sys/class/net");
   }
-  printf("· graphs network device: ");
-  puts(sys_cls_net_wlan);
+  printf("· network device: ");
+  puts(graph_net_device);
   return;
 }
 
 static void auto_config() {
-  auto_config_bat();
-  auto_config_wifi();
+  auto_config_battery();
+  auto_config_network_traffic();
 }
 
 static struct ifc {
@@ -608,7 +617,7 @@ int _rend_net() {
   return ret;
 }
 
-static void on_draw() {
+static void draw() {
   dc_set_y(dc, Y_TOP);
   dc_clear(dc);
   _rend_datetime();
@@ -616,7 +625,7 @@ static void on_draw() {
   _rend_hello_clonky();
   _rend_mem_info();
   _rend_swaps();
-  _rend_wifi_traffic();
+  _rend_net_traffic();
   _rend_net();
   _rend_hr();
   _rend_io_stat();
@@ -645,8 +654,8 @@ static void signal_exit(int i) {
   if (graph_mem) {
     graph_del(graph_mem);
   }
-  if (graph_wifi) {
-    graphd_del(graph_wifi);
+  if (graph_net) {
+    graphd_del(graph_net);
   }
   signal(SIGINT, SIG_DFL);
   kill(getpid(), SIGINT);
@@ -667,12 +676,12 @@ int main() {
   }
   graph_cpu = graph_new(WIDTH);
   graph_mem = graph_new(WIDTH);
-  graph_wifi = graphd_new(WIDTH);
+  graph_net = graphd_new(WIDTH);
 
   auto_config();
 
   while (1) {
     sleep(1);
-    on_draw();
+    draw();
   }
 }
