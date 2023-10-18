@@ -30,11 +30,11 @@ static struct graph *graph_mem;
 static struct graphd *graph_net;
 
 // auto_config_battery() copies the battery entry in '/sys/class/power_supply'I
-static char sys_cls_pwr_bat[64];
+static char sys_cls_pwr_bat[32];
 
 // auto_config_network_traffic() copies the device name found in
 // '/sys/class/net/' preferring wlan otherwise fallback on non loop-back device
-static char graph_net_device[64];
+static char graph_net_device[32];
 
 static void get_sys_value_str_tolower(const char *path, char *value,
                                       const int size) {
@@ -43,8 +43,9 @@ static void get_sys_value_str_tolower(const char *path, char *value,
     *value = 0;
     return;
   }
-  char fmt[32];
-  snprintf(fmt, sizeof(fmt), "%%%ds\\n", size);
+  char fmt[32] = "";
+  snprintf(fmt, sizeof(fmt), "%%%ds\\n",
+           size - 1); // -1 to leave space for '\0'
   fscanf(file, fmt, value);
   fclose(file);
   char *p = value;
@@ -149,19 +150,19 @@ static void _rend_cpu_load() {
   // iowait: waiting for I/O to complete
   // irq: servicing interrupts
   // softirq: servicing softirqs
-  int user, nice, system, idle, iowait, irq, softirq;
-  char bbuf[1024];
-  fscanf(file, "%1024s %d %d %d %d %d %d %d\n", bbuf, &user, &nice, &system,
-         &idle, &iowait, &irq, &softirq);
+  long long user, nice, system, idle, iowait, irq, softirq;
+  char bbuf[1024] = "";
+  fscanf(file, "%1023s %lld %lld %lld %lld %lld %lld %lld\n", bbuf, &user,
+         &nice, &system, &idle, &iowait, &irq, &softirq);
   fclose(file);
-  const int total = (user + nice + system + idle + iowait + irq + softirq);
-  const int usage = total - idle;
+  const long long total = user + nice + system + idle + iowait + irq + softirq;
+  const long long usage = total - idle;
   const long long dtotal = total - cpu_total_last;
   cpu_total_last = total;
-  const int dusage = usage - cpu_usage_last;
+  const long long dusage = usage - cpu_usage_last;
   cpu_usage_last = usage;
-  const int usagepercent = dusage * 100 / dtotal;
-  graph_add_value(graph_cpu, usagepercent);
+  const long long usage_percent = dusage * 100 / dtotal;
+  graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
   graph_draw2(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
@@ -182,16 +183,18 @@ static void _rend_mem_info() {
   if (!file) {
     return;
   }
-  char name[64] = "", unit[32] = "";
-  long long mem_total = 0, mem_avail = 0;
-  char bbuf[1024];
+  char name[64] = "";
+  char unit[32] = "";
+  long long mem_total = 0;
+  long long mem_avail = 0;
+  char bbuf[1024] = "";
   fgets(bbuf, sizeof(bbuf), file); //	MemTotal:        1937372 kB
-  sscanf(bbuf, "%64s %lld %32s", name, &mem_total, unit);
+  sscanf(bbuf, "%63s %lld %31s", name, &mem_total, unit);
   fgets(bbuf, sizeof(bbuf), file); //	MemFree:           99120 kB
   fgets(bbuf, sizeof(bbuf), file); //	MemAvailable:     887512 kB
   fclose(file);
 
-  sscanf(bbuf, "%64s %lld %32s", name, &mem_avail, unit);
+  sscanf(bbuf, "%63s %lld %31s", name, &mem_avail, unit);
   int proc = (mem_total - mem_avail) * 100 / mem_total;
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
@@ -210,7 +213,7 @@ static void _rend_mem_info() {
 
 static void _rend_net_traffic() {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
-  char bbuf[1024];
+  char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
            graph_net_device);
   long long wifi_tx = get_sys_value_long(bbuf);
@@ -281,14 +284,14 @@ static void _rend_io_stat() {
   //
   //	Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
   //	sda               7.89        25.40        80.46     914108    2896281
-  char bbuf[1024];
+  char bbuf[1024] = "";
   fgets(bbuf, sizeof(bbuf), f);
   fgets(bbuf, sizeof(bbuf), f);
   fgets(bbuf, sizeof(bbuf), f);
   float tps = 0, kb_read_s = 0, kb_written_s = 0;
   long long kb_read = 0, kb_written = 0;
   char dev[64];
-  fscanf(f, "%64s %f %f %f %lld %lld", dev, &tps, &kb_read_s, &kb_written_s,
+  fscanf(f, "%63s %f %f %f %lld %lld", dev, &tps, &kb_read_s, &kb_written_s,
          &kb_read, &kb_written);
   pclose(f);
   const char *unit = "kB";
@@ -345,9 +348,11 @@ inline static void _rend_date_time() {
 
 static void _rend_cpu_throttles() {
   FILE *f = fopen("/sys/devices/system/cpu/present", "r");
-  if (!f)
+  if (!f) {
     return;
-  int min, max;
+  }
+  int min = 0;
+  int max = 0;
   fscanf(f, "%d-%d", &min, &max);
   fclose(f);
 
@@ -386,10 +391,12 @@ static void _rend_swaps() {
   // /dev/mmcblk0p3   partition  2096124  16568  s-1
   char bbuf[1024];
   fgets(bbuf, sizeof bbuf, f);
-  char dev[64], type[32];
+  char dev[64] = "";
+  char type[32] = "";
   long long size = 0, used = 0;
-  if (!fscanf(f, "%64s %32s %lld %lld", dev, type, &size, &used))
+  if (!fscanf(f, "%63s %31s %lld %lld", dev, type, &size, &used)) {
     return;
+  }
   fclose(f);
 
   strb sb;

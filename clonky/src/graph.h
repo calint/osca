@@ -1,12 +1,21 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-#include "dc.h"
+
+struct dc;
 struct graph;
-struct graph *graph_new(const int nvalues);
-void graph_del(struct graph *g);
-void graph_print(const struct graph *g);
-void graph_draw(const struct graph *g, struct dc *dc, const int ysclshft);
-void graph_draw2(const struct graph *g, struct dc *dc, const int height,
-                const long long maxvalue);
-void graph_add_value(struct graph *g, const long long value);
+
+struct /*give*/ graph *graph_new(const int nvalues);
+
+void graph_del(/*take*/ struct graph *self);
+
+void graph_print(const struct graph *self);
+
+void graph_draw(const struct graph *self, struct dc *dc,
+                int y_value_shift_right);
+
+void graph_draw2(const struct graph *self, struct dc *dc, int height,
+                 long long max_value);
+
+void graph_add_value(struct graph *self, long long value);
+
 #endif

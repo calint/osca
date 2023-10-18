@@ -1,11 +1,18 @@
 #ifndef GRAPHD_H
 #define GRAPHD_H
-#include "dc.h"
+
+struct dc;
 struct graphd;
-struct graphd *graphd_new(const int nvalues);
-void graphd_del(struct graphd *g);
-void graphd_print(const struct graphd *g);
-void graphd_draw(const struct graphd *g, struct dc *dc, const int height,
-                const long long maxvalue);
-void graphd_add_value(struct graphd *g, const long long value);
+
+struct /*give*/ graphd *graphd_new(int nvalues);
+
+void graphd_del(/*take*/ struct graphd *self);
+
+void graphd_print(const struct graphd *self);
+
+void graphd_draw(const struct graphd *self, struct dc *dc, int height,
+                 long long max_value);
+
+void graphd_add_value(struct graphd *self, long long value);
+
 #endif

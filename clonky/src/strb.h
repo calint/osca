@@ -8,21 +8,21 @@ typedef struct {
 } strb;
 
 /// initiates @o
-void strb_init(strb *o);
+void strb_init(strb *self);
 
 /// @returns remaining free chars in @o
-size_t strb_rem(strb *o);
+size_t strb_rem(strb *self);
 
 /// appends @str to @o  @returns 0 if ok
-int strb_p(strb *o, const char *str);
+int strb_p(strb *self, const char *str);
 
 /// appends @n to @o  @returns 0 if ok
-int strb_fmt_long(strb *o, long long n);
+int strb_fmt_long(strb *self, long long n);
 
 /// formats @bytes to @o  @returns 0 if ok
-int strb_fmt_bytes(strb *o, long long bytes);
+int strb_fmt_bytes(strb *self, long long bytes);
 
 /// clears buffer by setting index to 0 and first char to EOS
-void strb_clear(strb *o);
+void strb_clear(strb *self);
 
 #endif
