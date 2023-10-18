@@ -1,0 +1,4 @@
+install minimal archlinux as described at:
+    https://wiki.archlinux.org/title/Installation_guide (2023-10-18)
+
+use the provided scripts at different points in the install

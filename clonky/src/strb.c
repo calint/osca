@@ -22,9 +22,9 @@ inline int strb_p(strb *self, const char *str) {
   return 0;
 }
 
-inline int strb_fmt_long(strb *self, const long long n) {
+inline int strb_fmt_long(strb *self, const long long num) {
   char buf[32];
-  snprintf(buf, sizeof(buf), "%lld", n);
+  snprintf(buf, sizeof(buf), "%lld", num);
   strb_p(self, buf);
   return 0;
 }

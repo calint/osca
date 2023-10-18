@@ -17,7 +17,7 @@ size_t strb_rem(strb *self);
 int strb_p(strb *self, const char *str);
 
 // appends @n to @o  @returns 0 if ok
-int strb_fmt_long(strb *self, long long n);
+int strb_fmt_long(strb *self, long long num);
 
 // formats @bytes to @o  @returns 0 if ok
 int strb_fmt_bytes(strb *self, long long bytes);
