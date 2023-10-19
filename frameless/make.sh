@@ -8,7 +8,6 @@ CC="gcc"
 #CC="clang -Weverything \
 #    -Wno-declaration-after-statement \
 #    -Wno-padded \
-#    -Wno-reserved-identifier
 #"
 BIN=frameless
 SRC=src/frameless.c

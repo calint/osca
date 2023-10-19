@@ -4,5 +4,12 @@
 [ ] clonky: net up/down in KB/s instead of total
 [ ] frameless: clang compile fix -Wno-sign-conversion
 [ ] gtk.css: export GTK_DEBUG=interactive
+[ ] clang-tidy: basic
+[x]     frameless
+[ ]     clonky
+[ ]     menuq
+[x]     snap
+[ ]     stickyo
+[ ] clang-tidy: maxed
 --------------------------------------------------------------
 [x] frameless: consolidate xwin.vh and bits into one field

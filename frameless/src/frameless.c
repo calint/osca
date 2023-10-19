@@ -63,11 +63,11 @@ static int dsk;
 static unsigned xwin_count;
 
 // default screen info
-static struct scr {
+static struct screen {
   unsigned id;
   unsigned wi;
   unsigned hi;
-} scr;
+} screen;
 
 // current key pressed
 static unsigned key_pressed;
@@ -99,7 +99,7 @@ static unsigned dragging_button;
 //     "ColormapNotify",   "ClientMessage",    "MappingNotify",
 //     "GenericEvent"};
 
-static xwin *xwin_get(Window w) {
+static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].bits & XWIN_BIT_ALLOCATED) {
@@ -137,7 +137,7 @@ static void xwin_focus(xwin *this) {
 
 static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
 
-static xwin *_win_find(Window w) {
+static xwin *winx_find_by_window(Window w) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].win == w)
       return &wins[i];
@@ -145,8 +145,8 @@ static xwin *_win_find(Window w) {
   return NULL;
 }
 
-static void xwin_free(Window w) {
-  xwin *win = _win_find(w);
+static void xwin_free_by_window(Window w) {
+  xwin *win = winx_find_by_window(w);
   if (!win) {
     return;
   }
@@ -172,8 +172,8 @@ static void xwin_set_geom(xwin *this) {
 
 static void xwin_center(xwin *this) {
   xwin_read_geom(this);
-  this->x = (int)((scr.wi - this->wi) >> 1);
-  this->y = (int)((scr.hi - this->hi) >> 1);
+  this->x = (int)((screen.wi - this->wi) >> 1);
+  this->y = (int)((screen.hi - this->hi) >> 1);
   xwin_set_geom(this);
 }
 
@@ -226,8 +226,8 @@ static void xwin_toggle_fullscreen(xwin *this) {
     this->hi_pf = this->hi;
     this->x = -WIN_BORDER_WIDTH;
     this->y = -WIN_BORDER_WIDTH;
-    this->wi = scr.wi;
-    this->hi = scr.hi;
+    this->wi = screen.wi;
+    this->hi = screen.hi;
     xwin_set_geom(this);
     this->bits |= XWIN_BITS_FULL_SCREEN;
   }
@@ -244,7 +244,7 @@ static void xwin_toggle_fullheight(xwin *this) {
     this->y_pf = this->y;
     this->hi_pf = this->hi;
     this->y = -WIN_BORDER_WIDTH;
-    this->hi = scr.hi;
+    this->hi = screen.hi;
     xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
@@ -261,7 +261,7 @@ static void xwin_toggle_fullwidth(xwin *this) {
     this->x_pf = this->x;
     this->wi_pf = this->wi;
     this->x = -WIN_BORDER_WIDTH;
-    this->wi = scr.wi;
+    this->wi = screen.wi;
     xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_WIDTH;
@@ -271,7 +271,7 @@ static void xwin_hide(xwin *this) {
   xwin_read_geom(this);
   this->desk_x = this->x;
   unsigned slip = (unsigned)(rand() % WIN_SLIP);
-  this->x = (int)(scr.wi - WIN_SLIP_DX + slip);
+  this->x = (int)(screen.wi - WIN_SLIP_DX + slip);
   xwin_set_geom(this);
 }
 
@@ -287,7 +287,7 @@ static void xwin_bump(xwin *this, int rand_amt) {
   xwin_set_geom(this);
 }
 
-static int _xwin_ix(xwin *this) {
+static int xwin_ix(xwin *this) {
   if (this == NULL) {
     return -1;
   }
@@ -299,7 +299,7 @@ static int _xwin_ix(xwin *this) {
   return -1;
 }
 
-static char _focus_try(unsigned ix) {
+static char xwin_focus_try_by_index(unsigned ix) {
   xwin *w = &wins[ix];
   if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
     xwin_raise(w);
@@ -330,7 +330,7 @@ static void desk_show(int dsk_id, int dsk_prv) {
   }
 }
 
-static void focus_first_win_on_desk(void) {
+static void focus_first_window_on_desk(void) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *w = &wins[i];
     if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
@@ -363,39 +363,39 @@ static void focus_window_after_desk_switch(void) {
   xwin_focus(win_focused);
 }
 
-static void focus_next_win(void) {
-  int i0 = _xwin_ix(win_focused);
+static void focus_next_window(void) {
+  int i0 = xwin_ix(win_focused);
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
-    if (_focus_try((unsigned)i)) {
+    if (xwin_focus_try_by_index((unsigned)i)) {
       return;
     }
   }
   i = 0;
   while (i <= i0) {
-    if (_focus_try((unsigned)i)) {
+    if (xwin_focus_try_by_index((unsigned)i)) {
       return;
     }
     i++;
   }
-  focus_first_win_on_desk();
+  focus_first_window_on_desk();
 }
 
-static void focus_prev_win(void) {
-  int i0 = _xwin_ix(win_focused);
+static void focus_previous_window(void) {
+  int i0 = xwin_ix(win_focused);
   int i = i0;
   while (--i >= 0) {
-    if (_focus_try((unsigned)i)) {
+    if (xwin_focus_try_by_index((unsigned)i)) {
       return;
     }
   }
   i = WIN_MAX_COUNT;
   while (--i >= 0) {
-    if (_focus_try((unsigned)i)) {
+    if (xwin_focus_try_by_index((unsigned)i)) {
       return;
     }
   }
-  focus_first_win_on_desk();
+  focus_first_window_on_desk();
 }
 
 static int error_handler(Display *d, XErrorEvent *e) {
@@ -432,9 +432,9 @@ int main(int argc, char **args, char **env) {
     exit(2);
   }
 
-  scr.id = (unsigned)DefaultScreen(dpy);
-  scr.wi = (unsigned)DisplayWidth(dpy, scr.id);
-  scr.hi = (unsigned)DisplayHeight(dpy, scr.id);
+  screen.id = (unsigned)DefaultScreen(dpy);
+  screen.wi = (unsigned)DisplayWidth(dpy, screen.id);
+  screen.hi = (unsigned)DisplayHeight(dpy, screen.id);
 
   root = DefaultRootWindow(dpy);
   Cursor root_window_cursor = XCreateFontCursor(dpy, XC_arrow);
@@ -461,7 +461,7 @@ int main(int argc, char **args, char **env) {
           ev.xmap.override_redirect) {
         break;
       }
-      xw = xwin_get(ev.xmap.window);
+      xw = xwin_get_by_window(ev.xmap.window);
       xwin_center(xw);
       xwin_focus(xw);
       XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
@@ -473,18 +473,18 @@ int main(int argc, char **args, char **env) {
           ev.xmap.override_redirect) {
         break;
       }
-      xwin_free(ev.xmap.window);
+      xwin_free_by_window(ev.xmap.window);
       break;
     case EnterNotify:
       if (is_dragging)
         break;
-      xw = xwin_get(ev.xcrossing.window);
+      xw = xwin_get_by_window(ev.xcrossing.window);
       xwin_focus(xw);
       break;
     case KeyPress:
       key_pressed = ev.xkey.keycode;
       if (ev.xkey.subwindow) {
-        xw = xwin_get(ev.xkey.subwindow);
+        xw = xwin_get_by_window(ev.xkey.subwindow);
       }
       switch (key_pressed) {
       case 53: // x
@@ -575,11 +575,11 @@ int main(int argc, char **args, char **env) {
         }
         break;
       case 113: // left
-        focus_prev_win();
+        focus_previous_window();
         break;
       case 52:  // z
       case 114: // right
-        focus_next_win();
+        focus_next_window();
         break;
       case 119: // del
         XKillClient(dpy, ev.xkey.subwindow);
@@ -622,7 +622,7 @@ int main(int argc, char **args, char **env) {
       dragging_start_x = ev.xbutton.x_root;
       dragging_start_y = ev.xbutton.y_root;
       dragging_button = ev.xbutton.button;
-      xw = xwin_get(ev.xbutton.window);
+      xw = xwin_get_by_window(ev.xbutton.window);
       xwin_focus(xw);
       XGrabPointer(dpy, xw->win, True, PointerMotionMask | ButtonReleaseMask,
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
@@ -636,17 +636,21 @@ int main(int argc, char **args, char **env) {
       int ydiff = ev.xbutton.y_root - dragging_start_y;
       dragging_start_x = ev.xbutton.x_root;
       dragging_start_y = ev.xbutton.y_root;
+      if (!xw) {
+        // case should not happen because 'xw' is set wind dragging startss
+        break;
+      }
       int new_x = xw->x + xdiff;
       unsigned new_wi = (unsigned)((int)xw->wi + xdiff);
       int new_y = xw->y + ydiff;
       unsigned new_hi = (unsigned)((int)xw->hi + ydiff);
       if (xw->bits & XWIN_BIT_FULL_WIDTH) {
         new_x = -WIN_BORDER_WIDTH;
-        new_wi = scr.wi;
+        new_wi = screen.wi;
       }
       if (xw->bits & XWIN_BIT_FULL_HEIGHT) {
         new_y = -WIN_BORDER_WIDTH;
-        new_hi = scr.hi;
+        new_hi = screen.hi;
       }
       if (dragging_button == 3) {
         if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
@@ -682,7 +686,7 @@ int main(int argc, char **args, char **env) {
     case ButtonRelease:
       is_dragging = False;
       dragging_button = 0;
-      xw = xwin_get(ev.xbutton.window);
+      xw = xwin_get_by_window(ev.xbutton.window);
       xw->desk = dsk;
       XUngrabPointer(dpy, CurrentTime);
       break;
