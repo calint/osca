@@ -458,9 +458,11 @@ int main(int argc, char **args, char **env) {
   while (!XNextEvent(dpy, &ev)) {
     fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
             (void *)ev.xany.window);
+    fflush(flog);
     switch (ev.type) {
     default:
       fprintf(flog, "  unhandled\n");
+      fflush(flog);
       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
