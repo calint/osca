@@ -358,9 +358,7 @@ static void focus_window_after_desk_switch(void) {
   if (!only_window) {
     return;
   }
-  win_focused = only_window;
-  xwin_raise(win_focused);
-  xwin_focus(win_focused);
+  xwin_focus(only_window);
 }
 
 static void focus_next_window(void) {
