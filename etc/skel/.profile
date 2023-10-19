@@ -5,7 +5,7 @@ export PATH=$PATH:$OSCA/sh
 export PS1=' :: '
 
 # launch frameleses window manager
-alias start-frameless='xinit -- :1 -nolisten tcp vt$XDG_VTNR'
+alias start-frameless='xinit -- :1 -nolisten tcp vt$XDG_VTNR > x11.log'
 # find
 alias f='grep --color=always -i'
 # list files
