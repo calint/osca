@@ -5,6 +5,11 @@ set -e
 cd $(dirname "$0")
 
 CC="cc"
+#CC="clang -Weverything \
+#    -Wno-sign-conversion \
+#    -Wno-padded \
+#    -Wno-declaration-after-statement \
+#    -Wno-reserved-identifier"
 BIN=frameless
 SRC=src/frameless.c
 OPTS="-Os -pedantic-errors -Wfatal-errors"

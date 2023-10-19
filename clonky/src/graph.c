@@ -4,12 +4,12 @@
 #include <stdlib.h>
 
 struct graph {
-  int nvalues;
+  unsigned nvalues;
   long long *values;
-  int ix;
+  unsigned ix;
 };
 
-struct /*give*/ graph *graph_new(int nvalues) {
+struct /*give*/ graph *graph_new(unsigned nvalues) {
   struct graph *self = malloc(sizeof(struct graph));
   if (!self) {
     printf("graphnew can not alloc\n");
@@ -30,12 +30,6 @@ void graph_del(/*take*/ struct graph *self) {
   free(self);
 }
 
-void graph_print(const struct graph *self) {
-  printf("graph:\n size %lu\n addr:%p\n nvalues: %d\n values: %p\n ix: %d\n",
-         sizeof(*self), (void *)self, self->nvalues, (void *)self->values,
-         self->ix);
-}
-
 void graph_add_value(struct graph *self, const long long value) {
   self->values[self->ix] = value;
   self->ix++;
@@ -43,31 +37,33 @@ void graph_add_value(struct graph *self, const long long value) {
     self->ix = 0;
 }
 
-void graph_draw(const struct graph *self, struct dc *dc, const int ysclshft) {
+void graph_draw(const struct graph *self, struct dc *dc,
+                const int y_value_shift_right) {
   const int dc_x = dc_get_x(dc);
   const int dc_y = dc_get_y(dc);
-  dc_draw_line(dc, dc_x, dc_y - (100 >> ysclshft), dc_x + self->nvalues,
-               dc_y - (100 >> ysclshft));
+  dc_draw_line(dc, dc_x, dc_y - (100 >> y_value_shift_right),
+               dc_x + (int)self->nvalues, dc_y - (100 >> y_value_shift_right));
   int x = dc_x;
   // circular buffer, draw from current index to end
-  for (int i = self->ix; i < self->nvalues; i++) {
-    long long v = self->values[i] >> ysclshft;
-    if (v == 0 && self->values[i] != 0)
+  for (unsigned i = self->ix; i < self->nvalues; i++) {
+    long long v = self->values[i] >> y_value_shift_right;
+    if (v == 0 && self->values[i] != 0) {
       v = 1;
-    dc_draw_line(dc, x, dc_y, x, dc_y - v);
+    }
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
     x++;
   }
   // draw from 0 to current index
-  for (int i = 0; i < self->ix; i++) {
-    long long v = self->values[i] >> ysclshft;
+  for (unsigned i = 0; i < self->ix; i++) {
+    long long v = self->values[i] >> y_value_shift_right;
     if (v == 0 && self->values[i] != 0)
       v = 1;
-    dc_draw_line(dc, x, dc_y, x, dc_y - v);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
     x++;
   }
 }
 
-static long long _cap(long long v, const int height) {
+static long long graphd_cap_value(long long v, const int height) {
   if (v > height)
     v = height;
   if (v < 0)
@@ -83,25 +79,26 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
   const int dc_x = dc_get_x(dc);
   const int dc_y = dc_get_y(dc);
   // draw top line
-  dc_draw_line(dc, dc_x, dc_y - height, dc_x + self->nvalues, dc_y - height);
+  dc_draw_line(dc, dc_x, dc_y - height, dc_x + (int)self->nvalues,
+               dc_y - height);
   int x = dc_x;
   // circular buffer, draw from current index to end
-  for (int i = self->ix; i < self->nvalues; i++) {
+  for (unsigned i = self->ix; i < self->nvalues; i++) {
     long long v = self->values[i] * height / max_value;
     if (v == 0 && self->values[i] != 0)
       v = 1;
-    v = _cap(v, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - v);
+    v = graphd_cap_value(v, height);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
     x++;
   }
   // draw from 0 to current index
-  for (int i = 0; i < self->ix; i++) {
+  for (unsigned i = 0; i < self->ix; i++) {
     long long v = self->values[i] * height / max_value;
     if (v == 0 && self->values[i] != 0) {
       v = 1;
     }
-    v = _cap(v, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - v);
+    v = graphd_cap_value(v, height);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
     x++;
   }
 }

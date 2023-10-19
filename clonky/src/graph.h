@@ -4,11 +4,9 @@
 struct dc;
 struct graph;
 
-struct /*give*/ graph *graph_new(int nvalues);
+struct /*give*/ graph *graph_new(unsigned nvalues);
 
 void graph_del(/*take*/ struct graph *self);
-
-void graph_print(const struct graph *self);
 
 void graph_draw(const struct graph *self, struct dc *dc,
                 int y_value_shift_right);

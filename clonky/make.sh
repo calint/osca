@@ -5,6 +5,7 @@ set -e
 cd $(dirname "$0")
 
 CC="gcc"
+#CC="clang -Weverything -Wno-disabled-macro-expansion -Wno-padded -Wno-declaration-after-statement -Wno-format-nonliteral -Wno-missing-noreturn"
 BIN="clonky"
 SRC="src/*.c"
 OPTS="-Os -Werror -Wfatal-errors"

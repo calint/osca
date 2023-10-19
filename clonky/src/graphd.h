@@ -4,11 +4,9 @@
 struct dc;
 struct graphd;
 
-struct /*give*/ graphd *graphd_new(int nvalues);
+struct /*give*/ graphd *graphd_new(unsigned nvalues);
 
 void graphd_del(/*take*/ struct graphd *self);
-
-void graphd_print(const struct graphd *self);
 
 void graphd_draw(const struct graphd *self, struct dc *dc, int height,
                  long long max_value);

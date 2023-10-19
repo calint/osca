@@ -290,7 +290,7 @@ static char _focus_try(unsigned ix) {
   }
   return False;
 }
-static void desk_show(int dsk, int dsk_prv) {
+static void desk_show(int dsk_id, int dsk_prv) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
     if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
@@ -305,7 +305,7 @@ static void desk_show(int dsk, int dsk_prv) {
     if (xw->desk == dsk_prv) {
       xwin_hide(xw);
     }
-    if (xw->desk == dsk) {
+    if (xw->desk == dsk_id) {
       xwin_show(xw);
     }
   }

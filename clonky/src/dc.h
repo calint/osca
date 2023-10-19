@@ -19,24 +19,24 @@ void dc_draw_str(struct dc *self, const char *str);
 
 void dc_newline(struct dc *self);
 
-void dc_inc_y(struct dc *self, const int dy);
+void dc_inc_y(struct dc *self, int dy);
 
 void dc_flush(const struct dc *self);
 
 int dc_get_x(const struct dc *self);
 
-void dc_set_x(struct dc *self, const int x);
+void dc_set_x(struct dc *self, int x);
 
 int dc_get_y(const struct dc *self);
 
-void dc_set_y(struct dc *self, const int y);
+void dc_set_y(struct dc *self, int y);
 
-int dc_get_width(const struct dc *self);
+unsigned dc_get_width(const struct dc *self);
 
-int dc_get_screen_width(const struct dc *self);
+unsigned dc_get_screen_width(const struct dc *self);
 
-void dc_set_width(struct dc *self, const int width);
+void dc_set_width(struct dc *self, unsigned width);
 
-void dc_set_left_x(struct dc *self, const int x);
+void dc_set_left_x(struct dc *self, int x);
 
 #endif

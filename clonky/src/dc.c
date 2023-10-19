@@ -11,9 +11,9 @@ struct dc {
   XftFont *font;
   XftDraw *draw;
   XftColor color;
-  unsigned int dpy_width;
-  unsigned int dpy_height;
-  unsigned int width;
+  unsigned dpy_width;
+  unsigned dpy_height;
+  unsigned width;
   int xlft;
   int ytop;
   int ddoty;
@@ -31,8 +31,8 @@ struct dc {
     return NULL;
   }
   self->scr = DefaultScreen(self->dpy);
-  self->dpy_width = DisplayWidth(self->dpy, self->scr);
-  self->dpy_height = DisplayHeight(self->dpy, self->scr);
+  self->dpy_width = (unsigned)DisplayWidth(self->dpy, self->scr);
+  self->dpy_height = (unsigned)DisplayHeight(self->dpy, self->scr);
   self->width = self->dpy_width;
   self->xlft = 0;
   self->ytop = 0;
@@ -79,13 +79,13 @@ void dc_newline(struct dc *self) { self->doty += self->ddoty; }
 void dc_draw_str(struct dc *self, const char *str) {
   XftDrawStringUtf8(self->draw, &self->color, self->font,
                     self->xlft + self->dotx, self->ytop + self->doty,
-                    (FcChar8 *)str, strlen(str));
+                    (const FcChar8 *)str, (int)strlen(str));
 }
 
 void dc_draw_hr(struct dc *self) {
   self->doty += 3;
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
-            self->xlft + self->width, self->doty);
+            self->xlft + (int)self->width, self->doty);
 }
 
 void dc_draw_hr1(struct dc *self, const int width) {
@@ -108,8 +108,8 @@ int dc_get_y(const struct dc *self) { return self->doty; }
 
 void dc_set_y(struct dc *self, const int y) { self->doty = y; }
 
-int dc_get_width(const struct dc *self) { return self->width; }
+unsigned dc_get_width(const struct dc *self) { return self->width; }
 
-void dc_set_width(struct dc *self, const int width) { self->width = width; }
+void dc_set_width(struct dc *self, const unsigned width) { self->width = width; }
 
-int dc_get_screen_width(const struct dc *self) { return self->dpy_width; }
+unsigned dc_get_screen_width(const struct dc *self) { return self->dpy_width; }

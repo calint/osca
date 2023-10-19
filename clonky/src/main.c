@@ -1,4 +1,3 @@
-#define _XOPEN_SOURCE 500
 #define _GNU_SOURCE // To get defines of NI_MAXSERV and NI_MAXHOST
 
 #include "dc.h"
@@ -35,10 +34,10 @@ static struct graph *graph_mem;
 static struct graphd *graph_net;
 
 // prefix to battery status directory
-const char power_supply_path_prefix[] = "/sys/class/power_supply/";
+static const char power_supply_path_prefix[] = "/sys/class/power_supply/";
 
 // quirk for different names for battery charge indicator
-const char *battery_energy_or_charge_prefix = "";
+static const char *battery_energy_or_charge_prefix = "";
 
 // auto_config_battery() copies the battery entry in '/sys/class/power_supply/'I
 static char battery_name[32] = "";
@@ -61,7 +60,7 @@ static void get_sys_value_str_tolower(const char *path, char *value,
   fclose(file);
   char *p = value;
   while (*p) {
-    *p = tolower(*p);
+    *p = (char)tolower(*p);
     p++;
   }
 }
@@ -125,7 +124,7 @@ static void render_battery(void) {
   if (nchars < 0 || (size_t)nchars >= sizeof(buf)) {
     return; // truncated
   }
-  const size_t maxlen = sizeof(buf) - nchars;
+  const size_t maxlen = sizeof(buf) - (size_t)nchars;
   char *p = buf + nchars;
   strncpy(p, "full", maxlen);
   const long long charge_full = get_sys_value_long(buf);
@@ -140,13 +139,13 @@ static void render_battery(void) {
            charge_now / 1000, charge_full / 1000);
   dc_draw_str(dc, bbuf);
   if (charge_full) {
-    dc_draw_hr1(dc, WIDTH * charge_now / charge_full);
+    dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
   }
 }
 
 static void render_cpu_load(void) {
-  static int cpu_total_last = 0;
-  static int cpu_usage_last = 0;
+  static long long cpu_total_last = 0;
+  static long long cpu_usage_last = 0;
 
   FILE *file = fopen("/proc/stat", "r");
   if (!file)
@@ -203,7 +202,7 @@ static void render_mem_info(void) {
   fclose(file);
 
   sscanf(bbuf, "%31s %lld %15s", name, &mem_avail, unit);
-  int proc = (mem_total - mem_avail) * 100 / mem_total;
+  int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
@@ -340,14 +339,14 @@ static void render_acpi(void) {
       break;
     }
     for (char *p = bbuf; *p; ++p) {
-      *p = tolower(*p);
+      *p = (char)tolower(*p);
     }
     pl(bbuf);
   }
   pclose(file);
 }
 
-inline static void render_date_time(void) {
+static void render_date_time(void) {
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t);
   strb sb;
@@ -588,7 +587,7 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
   return ifc;
 }
 
-int render_net_callback(struct ifc *ifc) {
+static int render_net_callback(struct ifc *ifc) {
   char buf[1024];
   // >> 20 to convert number of B to MB
   snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
@@ -599,7 +598,7 @@ int render_net_callback(struct ifc *ifc) {
   return 0;
 }
 
-int render_net(void) {
+static int render_net(void) {
   struct ifaddrs *ifas, *ifa;
   if (getifaddrs(&ifas) == -1) {
     perror("getifaddrs");
@@ -701,7 +700,7 @@ int main(int argc, char *argv[]) {
 
   if (ALIGN == 1) {
     // align right
-    dc_set_left_x(dc, dc_get_screen_width(dc) - WIDTH);
+    dc_set_left_x(dc, (int)dc_get_screen_width(dc) - WIDTH);
   }
 
   graph_cpu = graph_new(WIDTH);

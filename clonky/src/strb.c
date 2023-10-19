@@ -14,10 +14,10 @@ inline size_t strb_rem(strb *self) {
 inline int strb_p(strb *self, const char *str) {
   const size_t remaining = strb_rem(self);
   const int n = snprintf(self->chars + self->index, remaining, "%s", str);
-  if (n < 0) {
+  if (n < 0 || (size_t)n >= remaining) {
     return -1;
   }
-  self->index += n;
+  self->index += (size_t)n;
   const size_t remaining2 = strb_rem(self);
   if (remaining2 < 1) {
     return -2;
