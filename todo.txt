@@ -3,6 +3,7 @@
 [ ] clonky: throttle percentage display not same as in htop
 [ ] clonky: net up/down in KB/s instead of total
 [ ] frameless: clang compile fix -Wno-sign-conversion
+[ ] frameless: remember focused window on each desk
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clang-tidy: basic
 [x]     frameless
