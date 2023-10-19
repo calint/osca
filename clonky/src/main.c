@@ -21,6 +21,12 @@
 #include <time.h>
 #include <unistd.h>
 
+// number of tracked interfaces
+#define NET_IFCS_SIZE 4
+
+// size of interface name
+#define NET_IFC_NAME_SIZE 16
+
 // device context (renderer)
 static struct dc *dc;
 
@@ -523,7 +529,7 @@ static void auto_config_network_traffic(void) {
   if (!net_device[0]) {
     puts("[!] no network device found in /sys/class/net");
   }
-  printf("· network device: ");
+  printf("· graph network interface: ");
   puts(net_device);
   return;
 }
@@ -534,38 +540,29 @@ static void auto_config(void) {
 }
 
 static struct netifc {
-  /*own*/ char *name;
+  char name[NET_IFC_NAME_SIZE];
   long long rx_bytes_prv;
   long long tx_bytes_prv;
   /*ref*/ struct netifc *next;
-} *netifcs = NULL;
+} netifcs[NET_IFCS_SIZE];
 
-static void netifcs_free(void) {
-  struct netifc *ifc = netifcs;
-  while (ifc != NULL) {
-    struct netifc *nxt = ifc->next;
-    free(ifc->name);
-    free(ifc);
-    ifc = nxt;
-  }
-  netifcs = NULL;
-}
+static unsigned netifcs_len;
 
 static struct netifc *netifcs_get_by_name_or_create(/*refs*/ const char *name) {
-  struct netifc *ifc = netifcs;
-  while (ifc != NULL) {
-    if (!strncmp(ifc->name, name, NI_MAXHOST)) {
-      return ifc;
+  for (unsigned i = 0; i < NET_IFCS_SIZE; i++) {
+    struct netifc *ni = &netifcs[i];
+    if (!strncmp(ni->name, name, sizeof(ni->name))) {
+      return &netifcs[i];
     }
-    ifc = ifc->next;
   }
-  printf("· add network interface: %s\n", name);
-  ifc = (struct netifc *)calloc(1, sizeof(struct netifc));
-  ifc->name = malloc(128);
-  strncpy(ifc->name, name, 127);
-  ifc->next = netifcs;
-  netifcs = ifc;
-  return ifc;
+  if (netifcs_len >= sizeof(netifcs) / sizeof(struct netifc)) {
+    return NULL;
+  }
+  printf("· network interface: %s\n", name);
+  struct netifc *ni = &netifcs[netifcs_len];
+  netifcs_len++;
+  strncpy(ni->name, name, sizeof(ni->name));
+  return ni;
 }
 
 static void render_net_interfaces(void) {
@@ -590,6 +587,9 @@ static void render_net_interfaces(void) {
     long long rx_bytes = get_sys_value_long(buf);
 
     struct netifc *ifc = netifcs_get_by_name_or_create(entry->d_name);
+    if (!ifc) {
+      return;
+    }
     long long delta_tx_bytes =
         tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
     long long delta_rx_bytes =
@@ -639,7 +639,6 @@ static void signal_exit(int i) {
   if (graph_net) {
     graphd_del(graph_net);
   }
-  netifcs_free();
   exit(i);
 }
 
