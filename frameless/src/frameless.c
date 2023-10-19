@@ -482,8 +482,9 @@ int main(int argc, char **args, char **env) {
       xwin_free_by_window(ev.xmap.window);
       break;
     case EnterNotify:
-      if (is_dragging)
+      if (is_dragging) {
         break;
+      }
       xw = xwin_get_by_window(ev.xcrossing.window);
       xwin_focus(xw);
       break;
