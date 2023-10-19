@@ -456,11 +456,11 @@ int main(int argc, char **args, char **env) {
   xwin *xw = NULL;
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
-    // fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
-    //         (void *)ev.xany.window);
+    fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
+            (void *)ev.xany.window);
     switch (ev.type) {
     default:
-      // fprintf(flog, "  unhandled\n");
+      fprintf(flog, "  unhandled\n");
       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
@@ -603,6 +603,7 @@ int main(int argc, char **args, char **env) {
         }
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
+        fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
         break;
       case 40:  // d
       case 116: // down
