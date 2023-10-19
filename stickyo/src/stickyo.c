@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   gtk_box_pack_start(GTK_BOX(vbox), text_view, TRUE, TRUE, 0);
 
   const char *css = "textview { font: 9pt monospace; background-color: yellow; "
-                    "padding-left: 5pt; padding-right: 5pt } textview text { "
+                    "padding: 5pt; } textview text { "
                     "background: yellow; color: black; caret-color: black; }";
   GtkCssProvider *css_provider = gtk_css_provider_new();
   GError *error = NULL;
