@@ -5,4 +5,4 @@ xsetroot -bitmap $OSCA/bmp/sq.bmp
 $OSCA/clonky/clonky &
 
 # frameless logging to frameless.log'
-exec $OSCA/frameless/frameless > frameless.log
+exec $OSCA/frameless/frameless
