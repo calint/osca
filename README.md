@@ -15,49 +15,50 @@ contains:
 * menuq: binary launcher
 * mounte: automatic mounter of USB
 
-![screenshot](screenshots/frameless-archlinux-1.png)
+![screenshot 1](screenshots/frameless-archlinux-1.png)
+![screenshot 1](screenshots/frameless-archlinux-2.png)
 
 ```
 
             lines   words   chars
-   source:    702    1965   18091
-   zipped:     19     101    4359
+   source:    730    2099   19064
+   zipped:     16      99    4530
 
--rwxrwxr-x 1 c 22144 okt 19 17:13 frameless
+-rwxrwxr-x 1 c 22144 okt 19 21:55 frameless
 
 
             lines   words   chars
-   source:   1101    3458   28364
-   zipped:     30     177    7166
+   source:   1088    3434   28444
+   zipped:     33     165    6988
 
--rwxrwxr-x 1 c 37256 okt 19 17:13 clonky
+-rwxrwxr-x 1 c 37064 okt 19 21:55 clonky
 
 
             lines   words   chars
    source:    122     430    3791
    zipped:      5      22    1253
 
--rwxrwxr-x 1 c 16544 okt 19 17:13 menuq
+-rwxrwxr-x 1 c 16544 okt 19 21:55 menuq
 
 
             lines   words   chars
    source:     54     128    1748
    zipped:      2      19     821
 
--rwxrwxr-x 1 c 16960 okt 19 17:13 stickyo
+-rwxrwxr-x 1 c 16960 okt 19 21:55 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 19 17:13 snap
+-rwxrwxr-x 1 c 16144 okt 19 21:55 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16872 okt 19 17:13 mounte
+-rwxrwxr-x 1 c 16872 okt 19 21:55 mounte
 
 ```
