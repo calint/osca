@@ -619,7 +619,7 @@ static void render_net_interfaces(void) {
     if (!strcmp(entry->d_name, "lo")) {
       operstate[0] = '\0'; // empty string for 'lo'
     }
-    snprintf(buf, sizeof(buf), "%.*s %s ⇓ %lld %s ⇑ %lld %s", 16, entry->d_name,
+    snprintf(buf, sizeof(buf), "%.*s %s ↓ %lld %s ↑ %lld %s", 16, entry->d_name,
              operstate, delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
     // puts(buf);
     pl(buf);
