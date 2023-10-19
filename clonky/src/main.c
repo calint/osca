@@ -551,8 +551,7 @@ static void netifcs_delete(void) {
   netifcs = NULL;
 }
 
-static struct netifc *
-netifcs_get_by_name_or_create(/*refs*/ const char *name) {
+static struct netifc *netifcs_get_by_name_or_create(/*refs*/ const char *name) {
   struct netifc *ifc = netifcs;
   while (ifc != NULL) {
     if (!strncmp(ifc->name, name, NI_MAXHOST)) {
@@ -617,8 +616,12 @@ static void render_net_interfaces(void) {
       tx_scale = "KB/s";
     }
 
-    snprintf(buf, sizeof(buf), "%.*s %s %lld %s %lld %s\n", 16, entry->d_name,
-             operstate, delta_tx_bytes, tx_scale, delta_rx_bytes, rx_scale);
+    if (!strcmp(entry->d_name, "lo")) {
+      strcpy(operstate, "up");
+    }
+    snprintf(buf, sizeof(buf), "%.*s %s ↓ %lld %s ↑ %lld %s", 16, entry->d_name,
+             operstate, delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
+    puts(buf);
     pl(buf);
   }
   closedir(dir);
