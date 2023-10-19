@@ -4,7 +4,7 @@ set -e
 # change to directory of the script
 cd $(dirname "$0")
 
-CC="cc"
+CC="gcc"
 #CC="clang -Weverything \
 #    -Wno-sign-conversion \
 #    -Wno-padded \

@@ -8,14 +8,14 @@
 
 #define BORDER_WIDTH 1
 
-int main() {
+int main(void) {
   Display *dpy = XOpenDisplay(NULL);
   if (!dpy) {
     // fprintf(stderr, "!!! could not open display\n");
     return 1;
   }
   const int scr = DefaultScreen(dpy);
-  const int screen_width = DisplayWidth(dpy, scr);
+  const unsigned screen_width = (unsigned)DisplayWidth(dpy, scr);
   const int win_height = 23;
   const Window win = XCreateSimpleWindow(
       dpy, RootWindow(dpy, scr), -BORDER_WIDTH, 0, screen_width, win_height, 0,
@@ -39,7 +39,7 @@ int main() {
   const int char_width = 7;
   const int char_y_wiggle = 3;
   const int char_y_wiggle_up = -1;
-  const int options_start_x = (screen_width >> 1) + (screen_width >> 2);
+  const unsigned options_start_x = (screen_width >> 1) + (screen_width >> 2);
   int go = 1;
   XEvent e;
   while (go) {
@@ -61,7 +61,7 @@ int main() {
       go = 0;
       break;
     case KeyPress: {
-      int keycode = 0;
+      unsigned keycode = 0;
       // printf("KeyPress %d %d\n",e.xbutton.button,e.xbutton.state);
       keycode = e.xkey.keycode;
       if (keycode == 9) { // esc
@@ -93,7 +93,7 @@ int main() {
         XFillRectangle(dpy, win, gc, x, 0, char_width, win_height);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // get printable character
-        char buffer[4];
+        char buffer[4] = "";
         KeySym keysym;
         XLookupString(&e.xkey, buffer, sizeof buffer, &keysym, NULL);
         if (!buffer[0]) // printable character ?
@@ -107,7 +107,7 @@ int main() {
         y += char_y_wiggle_up + rand() % char_y_wiggle;
         XDrawString(dpy, win, gc, x, y, cursor_str, 1);
       }
-      XFillRectangle(dpy, win, gc, options_start_x, 0,
+      XFillRectangle(dpy, win, gc, (int)options_start_x, 0,
                      screen_width - options_start_x - 1, win_height - 1);
       break;
     }
