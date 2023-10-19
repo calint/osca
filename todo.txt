@@ -4,6 +4,7 @@
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] frameless: clang compile fix -Wno-sign-conversion
 [ ] frameless: remember focused window on each desk
+[ ] stickyo: upgrade to gtk4
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clang-tidy: basic
 [x]     frameless
