@@ -19,4 +19,10 @@
 // pixels of default graphs
 #define DEFAULT_GRAPH_HEIGHT 25
 
+// maximum number of network interfaces
+#define NETIFC_ARRAY_SIZE 4
+
+// size of network interface name
+#define NETIFC_NAME_SIZE 16
+
 #endif

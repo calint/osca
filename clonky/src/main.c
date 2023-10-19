@@ -21,12 +21,6 @@
 #include <time.h>
 #include <unistd.h>
 
-// number of tracked interfaces
-#define NET_IFCS_SIZE 4
-
-// size of interface name
-#define NET_IFC_NAME_SIZE 16
-
 // device context (renderer)
 static struct dc *dc;
 
@@ -51,6 +45,19 @@ static char battery_name[32] = "";
 // auto_config_network_traffic() copies the device name found in
 // '/sys/class/net/' preferring wlan otherwise fallback on non loop-back device
 static char net_device[32] = "";
+
+// network interfaces
+static struct netifc {
+  // name as listed in '/sys/class/net/'
+  char name[NETIFC_NAME_SIZE];
+  // bytes received at previous check
+  long long rx_bytes_prv;
+  // bytes transmitted at previous check
+  long long tx_bytes_prv;
+} netifcs[NETIFC_ARRAY_SIZE];
+
+// used network interfaces
+static unsigned netifcs_len;
 
 static void get_sys_value_str_tolower(const char *path, char *value,
                                       const int size) {
@@ -539,23 +546,14 @@ static void auto_config(void) {
   auto_config_network_traffic();
 }
 
-static struct netifc {
-  char name[NET_IFC_NAME_SIZE];
-  long long rx_bytes_prv;
-  long long tx_bytes_prv;
-  /*ref*/ struct netifc *next;
-} netifcs[NET_IFCS_SIZE];
-
-static unsigned netifcs_len;
-
-static struct netifc *netifcs_get_by_name_or_create(/*refs*/ const char *name) {
-  for (unsigned i = 0; i < NET_IFCS_SIZE; i++) {
+static struct netifc *netifcs_get_by_name_or_create(const char *name) {
+  for (unsigned i = 0; i < NETIFC_ARRAY_SIZE; i++) {
     struct netifc *ni = &netifcs[i];
     if (!strncmp(ni->name, name, sizeof(ni->name))) {
       return &netifcs[i];
     }
   }
-  if (netifcs_len >= sizeof(netifcs) / sizeof(struct netifc)) {
+  if (netifcs_len >= NETIFC_ARRAY_SIZE) {
     return NULL;
   }
   printf("· network interface: %s\n", name);
