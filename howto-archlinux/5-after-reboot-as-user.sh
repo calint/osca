@@ -22,7 +22,7 @@ sudo pacman -S --noconfirm pkg-config gtk3
 ~/w/osca/make-all.sh
 
 # frameless launched applications
-sudo pacman -S --noconfirm chromium thunar leafpad alsa-utils
+sudo pacman -S --noconfirm chromium thunar mousepad alsa-utils
 
 # utils
 sudo pacman -S --noconfirm wget htop pcmanfm feh scrot mplayer pkgfile ttf-dejavu
