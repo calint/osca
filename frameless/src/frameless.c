@@ -26,6 +26,7 @@
 #define XWIN_BIT_FULL_HEIGHT 1
 #define XWIN_BIT_FULL_WIDTH 2
 #define XWIN_BIT_ALLOCATED 4
+#define XWIN_BIT_FOCUSED 8
 #define XWIN_BITS_FULL_SCREEN 3
 #define XWIN_MIN_WIDTH_HEIGHT 4
 
@@ -41,7 +42,8 @@ typedef struct xwin {
   unsigned hi_pf; // hi pre full width / height / screen
   int desk;       // desk the window is on
   int desk_x;     // x coord of window before folded at desk switch
-  char bits;      // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
+  // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated, bit 4: focused
+  char bits;
 } xwin;
 
 // mapped xwin to X11 Window
@@ -129,9 +131,11 @@ static xwin *xwin_get_by_window(Window w) {
 static void xwin_focus(xwin *this) {
   if (win_focused) {
     XSetWindowBorder(dpy, win_focused->win, WIN_BORDER_INACTIVE_COLOR);
+    this->bits &= ~XWIN_BIT_FOCUSED;
   }
   XSetInputFocus(dpy, this->win, RevertToParent, CurrentTime);
   XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
+  this->bits |= XWIN_BIT_FOCUSED;
   win_focused = this;
 }
 
@@ -344,21 +348,24 @@ static void focus_first_window_on_desk(void) {
 
 // if only one window on desk then focus it
 static void focus_window_after_desk_switch(void) {
-  xwin *only_window = NULL;
+  xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *win = &wins[i];
     if ((win->bits & XWIN_BIT_ALLOCATED) && (win->desk == dsk)) {
-      if (only_window) {
-        // not the only window
-        return;
+      if (win->bits & XWIN_BIT_FOCUSED) {
+        // found focused window on this desk
+        focus = win;
+        break;
       }
-      only_window = win;
+      // focus on some window on this desk
+      focus = win;
     }
   }
-  if (!only_window) {
+  if (focus) {
+    xwin_focus(focus);
     return;
   }
-  xwin_focus(only_window);
+  win_focused = NULL;
 }
 
 static void focus_next_window(void) {
