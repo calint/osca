@@ -22,13 +22,13 @@ struct dc {
   XRenderColor rendcol;
 };
 
-struct /*give*/ dc *dc_new() {
+/*give*/ struct dc *dc_new(void) {
   struct dc *self = calloc(sizeof(struct dc), 1);
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
   if (!self->dpy) {
     fprintf(stderr, "!!! could not open display\n");
-    return 0;
+    return NULL;
   }
   self->scr = DefaultScreen(self->dpy);
   self->dpy_width = DisplayWidth(self->dpy, self->scr);
@@ -76,10 +76,10 @@ void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
 
 void dc_newline(struct dc *self) { self->doty += self->ddoty; }
 
-void dc_draw_str(struct dc *self, const char *s) {
+void dc_draw_str(struct dc *self, const char *str) {
   XftDrawStringUtf8(self->draw, &self->color, self->font,
                     self->xlft + self->dotx, self->ytop + self->doty,
-                    (FcChar8 *)s, strlen(s));
+                    (FcChar8 *)str, strlen(str));
 }
 
 void dc_draw_hr(struct dc *self) {
@@ -88,10 +88,10 @@ void dc_draw_hr(struct dc *self) {
             self->xlft + self->width, self->doty);
 }
 
-void dc_draw_hr1(struct dc *self, const int w) {
+void dc_draw_hr1(struct dc *self, const int width) {
   self->doty += 3;
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
-            self->xlft + w, self->doty);
+            self->xlft + width, self->doty);
 }
 
 void dc_inc_y(struct dc *self, const int dy) { self->doty += dy; }

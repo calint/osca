@@ -1,5 +1,5 @@
 #define _XOPEN_SOURCE 500
-#define _GNU_SOURCE /* To get defns of NI_MAXSERV and NI_MAXHOST */
+#define _GNU_SOURCE // To get defines of NI_MAXSERV and NI_MAXHOST
 
 #include "dc.h"
 #include "graph.h"
@@ -22,15 +22,22 @@
 #include <time.h>
 #include <unistd.h>
 
+// device context (renderer)
 static struct dc *dc;
+
+// cpu usage graph
 static struct graph *graph_cpu;
+
+// memory usage graph
 static struct graph *graph_mem;
+
+// network traffic graph
 static struct graphd *graph_net;
 
-// prefix to battery directory
+// prefix to battery status directory
 const char power_supply_path_prefix[] = "/sys/class/power_supply/";
 
-// quirk for different kernel names for battery charge indicator
+// quirk for different names for battery charge indicator
 const char *battery_energy_or_charge_prefix = "";
 
 // auto_config_battery() copies the battery entry in '/sys/class/power_supply/'I
@@ -81,10 +88,7 @@ static long long get_sys_value_long(const char *path) {
   return num;
 }
 
-static int sys_value_exists(const char *path) {
-  const int result = access(path, F_OK);
-  return result != -1 ? 1 : 0;
-}
+static int sys_value_exists(const char *path) { return !access(path, F_OK); }
 
 static void str_compact_spaces(char *str) {
   // "   a  b c  "
@@ -111,26 +115,24 @@ static void str_compact_spaces(char *str) {
   }
 }
 
-static void render_hr() { dc_draw_hr(dc); }
+static void render_hr(void) { dc_draw_hr(dc); }
 
-static void render_battery() {
-  char buf[255] = "";
+static void render_battery(void) {
+  char buf[128] = "";
   const int nchars =
       snprintf(buf, sizeof(buf), "%s%s/%s_", power_supply_path_prefix,
                battery_name, battery_energy_or_charge_prefix);
-  if (sizeof(buf) == nchars) {
-    return;
+  if (nchars < 0 || (size_t)nchars >= sizeof(buf)) {
+    return; // truncated
   }
-  const int maxlen = sizeof(buf) - nchars;
+  const size_t maxlen = sizeof(buf) - nchars;
   char *p = buf + nchars;
   strncpy(p, "full", maxlen);
   const long long charge_full = get_sys_value_long(buf);
   strncpy(p, "now", maxlen);
   const long long charge_now = get_sys_value_long(buf);
-  if (snprintf(buf, sizeof(buf), "%s%s/status", power_supply_path_prefix,
-               battery_name) == sizeof(buf)) {
-    return;
-  }
+  snprintf(buf, sizeof(buf), "%s%s/status", power_supply_path_prefix,
+           battery_name);
   get_sys_value_str_tolower(buf, buf, sizeof(buf));
   dc_newline(dc);
   char bbuf[1024];
@@ -142,7 +144,7 @@ static void render_battery() {
   }
 }
 
-static void render_cpu_load() {
+static void render_cpu_load(void) {
   static int cpu_total_last = 0;
   static int cpu_usage_last = 0;
 
@@ -174,7 +176,7 @@ static void render_cpu_load() {
   graph_draw2(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
 
-static void render_hello_clonky() {
+static void render_hello_clonky(void) {
   static long long unsigned counter = 0;
   counter++;
   char bbuf[128];
@@ -184,7 +186,7 @@ static void render_hello_clonky() {
   dc_draw_str(dc, bbuf);
 }
 
-static void render_mem_info() {
+static void render_mem_info(void) {
   FILE *file = fopen("/proc/meminfo", "r");
   if (!file) {
     return;
@@ -217,7 +219,7 @@ static void render_mem_info() {
   dc_draw_str(dc, bbuf);
 }
 
-static void render_net_traffic() {
+static void render_net_traffic(void) {
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
   char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
@@ -235,7 +237,7 @@ static void pl(const char *str) {
   dc_draw_str(dc, str);
 }
 
-static void render_cheetsheet() {
+static void render_cheetsheet(void) {
   static char *keysheet[] = {
       "ĸey", "+c               console", "+f                 files",
       "+e                editor", "+m                 media",
@@ -259,7 +261,7 @@ static void render_cheetsheet() {
   }
 }
 
-static void render_df() {
+static void render_df(void) {
   FILE *f = popen("df -h 2>/dev/null", "r");
   if (!f) {
     return;
@@ -278,7 +280,7 @@ static void render_df() {
   pclose(f);
 }
 
-static void render_io_stat() {
+static void render_io_stat(void) {
   static long long last_kb_read = 0;
   static long long last_kb_written = 0;
 
@@ -311,7 +313,7 @@ static void render_io_stat() {
   last_kb_written = kb_written;
 }
 
-static void render_dmsg() {
+static void render_dmsg(void) {
   FILE *file = popen("journalctl --lines=15 --no-pager", "r");
   if (!file) {
     return;
@@ -326,7 +328,7 @@ static void render_dmsg() {
   pclose(file);
 }
 
-static void render_acpi() {
+static void render_acpi(void) {
   FILE *file =
       popen("acpi -V | grep -vi 'no state information available'", "r");
   if (!file) {
@@ -345,7 +347,7 @@ static void render_acpi() {
   pclose(file);
 }
 
-inline static void render_date_time() {
+inline static void render_date_time(void) {
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t);
   strb sb;
@@ -359,7 +361,7 @@ inline static void render_date_time() {
   dc_draw_str(dc, sb.chars);
 }
 
-static void render_cpu_throttles() {
+static void render_cpu_throttles(void) {
   FILE *file = fopen("/sys/devices/system/cpu/present", "r");
   if (!file) {
     return;
@@ -376,7 +378,7 @@ static void render_cpu_throttles() {
   }
 
   for (int i = min; i <= max; i++) {
-    char bbuf[512];
+    char bbuf[128];
     snprintf(bbuf, sizeof bbuf,
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", i);
     const long long max_freq = get_sys_value_long(bbuf);
@@ -387,7 +389,7 @@ static void render_cpu_throttles() {
     if (max_freq) {
       // if available render percent of max frequency
       const long long proc = (cur_freq * 100) / max_freq;
-      strb_fmt_long(&sb, proc);
+      strb_p_long(&sb, proc);
       strb_p(&sb, "%");
     } else {
       // max frequency not available
@@ -397,7 +399,7 @@ static void render_cpu_throttles() {
   pl(sb.chars);
 }
 
-static void render_swaps() {
+static void render_swaps(void) {
   FILE *file = fopen("/proc/swaps", "r");
   if (!file) {
     return;
@@ -411,6 +413,7 @@ static void render_swaps() {
   long long size = 0;
   long long used = 0;
   if (!fscanf(file, "%63s %31s %lld %lld", dev, type, &size, &used)) {
+    fclose(file);
     return;
   }
   fclose(file);
@@ -420,13 +423,13 @@ static void render_swaps() {
   if (strb_p(&sb, "swapped ")) {
     return;
   }
-  if (strb_fmt_bytes(&sb, used << 10)) {
+  if (strb_p_nbytes(&sb, used << 10)) {
     return;
   }
   pl(sb.chars);
 }
 
-static void auto_config_battery() {
+static void auto_config_battery(void) {
   DIR *dir = opendir("/sys/class/power_supply");
   if (!dir) {
     puts("[!] battery: cannot open find dir '/sys/class/power_supply'");
@@ -440,11 +443,9 @@ static void auto_config_battery() {
       continue;
     }
     // find out if type is battery
-    char buf[512];
-    if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/type",
-                 entry->d_name) == sizeof(buf)) {
-      printf("%s:%d - buffer probably overrun\n", __FILE__, __LINE__);
-    }
+    char buf[128];
+    snprintf(buf, sizeof(buf), "/sys/class/power_supply/%.*s/type", 64,
+             entry->d_name);
     get_sys_value_str_tolower(buf, buf, sizeof(buf));
     if (strcmp(buf, "battery")) {
       continue;
@@ -453,18 +454,14 @@ static void auto_config_battery() {
     strncpy(battery_name, entry->d_name, sizeof(battery_name));
 
     //? quirk if it energy_full_design  charge_full_design
-    if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
-                 battery_name) == sizeof(buf)) {
-      return;
-    }
+    snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
+             battery_name);
     if (sys_value_exists(buf)) {
       battery_energy_or_charge_prefix = "energy";
       break;
     }
-    if (snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/charge_now",
-                 battery_name) == sizeof buf) {
-      return;
-    }
+    snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/charge_now",
+             battery_name);
     if (sys_value_exists(buf)) {
       battery_energy_or_charge_prefix = "charge";
       break;
@@ -495,13 +492,10 @@ static int is_wlan_device(const char *sys_cls_net_wlan) {
     return 0;
   }
   struct stat st;
-  if (stat(sb.chars, &st)) {
-    return 0;
-  }
-  return 1;
+  return !stat(sb.chars, &st);
 }
 
-static void auto_config_network_traffic() {
+static void auto_config_network_traffic(void) {
   DIR *dir = opendir("/sys/class/net");
   if (!dir) {
     puts("[!] wifi: cannot open find dir /sys/class/net");
@@ -535,7 +529,7 @@ static void auto_config_network_traffic() {
   return;
 }
 
-static void auto_config() {
+static void auto_config(void) {
   auto_config_battery();
   auto_config_network_traffic();
 }
@@ -548,7 +542,7 @@ static struct ifc {
 } *ifcs;
 
 // static struct ifc*ifcs;
-static void ifcs_delete() {
+static void ifcs_delete(void) {
   struct ifc *ifc = ifcs;
   while (ifc != NULL) {
     free(ifc->hostname);
@@ -596,7 +590,7 @@ static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
 
 int render_net_callback(struct ifc *ifc) {
   char buf[1024];
-  // >> 20 to convert bytes to MB
+  // >> 20 to convert number of B to MB
   snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
            ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
            ifc->rx_bytes >> 20);
@@ -605,7 +599,7 @@ int render_net_callback(struct ifc *ifc) {
   return 0;
 }
 
-int render_net() {
+int render_net(void) {
   struct ifaddrs *ifas, *ifa;
   if (getifaddrs(&ifas) == -1) {
     perror("getifaddrs");
@@ -663,7 +657,7 @@ static void signal_exit(int i) {
   exit(i);
 }
 
-static void draw() {
+static void draw(void) {
   dc_set_y(dc, TOP_Y);
   dc_clear(dc);
   render_date_time();
@@ -680,7 +674,7 @@ static void draw() {
   render_cpu_throttles();
   render_battery();
   render_hr();
-  render_acpi(dc);
+  render_acpi();
   render_hr();
   render_dmsg();
   render_hr();
@@ -691,10 +685,13 @@ static void draw() {
   dc_flush(dc);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   signal(SIGINT, signal_exit);
 
   puts("clonky system overview");
+  while (argc--) {
+    puts(*argv++);
+  }
 
   if (!(dc = dc_new())) {
     exit(1);

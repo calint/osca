@@ -310,7 +310,7 @@ static void desk_show(int dsk, int dsk_prv) {
     }
   }
 }
-static void focus_first_win_on_desk() {
+static void focus_first_win_on_desk(void) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *w = &wins[i];
     if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
@@ -321,7 +321,7 @@ static void focus_first_win_on_desk() {
   }
   win_focused = NULL;
 }
-static void focus_next_win() {
+static void focus_next_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
@@ -338,7 +338,7 @@ static void focus_next_win() {
   }
   focus_first_win_on_desk();
 }
-static void focus_prev_win() {
+static void focus_prev_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (--i >= 0) {

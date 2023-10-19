@@ -11,7 +11,7 @@ struct graphd {
   long long _value_prev;
 };
 
-struct graphd *graphd_new(const int nvalues) {
+struct /*give*/ graphd *graphd_new(const int nvalues) {
   struct graphd *self = calloc(sizeof(struct graphd), 1);
   if (!self) {
     printf("dgraphnew can not alloc\n");
@@ -24,18 +24,18 @@ struct graphd *graphd_new(const int nvalues) {
     exit(1);
   }
   self->ix = 0;
-  //	graphprint(g);
   return self;
+}
+
+void graphd_del(/*take*/ struct graphd *self) {
+  free(self->values);
+  free(self);
 }
 
 void graphd_print(const struct graphd *self) {
   printf("dgraph:\n size %lu\n addr:%p\n nvalues: %d\n values: %p\n ix: %d\n",
-         sizeof(*self), (void *)self, self->nvalues, (void *)self->values, self->ix);
-}
-
-void graphd_del(struct graphd *self) {
-  free(self->values);
-  free(self);
+         sizeof(*self), (void *)self, self->nvalues, (void *)self->values,
+         self->ix);
 }
 
 void graphd_add_value(struct graphd *self, const long long value) {
@@ -47,7 +47,7 @@ void graphd_add_value(struct graphd *self, const long long value) {
     self->ix = 0;
 }
 
-static long long _adjust(long long v, const int height) {
+static long long _cap(long long v, const int height) {
   if (v > height) {
     return height;
   }
@@ -67,7 +67,7 @@ void graphd_draw(struct graphd *self, struct dc *dc, const int height,
   // circular buffer, draw from current index to end
   for (int i = self->ix; i < self->nvalues; i++) {
     long long v = self->values[i] * height / max_value;
-    v = _adjust(v, height);
+    v = _cap(v, height);
     if (v == 0 && self->values[i] != 0) {
       v = 1;
     }
@@ -77,7 +77,7 @@ void graphd_draw(struct graphd *self, struct dc *dc, const int height,
   // draw from 0 to current index
   for (int i = 0; i < self->ix; i++) {
     long long v = self->values[i] * height / max_value;
-    v = _adjust(v, height);
+    v = _cap(v, height);
     if (v == 0 && self->values[i] != 0) {
       v = 1;
     }

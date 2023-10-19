@@ -3,20 +3,19 @@
 
 struct dc;
 
-struct /*give*/ dc *dc_new();
+/*give*/ struct dc *dc_new(void);
 
 void dc_del(/*take*/ struct dc *self);
 
 void dc_clear(struct dc *self);
 
-void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
-                  const int y1);
+void dc_draw_line(struct dc *self, int x0, int y0, int x1, int y1);
 
 void dc_draw_hr(struct dc *self);
 
-void dc_draw_hr1(struct dc *self, const int w);
+void dc_draw_hr1(struct dc *self, int width);
 
-void dc_draw_str(struct dc *self, const char *s);
+void dc_draw_str(struct dc *self, const char *str);
 
 void dc_newline(struct dc *self);
 
@@ -30,7 +29,7 @@ void dc_set_x(struct dc *self, const int x);
 
 int dc_get_y(const struct dc *self);
 
-void dc_set_y(struct dc *self, const int px);
+void dc_set_y(struct dc *self, const int y);
 
 int dc_get_width(const struct dc *self);
 

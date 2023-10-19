@@ -6,6 +6,6 @@ cd $(dirname "$0")
 
 for f in frameless clonky menuq stickyo snap; do
     cd $f
-    sh make.sh
+    ./make.sh
     cd ..
 done

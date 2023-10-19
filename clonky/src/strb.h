@@ -2,25 +2,29 @@
 #define STRB_h
 #include <unistd.h>
 
-typedef struct {
+typedef struct strb {
   char chars[512];
+  // index in chars. points at string terminator '\0'
   size_t index;
 } strb;
 
-// initiates @o
+// initiates self
 void strb_init(strb *self);
 
-// @returns remaining free chars in @o
+// returns remaining free chars in self
 size_t strb_rem(strb *self);
 
-// appends @str to @o  @returns 0 if ok
+// appends str to self. returns 0 if ok
 int strb_p(strb *self, const char *str);
 
-// appends @n to @o  @returns 0 if ok
-int strb_fmt_long(strb *self, long long num);
+// appends ch to self. returns 0 if oks
+int strb_p_char(strb *self, char ch);
 
-// formats @bytes to @o  @returns 0 if ok
-int strb_fmt_bytes(strb *self, long long bytes);
+// appends num to str. returns 0 if ok
+int strb_p_long(strb *self, long long num);
+
+// formats bytes to str. returns 0 if ok
+int strb_p_nbytes(strb *self, long long bytes);
 
 // back and write '\0'
 void strb_back(strb *self);

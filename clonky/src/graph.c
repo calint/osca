@@ -67,7 +67,7 @@ void graph_draw(const struct graph *self, struct dc *dc, const int ysclshft) {
   }
 }
 
-static long long _adjust(long long v, const int height) {
+static long long _cap(long long v, const int height) {
   if (v > height)
     v = height;
   if (v < 0)
@@ -90,7 +90,7 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
     long long v = self->values[i] * height / max_value;
     if (v == 0 && self->values[i] != 0)
       v = 1;
-    v = _adjust(v, height);
+    v = _cap(v, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - v);
     x++;
   }
@@ -100,7 +100,7 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
     if (v == 0 && self->values[i] != 0) {
       v = 1;
     }
-    v = _adjust(v, height);
+    v = _cap(v, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - v);
     x++;
   }
