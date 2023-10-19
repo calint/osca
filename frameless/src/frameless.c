@@ -346,7 +346,7 @@ static void focus_first_window_on_desk(void) {
   win_focused = NULL;
 }
 
-// if only one window on desk then focus it
+// focus on previously focused window or some window on this desktop
 static void focus_window_after_desk_switch(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
@@ -361,11 +361,12 @@ static void focus_window_after_desk_switch(void) {
       focus = win;
     }
   }
-  if (focus) {
-    xwin_focus(focus);
+  win_focused = NULL;
+  if (!focus) {
+    // didn't find any window to focus
     return;
   }
-  win_focused = NULL;
+  xwin_focus(focus);
 }
 
 static void focus_next_window(void) {
