@@ -10,6 +10,7 @@ CC="gcc"
 #CC="clang -Weverything"
 CF="-Os -Wfatal-errors -Werror"
 CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wconversion -Wsign-conversion"
+#CMD="gcc $SRC -o $BIN $CF $CW `pkg-config --cflags --libs gtk4`"
 CMD="gcc $SRC -o $BIN $CF $CW `pkg-config --cflags --libs gtk+-3.0`"
 #echo
 #echo $CMD
