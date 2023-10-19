@@ -304,10 +304,10 @@ static int xwin_ix(xwin *this) {
 }
 
 static char xwin_focus_try_by_index(unsigned ix) {
-  xwin *w = &wins[ix];
-  if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
-    xwin_raise(w);
-    xwin_focus(w);
+  xwin *xw = &wins[ix];
+  if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+    xwin_raise(xw);
+    xwin_focus(xw);
     return True;
   }
   return False;
@@ -336,29 +336,45 @@ static void desk_show(int dsk_id, int dsk_prv) {
 
 static void focus_first_window_on_desk(void) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    xwin *w = &wins[i];
-    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
-      xwin_raise(w);
-      xwin_focus(w);
+    xwin *xw = &wins[i];
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+      xwin_raise(xw);
+      xwin_focus(xw);
       return;
     }
   }
   win_focused = NULL;
 }
 
+static void focus_on_only_window_on_desk(void) {
+  xwin *focus = NULL;
+  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+    xwin *xw = &wins[i];
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+      if (focus) {
+        return; // there are more than 1 window on this desk
+      }
+      focus = xw;
+    }
+  }
+  if (focus) {
+    xwin_focus(focus);
+  }
+}
+
 // focus on previously focused window or some window on this desktop
 static void focus_window_after_desk_switch(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    xwin *win = &wins[i];
-    if ((win->bits & XWIN_BIT_ALLOCATED) && (win->desk == dsk)) {
-      if (win->bits & XWIN_BIT_FOCUSED) {
+    xwin *xw = &wins[i];
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+      if (xw->bits & XWIN_BIT_FOCUSED) {
         // found focused window on this desk
-        focus = win;
+        focus = xw;
         break;
       }
       // focus on some window on this desk
-      focus = win;
+      focus = xw;
     }
   }
   win_focused = NULL;
@@ -482,6 +498,7 @@ int main(int argc, char **args, char **env) {
         break;
       }
       xwin_free_by_window(ev.xmap.window);
+      focus_on_only_window_on_desk();
       break;
     case EnterNotify:
       if (is_dragging || key_pressed) {
@@ -681,12 +698,12 @@ int main(int argc, char **args, char **env) {
         break;
       }
       switch (key_pressed) {
-      default:
+      default: // moving window
         xw->x = new_x;
         xw->y = new_y;
         xwin_set_geom(xw);
         break;
-      case 27: // r
+      case 27: // r (resizing window)
         if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
           new_wi = XWIN_MIN_WIDTH_HEIGHT;
         }
