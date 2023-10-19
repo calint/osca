@@ -484,7 +484,10 @@ int main(int argc, char **args, char **env) {
       xwin_free_by_window(ev.xmap.window);
       break;
     case EnterNotify:
-      if (is_dragging) {
+      if (is_dragging || key_pressed) {
+        // if dragging then it is resizing, don't change focus
+        // if key pressed then it is switching desktop so ignore
+        //   focus on the window that the pointer lands on 
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
@@ -606,6 +609,7 @@ int main(int argc, char **args, char **env) {
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
         fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
+        fflush(flog);
         break;
       case 40:  // d
       case 116: // down
@@ -620,6 +624,8 @@ int main(int argc, char **args, char **env) {
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
         break;
+        fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
+        fflush(flog);
       }
       break;
     case KeyRelease:
