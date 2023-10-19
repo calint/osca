@@ -14,9 +14,9 @@ SRC=src/*.c
 BIN=mounte
 OPTS="-Os -Wfatal-errors -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"
 $CC -o $BIN $OPTS $SRC
-chmod go-w $BIN
-sudo chown root $BIN
-sudo chmod u+s $BIN
+#chmod go-w $BIN
+#sudo chown root $BIN
+#sudo chmod u+s $BIN
 
 echo
 echo    "             lines  words   chars"
