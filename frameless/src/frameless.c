@@ -149,7 +149,6 @@ static void xwin_free(Window w) {
   if (win->bits & XWIN_BIT_ALLOCATED) {
     win->bits = 0; // mark free
     xwin_count--;
-    // fprintf(flog, "windows allocated: %d\n", wincount);
   }
   if (win_focused == win) {
     win_focused = NULL;
@@ -322,6 +321,27 @@ static void focus_first_win_on_desk(void) {
   }
   win_focused = NULL;
 }
+
+static void focus_first_window_if_only_one_on_desk(void) {
+  xwin *only_window = NULL;
+  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+    xwin *w = &wins[i];
+    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
+      if (only_window) {
+        // not the only window
+        return;
+      }
+      only_window = w;
+    }
+  }
+  if (!only_window) {
+    return;
+  }
+  xwin_raise(only_window);
+  xwin_focus(only_window);
+  win_focused = only_window;
+}
+
 static void focus_next_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
@@ -551,12 +571,11 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
             win_focused->desk = dsk;
-            xwin_read_geom(win_focused);
-            win_focused->desk_x = win_focused->x;
             xwin_raise(win_focused);
           }
         }
         desk_show(dsk, dsk_prv);
+        focus_first_window_if_only_one_on_desk();
         break;
       case 40:  // d
       case 116: // down
@@ -565,12 +584,11 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
             win_focused->desk = dsk;
-            xwin_read_geom(win_focused);
-            win_focused->desk_x = win_focused->x;
             xwin_raise(win_focused);
           }
         }
         desk_show(dsk, dsk_prv);
+        focus_first_window_if_only_one_on_desk();
         break;
       }
       break;
