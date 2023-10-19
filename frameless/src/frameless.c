@@ -131,7 +131,7 @@ static xwin *xwin_get_by_window(Window w) {
 static void xwin_focus(xwin *this) {
   if (win_focused) {
     XSetWindowBorder(dpy, win_focused->win, WIN_BORDER_INACTIVE_COLOR);
-    this->bits &= ~XWIN_BIT_FOCUSED;
+    win_focused->bits &= ~XWIN_BIT_FOCUSED;
   }
   XSetInputFocus(dpy, this->win, RevertToParent, CurrentTime);
   XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
