@@ -533,112 +533,95 @@ static void auto_config(void) {
   auto_config_network_traffic();
 }
 
-static struct ifc {
-  /*ref*/ const char *name;
-  unsigned long long rx_bytes, tx_bytes;
-  /*own*/ char *hostname;
-  /*ref*/ struct ifc *next;
-} *ifcs;
+static struct netifc {
+  /*own*/ char *name;
+  long long rx_bytes_prv;
+  long long tx_bytes_prv;
+  /*ref*/ struct netifc *next;
+} *netifcs = NULL;
 
-// static struct ifc*ifcs;
-static void ifcs_delete(void) {
-  struct ifc *ifc = ifcs;
+static void netifcs_delete(void) {
+  struct netifc *ifc = netifcs;
   while (ifc != NULL) {
-    free(ifc->hostname);
-    struct ifc *nxt = ifc->next;
+    struct netifc *nxt = ifc->next;
+    free(ifc->name);
     free(ifc);
     ifc = nxt;
   }
-  ifcs = NULL;
+  netifcs = NULL;
 }
 
-static void ifcs_for_each(int f(struct ifc *)) {
-  struct ifc *ifc = ifcs;
-  while (ifc != NULL) {
-    const int ret = f(ifc);
-    if (ret) {
-      break;
-    }
-    ifc = ifc->next;
-  }
-}
-
-static void ifcs_add_first(/*takes*/ struct ifc *ifc) {
-  if (ifcs) {
-    ifc->next = ifcs;
-    ifcs = ifc;
-    return;
-  }
-  ifcs = ifc;
-  ifc->next = NULL;
-}
-
-static struct ifc *ifcs_get_by_name(/*refs*/ const char *name) {
-  struct ifc *ifc = ifcs;
+static struct netifc *
+netifcs_get_by_name_or_create(/*refs*/ const char *name) {
+  struct netifc *ifc = netifcs;
   while (ifc != NULL) {
     if (!strncmp(ifc->name, name, NI_MAXHOST)) {
       return ifc;
     }
     ifc = ifc->next;
   }
-  ifc = (struct ifc *)calloc(1, sizeof(struct ifc));
-  ifc->name = name;
-  ifcs_add_first(/*give*/ ifc);
+  printf("· add network interface: %s\n", name);
+  ifc = (struct netifc *)calloc(1, sizeof(struct netifc));
+  ifc->name = malloc(128);
+  strncpy(ifc->name, name, 127);
+  ifc->next = netifcs;
+  netifcs = ifc;
   return ifc;
 }
 
-static int render_net_callback(struct ifc *ifc) {
-  char buf[1024];
-  // >> 20 to convert number of B to MB
-  snprintf(buf, sizeof(buf), "%s  %s  %llu / %llu MB", ifc->name,
-           ifc->hostname ? "up" : "down", ifc->tx_bytes >> 20,
-           ifc->rx_bytes >> 20);
-  dc_newline(dc);
-  dc_draw_str(dc, buf);
-  return 0;
-}
+static void render_net_interfaces(void) {
+  DIR *dir = opendir("/sys/class/net/");
+  if (!dir) {
+    return;
+  }
+  char operstate[32] = "";
+  char buf[256] = "";
+  for (struct dirent *entry = readdir(dir); entry; entry = readdir(dir)) {
+    if (entry->d_name[0] == '.') {
+      continue; // ignore '.' and '..'
+    }
+    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
+             entry->d_name);
+    get_sys_value_str_tolower(buf, operstate, sizeof(operstate));
+    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
+             entry->d_name);
+    long long tx_bytes = get_sys_value_long(buf);
+    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
+             entry->d_name);
+    long long rx_bytes = get_sys_value_long(buf);
 
-static int render_net(void) {
-  struct ifaddrs *ifas, *ifa;
-  if (getifaddrs(&ifas) == -1) {
-    perror("getifaddrs");
-    return -1;
+    struct netifc *ifc = netifcs_get_by_name_or_create(entry->d_name);
+    long long delta_tx_bytes =
+        tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
+    long long delta_rx_bytes =
+        rx_bytes - (ifc->rx_bytes_prv ? ifc->rx_bytes_prv : rx_bytes);
+
+    ifc->tx_bytes_prv = tx_bytes;
+    ifc->rx_bytes_prv = rx_bytes;
+
+    const char *rx_scale = "B/s";
+    if (delta_rx_bytes >> 20) {
+      delta_rx_bytes >>= 20;
+      rx_scale = "MB/s";
+    } else if (delta_rx_bytes >> 10) {
+      delta_rx_bytes >>= 10;
+      rx_scale = "KB/s";
+    }
+
+    const char *tx_scale = "B/s";
+    if (delta_tx_bytes >> 20) {
+      delta_tx_bytes >>= 20;
+      tx_scale = "MB/s";
+    } else if (delta_tx_bytes >> 10) {
+      delta_tx_bytes >>= 10;
+      tx_scale = "KB/s";
+    }
+
+    snprintf(buf, sizeof(buf), "%.*s %s %lld %s %lld %s\n", 16, entry->d_name,
+             operstate, delta_tx_bytes, tx_scale, delta_rx_bytes, rx_scale);
+    pl(buf);
   }
-  ifa = ifas;
-  int ret = 0;
-  for (int i = 0; ifa != NULL; ifa = ifa->ifa_next, i++) {
-    if (ifa->ifa_addr == NULL) {
-      continue;
-    }
-    const int family = ifa->ifa_addr->sa_family;
-    const char *name = ifa->ifa_name;
-    struct ifc *ifc = ifcs_get_by_name(name);
-    if (family == AF_PACKET && ifa->ifa_data != NULL) {
-      struct rtnl_link_stats *stats = ifa->ifa_data;
-      ifc->rx_bytes = stats->rx_bytes;
-      ifc->tx_bytes = stats->tx_bytes;
-    }
-    //		if(family==AF_INET||family==AF_INET6){
-    if (family == AF_INET) {
-      ifc->hostname = malloc(NI_MAXHOST);
-      const int name_info =
-          getnameinfo(ifa->ifa_addr,
-                      family == AF_INET ? sizeof(struct sockaddr_in)
-                                        : sizeof(struct sockaddr_in6),
-                      ifc->hostname, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-      if (name_info != 0) {
-        //				printf("%s",gai_strerror(s));
-        //				ret=-2;
-        //				goto cleanup;
-        continue;
-      }
-    }
-  }
-  ifcs_for_each(render_net_callback);
-  // cleanup:
-  freeifaddrs(ifas);
-  ifcs_delete();
-  return ret;
+  closedir(dir);
 }
 
 static void signal_exit(int i) {
@@ -653,6 +636,7 @@ static void signal_exit(int i) {
   if (graph_net) {
     graphd_del(graph_net);
   }
+  netifcs_delete();
   exit(i);
 }
 
@@ -665,7 +649,7 @@ static void draw(void) {
   render_mem_info();
   render_swaps();
   render_net_traffic();
-  render_net();
+  render_net_interfaces();
   render_hr();
   render_io_stat();
   render_df();
