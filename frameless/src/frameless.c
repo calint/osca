@@ -125,6 +125,7 @@ static xwin *xwin_get(Window w) {
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
   return xw;
 }
+
 static void xwin_focus(xwin *this) {
   if (win_focused) {
     XSetWindowBorder(dpy, win_focused->win, WIN_BORDER_INACTIVE_COLOR);
@@ -133,7 +134,9 @@ static void xwin_focus(xwin *this) {
   XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
   win_focused = this;
 }
+
 static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
+
 static xwin *_win_find(Window w) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (wins[i].win == w)
@@ -141,6 +144,7 @@ static xwin *_win_find(Window w) {
   }
   return NULL;
 }
+
 static void xwin_free(Window w) {
   xwin *win = _win_find(w);
   if (!win) {
@@ -154,21 +158,25 @@ static void xwin_free(Window w) {
     win_focused = NULL;
   }
 }
+
 static void xwin_read_geom(xwin *this) {
   Window wsink;
   unsigned dummy;
   XGetGeometry(dpy, this->win, &wsink, &this->x, &this->y, &this->wi, &this->hi,
                &dummy, &dummy);
 }
+
 static void xwin_set_geom(xwin *this) {
   XMoveResizeWindow(dpy, this->win, this->x, this->y, this->wi, this->hi);
 }
+
 static void xwin_center(xwin *this) {
   xwin_read_geom(this);
   this->x = (int)((scr.wi - this->wi) >> 1);
   this->y = (int)((scr.hi - this->hi) >> 1);
   xwin_set_geom(this);
 }
+
 static void xwin_wider(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
@@ -176,6 +184,7 @@ static void xwin_wider(xwin *this) {
   this->x = this->x - (int)((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
 }
+
 static void xwin_thinner(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
@@ -186,6 +195,7 @@ static void xwin_thinner(xwin *this) {
   this->x = this->x - (int)((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
 }
+
 static void xwin_close(xwin *this) {
   XEvent ke;
   ke.type = ClientMessage;
@@ -196,6 +206,7 @@ static void xwin_close(xwin *this) {
   ke.xclient.data.l[1] = CurrentTime;
   XSendEvent(dpy, this->win, False, NoEventMask, &ke);
 }
+
 static void xwin_toggle_fullscreen(xwin *this) {
   if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
     // toggle from fullscreen
@@ -221,6 +232,7 @@ static void xwin_toggle_fullscreen(xwin *this) {
     this->bits |= XWIN_BITS_FULL_SCREEN;
   }
 }
+
 static void xwin_toggle_fullheight(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
     xwin_read_geom(this);
@@ -237,6 +249,7 @@ static void xwin_toggle_fullheight(xwin *this) {
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
 }
+
 static void xwin_toggle_fullwidth(xwin *this) {
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
     xwin_read_geom(this);
@@ -253,6 +266,7 @@ static void xwin_toggle_fullwidth(xwin *this) {
   }
   this->bits ^= XWIN_BIT_FULL_WIDTH;
 }
+
 static void xwin_hide(xwin *this) {
   xwin_read_geom(this);
   this->desk_x = this->x;
@@ -260,16 +274,19 @@ static void xwin_hide(xwin *this) {
   this->x = (int)(scr.wi - WIN_SLIP_DX + slip);
   xwin_set_geom(this);
 }
+
 static void xwin_show(xwin *this) {
   this->x = this->desk_x;
   xwin_set_geom(this);
 }
+
 static void xwin_bump(xwin *this, int rand_amt) {
   xwin_read_geom(this);
   this->x += (rand() % rand_amt) - (rand_amt >> 1);
   this->y += (rand() % rand_amt) - (rand_amt >> 1);
   xwin_set_geom(this);
 }
+
 static int _xwin_ix(xwin *this) {
   if (this == NULL) {
     return -1;
@@ -281,6 +298,7 @@ static int _xwin_ix(xwin *this) {
   }
   return -1;
 }
+
 static char _focus_try(unsigned ix) {
   xwin *w = &wins[ix];
   if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
@@ -290,6 +308,7 @@ static char _focus_try(unsigned ix) {
   }
   return False;
 }
+
 static void desk_show(int dsk_id, int dsk_prv) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
@@ -310,6 +329,7 @@ static void desk_show(int dsk_id, int dsk_prv) {
     }
   }
 }
+
 static void focus_first_win_on_desk(void) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *w = &wins[i];
@@ -322,24 +342,25 @@ static void focus_first_win_on_desk(void) {
   win_focused = NULL;
 }
 
-static void focus_first_window_if_only_one_on_desk(void) {
+// if only one window on desk then focus it
+static void focus_window_after_desk_switch(void) {
   xwin *only_window = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    xwin *w = &wins[i];
-    if ((w->bits & XWIN_BIT_ALLOCATED) && (w->desk == dsk)) {
+    xwin *win = &wins[i];
+    if ((win->bits & XWIN_BIT_ALLOCATED) && (win->desk == dsk)) {
       if (only_window) {
         // not the only window
         return;
       }
-      only_window = w;
+      only_window = win;
     }
   }
   if (!only_window) {
     return;
   }
-  xwin_raise(only_window);
-  xwin_focus(only_window);
   win_focused = only_window;
+  xwin_raise(win_focused);
+  xwin_focus(win_focused);
 }
 
 static void focus_next_win(void) {
@@ -359,6 +380,7 @@ static void focus_next_win(void) {
   }
   focus_first_win_on_desk();
 }
+
 static void focus_prev_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
@@ -375,6 +397,7 @@ static void focus_prev_win(void) {
   }
   focus_first_win_on_desk();
 }
+
 static int error_handler(Display *d, XErrorEvent *e) {
   char buffer_return[1024] = "";
   XGetErrorText(d, e->error_code, buffer_return, sizeof(buffer_return));
@@ -386,6 +409,7 @@ static int error_handler(Display *d, XErrorEvent *e) {
   fflush(flog);
   return 0;
 }
+
 int main(int argc, char **args, char **env) {
   while (argc--) {
     puts(*args++);
@@ -418,10 +442,6 @@ int main(int argc, char **args, char **env) {
   XGrabKey(dpy, AnyKey, Mod4Mask, root, True, GrabModeAsync, GrabModeAsync);
   XGrabKey(dpy, AnyKey, Mod4Mask + ShiftMask, root, True, GrabModeAsync,
            GrabModeAsync);
-  // XGrabKey(dpy, 122, 0, root, True, GrabModeAsync, GrabModeAsync); // volume
-  // down XGrabKey(dpy, 123, 0, root, True, GrabModeAsync, GrabModeAsync); //
-  // volume sup XGrabKey(dpy, 107, 0, root, True, GrabModeAsync, GrabModeAsync);
-  // // print
   XSelectInput(dpy, root, SubstructureNotifyMask);
 
   // previous desk
@@ -575,7 +595,7 @@ int main(int argc, char **args, char **env) {
           }
         }
         desk_show(dsk, dsk_prv);
-        focus_first_window_if_only_one_on_desk();
+        focus_window_after_desk_switch();
         break;
       case 40:  // d
       case 116: // down
@@ -588,7 +608,7 @@ int main(int argc, char **args, char **env) {
           }
         }
         desk_show(dsk, dsk_prv);
-        focus_first_window_if_only_one_on_desk();
+        focus_window_after_desk_switch();
         break;
       }
       break;
