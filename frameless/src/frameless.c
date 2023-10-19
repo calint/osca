@@ -83,23 +83,23 @@ static int dragging_start_x;
 static int dragging_start_y;
 static unsigned dragging_button;
 
-// static char *ix_evnames[LASTEvent] = {
-//     "unknown",          "unknown",       // 0
-//     "KeyPress",         "KeyRelease",    // 2
-//     "ButtonPress",      "ButtonRelease", // 4
-//     "MotionNotify",                      // 6
-//     "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
-//     "FocusIn",          "FocusOut",      // 9 from XSetFocus
-//     "KeymapNotify",                      // 11
-//     "Expose",           "GraphicsExpose",   "NoExpose", // 12
-//     "VisibilityNotify", "CreateNotify",     "DestroyNotify",
-//     "UnmapNotify",      "MapNotify", // 15
-//     "MapRequest",       "ReparentNotify",   "ConfigureNotify",
-//     "ConfigureRequest", "GravityNotify",    "ResizeRequest",
-//     "CirculateNotify",  "CirculateRequest", "PropertyNotify",
-//     "SelectionClear",   "SelectionRequest", "SelectionNotify",
-//     "ColormapNotify",   "ClientMessage",    "MappingNotify",
-//     "GenericEvent"};
+static char *ix_evnames[LASTEvent] = {
+    "unknown",          "unknown",       // 0
+    "KeyPress",         "KeyRelease",    // 2
+    "ButtonPress",      "ButtonRelease", // 4
+    "MotionNotify",                      // 6
+    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
+    "FocusIn",          "FocusOut",      // 9 from XSetFocus
+    "KeymapNotify",                      // 11
+    "Expose",           "GraphicsExpose",   "NoExpose", // 12
+    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
+    "UnmapNotify",      "MapNotify", // 15
+    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
+    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
+    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
+    "SelectionClear",   "SelectionRequest", "SelectionNotify",
+    "ColormapNotify",   "ClientMessage",    "MappingNotify",
+    "GenericEvent"};
 
 static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
