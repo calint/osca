@@ -20,37 +20,44 @@ contains:
 ```
 
             lines   words   chars
-   source:    653    1901   17240
-   zipped:     18      97    4153
+   source:    695    1935   17887
+   zipped:     22      99    4307
 
--rwxrwxr-x 1 c 22112 okt 18 18:36 frameless
-
-
-            lines   words   chars
-   source:   1101    3489   28083
-   zipped:     32     174    7124
-
--rwxrwxr-x 1 c 37360 okt 18 18:36 clonky
+-rwxrwxr-x 1 c 22144 okt 19 16:46 frameless
 
 
             lines   words   chars
-   source:    122     429    3744
-   zipped:      1      25    1227
+   source:   1101    3458   28364
+   zipped:     30     177    7166
 
--rwxrwxr-x 1 c 16544 okt 18 18:36 menuq
+-rwxrwxr-x 1 c 37256 okt 19 16:46 clonky
+
+
+            lines   words   chars
+   source:    122     430    3791
+   zipped:      5      22    1253
+
+-rwxrwxr-x 1 c 16544 okt 19 16:46 menuq
 
 
             lines   words   chars
    source:     54     128    1748
    zipped:      2      19     821
 
--rwxrwxr-x 1 c 16960 okt 18 18:36 stickyo
+-rwxrwxr-x 1 c 16960 okt 19 16:46 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 18 18:36 snap
+-rwxrwxr-x 1 c 16144 okt 19 16:46 snap
+
+
+             lines  words   chars
+   source:    118     344    3206
+   zipped:      6      24    1141
+
+-rwxrwxr-x 1 c 16872 okt 19 16:46 mounte
 
 ```
