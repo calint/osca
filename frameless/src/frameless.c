@@ -83,23 +83,23 @@ static int dragging_start_x;
 static int dragging_start_y;
 static unsigned dragging_button;
 
-static char *ix_evnames[LASTEvent] = {
-    "unknown",          "unknown",       // 0
-    "KeyPress",         "KeyRelease",    // 2
-    "ButtonPress",      "ButtonRelease", // 4
-    "MotionNotify",                      // 6
-    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
-    "FocusIn",          "FocusOut",      // 9 from XSetFocus
-    "KeymapNotify",                      // 11
-    "Expose",           "GraphicsExpose",   "NoExpose", // 12
-    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
-    "UnmapNotify",      "MapNotify", // 15
-    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
-    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
-    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
-    "SelectionClear",   "SelectionRequest", "SelectionNotify",
-    "ColormapNotify",   "ClientMessage",    "MappingNotify",
-    "GenericEvent"};
+// static char *ix_evnames[LASTEvent] = {
+//     "unknown",          "unknown",       // 0
+//     "KeyPress",         "KeyRelease",    // 2
+//     "ButtonPress",      "ButtonRelease", // 4
+//     "MotionNotify",                      // 6
+//     "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
+//     "FocusIn",          "FocusOut",      // 9 from XSetFocus
+//     "KeymapNotify",                      // 11
+//     "Expose",           "GraphicsExpose",   "NoExpose", // 12
+//     "VisibilityNotify", "CreateNotify",     "DestroyNotify",
+//     "UnmapNotify",      "MapNotify", // 15
+//     "MapRequest",       "ReparentNotify",   "ConfigureNotify",
+//     "ConfigureRequest", "GravityNotify",    "ResizeRequest",
+//     "CirculateNotify",  "CirculateRequest", "PropertyNotify",
+//     "SelectionClear",   "SelectionRequest", "SelectionNotify",
+//     "ColormapNotify",   "ClientMessage",    "MappingNotify",
+//     "GenericEvent"};
 
 static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
@@ -456,13 +456,13 @@ int main(int argc, char **args, char **env) {
   xwin *xw = NULL;
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
-    fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
-            (void *)ev.xany.window);
-    fflush(flog);
+    // fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
+    //         (void *)ev.xany.window);
+    // fflush(flog);
     switch (ev.type) {
     default:
-      fprintf(flog, "  unhandled\n");
-      fflush(flog);
+      // fprintf(flog, "  unhandled\n");
+      // fflush(flog);
       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
@@ -486,8 +486,8 @@ int main(int argc, char **args, char **env) {
     case EnterNotify:
       if (is_dragging || key_pressed) {
         // if dragging then it is resizing, don't change focus
-        // if key pressed then it is switching desktop so ignore
-        //   focus on the window that the pointer lands on 
+        // if key pressed then it is switching desktop, ignore
+        //   focus on the window that is under the pointer
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
@@ -608,8 +608,8 @@ int main(int argc, char **args, char **env) {
         }
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
-        fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
-        fflush(flog);
+        // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
+        // fflush(flog);
         break;
       case 40:  // d
       case 116: // down
@@ -623,9 +623,9 @@ int main(int argc, char **args, char **env) {
         }
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
+        // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
+        // fflush(flog);
         break;
-        fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
-        fflush(flog);
       }
       break;
     case KeyRelease:
