@@ -9,7 +9,7 @@ SRC=src/menuq.c
 CC="gcc"
 #CC="clang -Weverything -Wno-declaration-after-statement"
 CF="-Os -Wfatal-errors -Werror"
-CW="-Wall -Wextra -Wpedantic"
+CW="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"
 LIBS="-lX11"
 CMD="$CC $SRC -o $BIN $CF $CW $LIBS"
 $CMD

@@ -30,18 +30,18 @@
 #define XWIN_MIN_WIDTH_HEIGHT 4
 
 typedef struct xwin {
-  Window win;  // x11 window handle
-  int x;       // position x
-  int y;       // position y
-  unsigned wi; // width
-  unsigned hi; // height
-  int x_pf;    // x pre full width / height / screen
-  int y_pf;    // y pre full width / height / screen
-  int wi_pf;   // wi pre full width / height / screen
-  int hi_pf;   // hi pre full width / height / screen
-  int desk;    // desk the window is on
-  int desk_x;  // x coord of window before folded at desk switch
-  char bits;   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
+  Window win;     // x11 window handle
+  int x;          // position x
+  int y;          // position y
+  unsigned wi;    // width
+  unsigned hi;    // height
+  int x_pf;       // x pre full width / height / screen
+  int y_pf;       // y pre full width / height / screen
+  unsigned wi_pf; // wi pre full width / height / screen
+  unsigned hi_pf; // hi pre full width / height / screen
+  int desk;       // desk the window is on
+  int desk_x;     // x coord of window before folded at desk switch
+  char bits;      // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated
 } xwin;
 
 // mapped xwin to X11 Window
@@ -64,7 +64,9 @@ static unsigned xwin_count;
 
 // default screen info
 static struct scr {
-  int id, wi, hi;
+  unsigned id;
+  unsigned wi;
+  unsigned hi;
 } scr;
 
 // current key pressed
@@ -77,7 +79,7 @@ static xwin *win_focused;
 static char is_dragging;
 static int dragging_start_x;
 static int dragging_start_y;
-static int dragging_button;
+static unsigned dragging_button;
 
 // static char *ix_evnames[LASTEvent] = {
 //     "unknown",          "unknown",       // 0
@@ -106,7 +108,7 @@ static xwin *xwin_get(Window w) {
       }
     } else {
       if (first_avail == -1) {
-        first_avail = i;
+        first_avail = (int)i;
       }
     }
   }
@@ -164,15 +166,15 @@ static void xwin_set_geom(xwin *this) {
 }
 static void xwin_center(xwin *this) {
   xwin_read_geom(this);
-  this->x = (scr.wi - this->wi) >> 1;
-  this->y = (scr.hi - this->hi) >> 1;
+  this->x = (int)((scr.wi - this->wi) >> 1);
+  this->y = (int)((scr.hi - this->hi) >> 1);
   xwin_set_geom(this);
 }
 static void xwin_wider(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
   this->wi = ((this->wi << 2) + this->wi) >> 2;
-  this->x = this->x - ((this->wi - wi_prv) >> 1);
+  this->x = this->x - (int)((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
 }
 static void xwin_thinner(xwin *this) {
@@ -182,8 +184,7 @@ static void xwin_thinner(xwin *this) {
   if (this->wi < XWIN_MIN_WIDTH_HEIGHT) {
     this->wi = XWIN_MIN_WIDTH_HEIGHT;
   }
-  printf("*** %d\n", this->wi);
-  this->x = this->x - ((this->wi - wi_prv) >> 1);
+  this->x = this->x - (int)((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
 }
 static void xwin_close(xwin *this) {
@@ -192,7 +193,7 @@ static void xwin_close(xwin *this) {
   ke.xclient.window = this->win;
   ke.xclient.message_type = XInternAtom(dpy, "WM_PROTOCOLS", True);
   ke.xclient.format = 32;
-  ke.xclient.data.l[0] = XInternAtom(dpy, "WM_DELETE_WINDOW", True);
+  ke.xclient.data.l[0] = (long)XInternAtom(dpy, "WM_DELETE_WINDOW", True);
   ke.xclient.data.l[1] = CurrentTime;
   XSendEvent(dpy, this->win, False, NoEventMask, &ke);
 }
@@ -256,8 +257,8 @@ static void xwin_toggle_fullwidth(xwin *this) {
 static void xwin_hide(xwin *this) {
   xwin_read_geom(this);
   this->desk_x = this->x;
-  int slip = rand() % WIN_SLIP;
-  this->x = (scr.wi - WIN_SLIP_DX + slip);
+  unsigned slip = (unsigned)(rand() % WIN_SLIP);
+  this->x = (int)(scr.wi - WIN_SLIP_DX + slip);
   xwin_set_geom(this);
 }
 static void xwin_show(xwin *this) {
@@ -276,7 +277,7 @@ static int _xwin_ix(xwin *this) {
   }
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     if (this == &wins[i]) {
-      return i;
+      return (int)i;
     }
   }
   return -1;
@@ -325,13 +326,13 @@ static void focus_next_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
-    if (_focus_try(i)) {
+    if (_focus_try((unsigned)i)) {
       return;
     }
   }
   i = 0;
   while (i <= i0) {
-    if (_focus_try(i)) {
+    if (_focus_try((unsigned)i)) {
       return;
     }
     i++;
@@ -342,13 +343,13 @@ static void focus_prev_win(void) {
   int i0 = _xwin_ix(win_focused);
   int i = i0;
   while (--i >= 0) {
-    if (_focus_try(i)) {
+    if (_focus_try((unsigned)i)) {
       return;
     }
   }
   i = WIN_MAX_COUNT;
   while (--i >= 0) {
-    if (_focus_try(i)) {
+    if (_focus_try((unsigned)i)) {
       return;
     }
   }
@@ -387,9 +388,9 @@ int main(int argc, char **args, char **env) {
     exit(2);
   }
 
-  scr.id = DefaultScreen(dpy);
-  scr.wi = DisplayWidth(dpy, scr.id);
-  scr.hi = DisplayHeight(dpy, scr.id);
+  scr.id = (unsigned)DefaultScreen(dpy);
+  scr.wi = (unsigned)DisplayWidth(dpy, scr.id);
+  scr.hi = (unsigned)DisplayHeight(dpy, scr.id);
 
   root = DefaultRootWindow(dpy);
   Cursor root_window_cursor = XCreateFontCursor(dpy, XC_arrow);
@@ -598,9 +599,9 @@ int main(int argc, char **args, char **env) {
       dragging_start_x = ev.xbutton.x_root;
       dragging_start_y = ev.xbutton.y_root;
       int new_x = xw->x + xdiff;
-      int new_wi = xw->wi + xdiff;
+      unsigned new_wi = (unsigned)((int)xw->wi + xdiff);
       int new_y = xw->y + ydiff;
-      int new_hi = xw->hi + ydiff;
+      unsigned new_hi = (unsigned)((int)xw->hi + ydiff);
       if (xw->bits & XWIN_BIT_FULL_WIDTH) {
         new_x = -WIN_BORDER_WIDTH;
         new_wi = scr.wi;

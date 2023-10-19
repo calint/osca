@@ -46,19 +46,19 @@ void graph_draw(const struct graph *self, struct dc *dc,
   int x = dc_x;
   // circular buffer, draw from current index to end
   for (unsigned i = self->ix; i < self->nvalues; i++) {
-    long long v = self->values[i] >> y_value_shift_right;
-    if (v == 0 && self->values[i] != 0) {
-      v = 1;
+    long long value = self->values[i] >> y_value_shift_right;
+    if (value == 0 && self->values[i] != 0) {
+      value = 1;
     }
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
   // draw from 0 to current index
   for (unsigned i = 0; i < self->ix; i++) {
-    long long v = self->values[i] >> y_value_shift_right;
-    if (v == 0 && self->values[i] != 0)
-      v = 1;
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
+    long long value = self->values[i] >> y_value_shift_right;
+    if (value == 0 && self->values[i] != 0)
+      value = 1;
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
 }
@@ -84,21 +84,21 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
   int x = dc_x;
   // circular buffer, draw from current index to end
   for (unsigned i = self->ix; i < self->nvalues; i++) {
-    long long v = self->values[i] * height / max_value;
-    if (v == 0 && self->values[i] != 0)
-      v = 1;
-    v = graphd_cap_value(v, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
+    long long value = self->values[i] * height / max_value;
+    if (value == 0 && self->values[i] != 0)
+      value = 1;
+    value = graphd_cap_value(value, height);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
   // draw from 0 to current index
   for (unsigned i = 0; i < self->ix; i++) {
-    long long v = self->values[i] * height / max_value;
-    if (v == 0 && self->values[i] != 0) {
-      v = 1;
+    long long value = self->values[i] * height / max_value;
+    if (value == 0 && self->values[i] != 0) {
+      value = 1;
     }
-    v = graphd_cap_value(v, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)v);
+    value = graphd_cap_value(value, height);
+    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
 }

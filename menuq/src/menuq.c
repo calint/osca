@@ -25,7 +25,7 @@ int main(void) {
   XMapWindow(dpy, win);
   const GC gc = XCreateGC(dpy, win, 0, NULL);
   const int x_init =
-      (screen_width >> 1) - (screen_width >> 2) + (screen_width >> 3);
+      (int)((screen_width >> 1) - (screen_width >> 2) + (screen_width >> 3));
   int x = x_init;
   const int y_init = (win_height >> 1) + (win_height >> 2);
   int y = y_init;
@@ -33,7 +33,7 @@ int main(void) {
   XSetForeground(dpy, gc, WhitePixel(dpy, scr));
   XDrawString(dpy, win, gc, x, y, cursor_str, 1);
   char buf[32];
-  int bufi = 0;
+  unsigned bufi = 0;
   char *bufp = buf;
   *bufp = 0;
   const int char_width = 7;
@@ -102,7 +102,7 @@ int main(void) {
         x += char_width;
         *bufp++ = buffer[0];
         bufi++;
-        if ((bufi + 1) >= (int)sizeof buf) // buffer full ?
+        if ((bufi + 1) >= sizeof(buf)) // buffer full ?
           go = 0;
         y += char_y_wiggle_up + rand() % char_y_wiggle;
         XDrawString(dpy, win, gc, x, y, cursor_str, 1);

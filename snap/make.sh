@@ -15,9 +15,10 @@ CC="gcc"
 #    -Wno-missing-noreturn \
 #    -Wno-reserved-identifier \
 #    -Wno-documentation \
-#    -Wno-documentation-unknown-command"
+#    -Wno-documentation-unknown-command \
+#"
 CF="-Os -Wfatal-errors -Werror"
-CW="-Wall -Wextra -Wpedantic"
+CW="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"
 CMD="$CC $SRC -o $BIN $CF $CW -I/usr/include/cairo/ -lX11 -lcairo"
 #echo
 #echo $CMD
