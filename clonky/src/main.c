@@ -410,16 +410,15 @@ static void render_cpu_throttles(void) {
   if (ncpus != 1) {
     strb_p_char(&sb, 's');
   }
-  const unsigned ncols = 10;
-  const unsigned nrows = (ncpus + ncols - 1) / ncols;
-  unsigned cpu_ix = min;
   if (ncpus > 4) {
     // if more than 4 cpus display throttles on new line
     pl(sb.chars);
-    // puts(sb.chars);
+    puts(sb.chars);
     strb_clear(&sb);
   }
-  for (unsigned row = 0; row < nrows && cpu_ix <= max; row++) {
+  const unsigned ncols = 10;
+  unsigned cpu_ix = min;
+  while (cpu_ix <= max) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
       char buf[128];
       snprintf(buf, sizeof(buf),
@@ -443,7 +442,7 @@ static void render_cpu_throttles(void) {
       cpu_ix++;
     }
     pl(sb.chars);
-    // puts(sb.chars);
+    puts(sb.chars);
     strb_clear(&sb);
   }
 }
