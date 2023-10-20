@@ -1,5 +1,4 @@
-export WORKSPACE=$HOME/w
-export OSCA=$WORKSPACE/osca
+export OSCA=$HOME/w/osca
 export PATH=$PATH:$OSCA/sh
 
 export PS1=' :: '
