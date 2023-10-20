@@ -1,11 +1,13 @@
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
 [ ] clonky: throttle percentage display not same as in htop
-[ ] clonky: render_io_stat: select drive
+[ ] clonky: render_io_stat: re-write considering loop devices
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] frameless: clang compile fix -Wno-sign-conversion
 [ ] frameless: remember focused window on each desk
 [ ] stickyo: upgrade to gtk4
+[ ] frameless: "scrot -s" to select screenshot area
+[ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clang-tidy: basic
 [x]     frameless

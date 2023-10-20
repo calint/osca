@@ -274,55 +274,71 @@ static void render_cheetsheet(void) {
 }
 
 static void render_df(void) {
-  FILE *f = popen("df -h 2>/dev/null", "r");
-  if (!f) {
+  FILE *file = popen("df -h 2>/dev/null", "r");
+  if (!file) {
     return;
   }
-  char bbuf[256] = "";
+  char buf[256] = "";
   while (1) {
-    if (!fgets(bbuf, sizeof(bbuf), f)) {
+    if (!fgets(buf, sizeof(buf), file)) {
       break;
     }
-    str_compact_spaces(bbuf);
-    if (bbuf[0] != '/') {
+    str_compact_spaces(buf);
+    if (buf[0] != '/') {
       continue;
     }
-    pl(bbuf);
+    pl(buf);
   }
-  pclose(f);
+  pclose(file);
 }
 
 static void render_io_stat(void) {
-  static long long last_kb_read = 0;
-  static long long last_kb_written = 0;
+  static long long prv_kb_read_total = 0;
+  static long long prv_kb_written_total = 0;
 
   FILE *file = popen("iostat -d", "r");
   if (!file) {
     return;
   }
-  //	Linux 3.11.0-14-generic (vaio) 	03/12/2014 	_x86_64_	(2 CPU)
+  // Linux 6.2.0-34-generic (c) 	2023-10-20 	_x86_64_	(12 CPU)
+  // Device  tps  kB_read/s  kB_wrtn/s  kB_dscd/s  kB_read  kB_wrtn  kB_dscd
   //
-  //	Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-  //	sda               7.89        25.40        80.46     914108    2896281
-  char bbuf[512] = "";
-  fgets(bbuf, sizeof(bbuf), file);
-  fgets(bbuf, sizeof(bbuf), file);
-  fgets(bbuf, sizeof(bbuf), file);
-  float tps = 0;
-  float kb_read_s = 0;
-  float kb_written_s = 0;
+  // loop0   0,00 0,00       0,00       0,00       21       0        0
+
+  char buf[256] = "";
+  fgets(buf, sizeof(buf), file);
+  fgets(buf, sizeof(buf), file);
+  fgets(buf, sizeof(buf), file);
   long long kb_read = 0;
+  long long kb_read_total = 0;
   long long kb_written = 0;
+  long long kb_written_total = 0;
   char dev[64] = "";
-  fscanf(file, "%63s %f %f %f %lld %lld", dev, &tps, &kb_read_s, &kb_written_s,
-         &kb_read, &kb_written);
+  while (fgets(buf, sizeof(buf), file)) {
+    if (buf[0] == '\0') {
+      // break on empty line
+      break;
+    }
+    sscanf(buf, "%63s %*s %*s %*s %*s %lld %lld %*s\n", dev, &kb_read,
+           &kb_written);
+    // puts(buf);
+    // printf("read/written %lld  %lld\n", kb_read, kb_written);
+    kb_read_total += kb_read;
+    kb_written_total += kb_written;
+  }
   pclose(file);
-  const char *unit = "kB";
-  snprintf(bbuf, sizeof(bbuf), "read %lld %s wrote %lld %s",
-           kb_read - last_kb_read, unit, kb_written - last_kb_written, unit);
-  pl(bbuf);
-  last_kb_read = kb_read;
-  last_kb_written = kb_written;
+  const char *unit = "kB/s";
+  snprintf(buf, sizeof(buf), "read %lld %s wrote %lld %s",
+           kb_read_total -
+               (prv_kb_read_total ? prv_kb_read_total : kb_read_total),
+           unit,
+           kb_written_total -
+               (prv_kb_written_total ? prv_kb_written_total : kb_written_total),
+           unit);
+  pl(buf);
+  // puts(buf);
+  prv_kb_read_total = kb_read_total;
+  prv_kb_written_total = kb_written_total;
 }
 
 static void render_dmsg(void) {
@@ -378,9 +394,9 @@ static void render_cpu_throttles(void) {
   if (!file) {
     return;
   }
-  int min = 0;
-  int max = 0;
-  fscanf(file, "%d-%d", &min, &max);
+  unsigned min = 0;
+  unsigned max = 0;
+  fscanf(file, "%ud-%ud", &min, &max);
   fclose(file);
 
   strb sb;
@@ -389,7 +405,7 @@ static void render_cpu_throttles(void) {
     return;
   }
 
-  for (int i = min; i <= max; i++) {
+  for (unsigned i = min; i <= max; i++) {
     char bbuf[128];
     snprintf(bbuf, sizeof bbuf,
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", i);
@@ -640,7 +656,7 @@ static void signal_exit(int i) {
   exit(i);
 }
 
-static void draw(void) {
+static void render(void) {
   dc_set_y(dc, TOP_Y);
   dc_clear(dc);
   render_date_time();
@@ -695,6 +711,6 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     sleep(1);
-    draw();
+    render();
   }
 }
