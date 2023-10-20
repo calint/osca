@@ -411,7 +411,7 @@ static void render_cpu_throttles(void) {
     strb_p_char(&sb, 's');
   }
   const unsigned ncols = 10;
-  const unsigned nrows = ncpus / ncols + 1;
+  const unsigned nrows = (ncpus + ncols - 1) / ncols;
   unsigned cpu_ix = min;
   if (ncpus > 4) {
     // if more than 4 cpus display throttles on new line
@@ -474,7 +474,7 @@ static void render_swaps(void) {
     return;
   }
   pl(sb.chars);
-  // puts(sb.chars);s
+  // puts(sb.chars);
 }
 
 static void auto_config_battery(void) {
