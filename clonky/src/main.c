@@ -422,23 +422,23 @@ static void render_cpu_throttles(void) {
   for (unsigned row = 0; row < nrows && cpu_ix <= max; row++) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
       char buf[128];
-      snprintf(buf, sizeof buf,
+      snprintf(buf, sizeof(buf),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
                cpu_ix);
       const long long max_freq = get_sys_value_long(buf);
-      snprintf(buf, sizeof buf,
+      snprintf(buf, sizeof(buf),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
                cpu_ix);
       const long long cur_freq = get_sys_value_long(buf);
       strb_p_char(&sb, ' ');
       if (max_freq) {
         // if available render percent of max frequency
-        const long long proc = cur_freq * 100 / max_freq;
-        strb_p_long(&sb, proc);
+        const unsigned proc = (unsigned)(cur_freq * 100 / max_freq);
+        strb_p_long(&sb, (int)proc);
         strb_p(&sb, "%");
       } else {
         // max frequency not available
-        strb_p(&sb, "n/a");
+        strb_p(&sb, "----");
       }
       cpu_ix++;
     }
