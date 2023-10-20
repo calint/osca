@@ -446,7 +446,6 @@ static void render_cpu_throttles(void) {
     pl(sb.chars);
     // puts(sb.chars);
     strb_clear(&sb);
-    dc_newline(dc);
   }
 }
 
