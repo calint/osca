@@ -41,6 +41,13 @@ inline int strb_p_long(strb *self, const long long num) {
   return 0;
 }
 
+inline int strb_p_int(strb *self, const int num) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%d", num);
+  strb_p(self, buf);
+  return 0;
+}
+
 int strb_p_nbytes(strb *self, long long bytes) {
   const long long kb = bytes >> 10;
   if (kb == 0) {

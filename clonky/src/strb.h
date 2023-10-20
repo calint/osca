@@ -21,6 +21,9 @@ int strb_p(strb *self, const char *str);
 int strb_p_char(strb *self, char ch);
 
 // appends num to str. returns 0 if ok
+int strb_p_int(strb *self, const int num);
+
+// appends num to str. returns 0 if ok
 int strb_p_long(strb *self, long long num);
 
 // formats bytes to str. returns 0 if ok

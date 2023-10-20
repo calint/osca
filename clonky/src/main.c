@@ -404,28 +404,50 @@ static void render_cpu_throttles(void) {
   if (strb_p(&sb, "throttle ")) {
     return;
   }
-
-  for (unsigned i = min; i <= max; i++) {
-    char buf[128];
-    snprintf(buf, sizeof buf,
-             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", i);
-    const long long max_freq = get_sys_value_long(buf);
-    snprintf(buf, sizeof buf,
-             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", i);
-    const long long cur_freq = get_sys_value_long(buf);
-    strb_p(&sb, " ");
-    if (max_freq) {
-      // if available render percent of max frequency
-      const long long proc = cur_freq * 100 / max_freq;
-      strb_p_long(&sb, proc);
-      strb_p(&sb, "%");
-    } else {
-      // max frequency not available
-      strb_p(&sb, "n/a");
-    }
+  const unsigned ncpus = max - min + 1;
+  strb_p_int(&sb, (int)ncpus);
+  strb_p(&sb, " cpu");
+  if (ncpus != 1) {
+    strb_p_char(&sb, 's');
   }
-  pl(sb.chars);
-  puts(sb.chars);
+  const unsigned ncols = 6;
+  const unsigned nrows = ncpus / ncols + 1;
+  unsigned cpu_ix = min;
+  if (ncpus > 4) {
+    // if more than 4 cpus display throttles on new line
+    pl(sb.chars);
+    // puts(sb.chars);
+    strb_clear(&sb);
+    dc_newline(dc);
+  }
+  for (unsigned row = 0; row < nrows && cpu_ix <= max; row++) {
+    for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
+      char buf[128];
+      snprintf(buf, sizeof buf,
+               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
+               cpu_ix);
+      const long long max_freq = get_sys_value_long(buf);
+      snprintf(buf, sizeof buf,
+               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
+               cpu_ix);
+      const long long cur_freq = get_sys_value_long(buf);
+      strb_p_char(&sb, ' ');
+      if (max_freq) {
+        // if available render percent of max frequency
+        const long long proc = cur_freq * 100 / max_freq;
+        strb_p_long(&sb, proc);
+        strb_p(&sb, "%");
+      } else {
+        // max frequency not available
+        strb_p(&sb, "n/a");
+      }
+      cpu_ix++;
+    }
+    pl(sb.chars);
+    // puts(sb.chars);
+    strb_clear(&sb);
+    dc_newline(dc);
+  }
 }
 
 static void render_swaps(void) {
