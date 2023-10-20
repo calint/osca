@@ -505,6 +505,7 @@ int main(int argc, char **args, char **env) {
         // if dragging then it is resizing, don't change focus
         // if key pressed then it is switching desktop, ignore
         //   focus on the window that is under the pointer
+        //? todo. check that keys for switching desktop are pressed
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
