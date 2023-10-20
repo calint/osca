@@ -620,7 +620,7 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
             win_focused->desk = dsk;
-            // set desk_x because 'desk_show' will restore it to x
+            // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
             xwin_raise(win_focused);
           }
@@ -637,6 +637,8 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
             win_focused->desk = dsk;
+            // set 'desk_x' because 'desk_show' will restore it to 'x'
+            win_focused->desk_x = win_focused->x;
             xwin_raise(win_focused);
           }
         }
