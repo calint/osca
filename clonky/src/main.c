@@ -410,7 +410,7 @@ static void render_cpu_throttles(void) {
   if (ncpus != 1) {
     strb_p_char(&sb, 's');
   }
-  const unsigned ncols = 6;
+  const unsigned ncols = 8;
   const unsigned nrows = ncpus / ncols + 1;
   unsigned cpu_ix = min;
   if (ncpus > 4) {
