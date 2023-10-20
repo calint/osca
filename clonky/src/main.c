@@ -413,10 +413,10 @@ static void render_cpu_throttles(void) {
   if (ncpus > 4) {
     // if more than 4 cpus display throttles on new line
     pl(sb.chars);
-    puts(sb.chars);
+    // puts(sb.chars);
     strb_clear(&sb);
   }
-  const unsigned ncols = 10;
+  const unsigned ncols = 5;
   unsigned cpu_ix = min;
   while (cpu_ix <= max) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
@@ -442,7 +442,7 @@ static void render_cpu_throttles(void) {
       cpu_ix++;
     }
     pl(sb.chars);
-    puts(sb.chars);
+    // puts(sb.chars);
     strb_clear(&sb);
   }
 }

@@ -8,7 +8,7 @@
 #define WIN_MAX_COUNT 128
 
 // pixels to show of a window folded to the right
-#define WIN_SLIP_DX 13
+#define WIN_SLIP_DX 21
 
 // random pixels relative to WIN_SLIP_DX
 #define WIN_SLIP 7
@@ -620,6 +620,8 @@ int main(int argc, char **args, char **env) {
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
             win_focused->desk = dsk;
+            // set desk_x because 'desk_show' will restore it to x
+            win_focused->desk_x = win_focused->x;
             xwin_raise(win_focused);
           }
         }
