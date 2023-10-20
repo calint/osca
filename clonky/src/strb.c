@@ -48,6 +48,13 @@ inline int strb_p_int(strb *self, const int num) {
   return 0;
 }
 
+inline int strb_p_int_with_width(strb *self, const int num, const int width) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%*d", width, num);
+  strb_p(self, buf);
+  return 0;
+}
+
 int strb_p_nbytes(strb *self, long long bytes) {
   const long long kb = bytes >> 10;
   if (kb == 0) {

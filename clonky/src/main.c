@@ -434,8 +434,8 @@ static void render_cpu_throttles(void) {
       if (max_freq) {
         // if available render percent of max frequency
         const unsigned proc = (unsigned)(cur_freq * 100 / max_freq);
-        strb_p_long(&sb, (int)proc);
-        strb_p(&sb, "%");
+        strb_p_int_with_width(&sb, (int)proc, 3);
+        strb_p_char(&sb, '%');
       } else {
         // max frequency not available
         strb_p(&sb, "----");

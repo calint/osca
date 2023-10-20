@@ -23,6 +23,10 @@ int strb_p_char(strb *self, char ch);
 // appends num to str. returns 0 if ok
 int strb_p_int(strb *self, const int num);
 
+// appends num to str with specified field width aligned right
+// returns 0 if ok
+int strb_p_int_with_width(strb *self, int num, int width);
+
 // appends num to str. returns 0 if ok
 int strb_p_long(strb *self, long long num);
 
