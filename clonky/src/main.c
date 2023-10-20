@@ -418,7 +418,6 @@ static void render_cpu_throttles(void) {
     pl(sb.chars);
     // puts(sb.chars);
     strb_clear(&sb);
-    dc_newline(dc);
   }
   for (unsigned row = 0; row < nrows && cpu_ix <= max; row++) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
