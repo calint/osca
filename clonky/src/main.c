@@ -396,7 +396,7 @@ static void render_cpu_throttles(void) {
   }
   unsigned min = 0;
   unsigned max = 0;
-  fscanf(file, "%ud-%ud", &min, &max);
+  fscanf(file, "%u-%u", &min, &max);
   fclose(file);
 
   strb sb;
@@ -406,17 +406,17 @@ static void render_cpu_throttles(void) {
   }
 
   for (unsigned i = min; i <= max; i++) {
-    char bbuf[128];
-    snprintf(bbuf, sizeof bbuf,
+    char buf[128];
+    snprintf(buf, sizeof buf,
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq", i);
-    const long long max_freq = get_sys_value_long(bbuf);
-    snprintf(bbuf, sizeof bbuf,
+    const long long max_freq = get_sys_value_long(buf);
+    snprintf(buf, sizeof buf,
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", i);
-    const long long cur_freq = get_sys_value_long(bbuf);
+    const long long cur_freq = get_sys_value_long(buf);
     strb_p(&sb, " ");
     if (max_freq) {
       // if available render percent of max frequency
-      const long long proc = (cur_freq * 100) / max_freq;
+      const long long proc = cur_freq * 100 / max_freq;
       strb_p_long(&sb, proc);
       strb_p(&sb, "%");
     } else {
@@ -425,6 +425,7 @@ static void render_cpu_throttles(void) {
     }
   }
   pl(sb.chars);
+  puts(sb.chars);
 }
 
 static void render_swaps(void) {
