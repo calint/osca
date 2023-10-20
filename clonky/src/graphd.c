@@ -37,8 +37,9 @@ void graphd_add_value(struct graphd *self, const long long value) {
   self->_value_prev = value;
   self->values[self->ix] = delta;
   self->ix++;
-  if (self->ix == self->nvalues)
+  if (self->ix == self->nvalues) {
     self->ix = 0;
+  }
 }
 
 static long long graphd_cap_value(long long v, const int height) {

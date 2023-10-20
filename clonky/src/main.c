@@ -236,11 +236,11 @@ static void render_net_traffic(void) {
   char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
            net_device);
-  long long wifi_tx = get_sys_value_long(bbuf);
+  long long tx_bytes = get_sys_value_long(bbuf);
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
            net_device);
-  long long wifi_rx = get_sys_value_long(bbuf);
-  graphd_add_value(graph_net, wifi_tx + wifi_rx);
+  long long rx_bytes = get_sys_value_long(bbuf);
+  graphd_add_value(graph_net, tx_bytes + rx_bytes);
   graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
 

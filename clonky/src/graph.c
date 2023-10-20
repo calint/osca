@@ -33,8 +33,9 @@ void graph_del(/*take*/ struct graph *self) {
 void graph_add_value(struct graph *self, const long long value) {
   self->values[self->ix] = value;
   self->ix++;
-  if (self->ix == self->nvalues)
+  if (self->ix == self->nvalues) {
     self->ix = 0;
+  }
 }
 
 void graph_draw(const struct graph *self, struct dc *dc,
@@ -64,10 +65,10 @@ void graph_draw(const struct graph *self, struct dc *dc,
 }
 
 static long long graphd_cap_value(const long long value, const int height) {
-  if (value > height){
+  if (value > height) {
     return height;
   }
-  if (value < 0){
+  if (value < 0) {
     return 0;
   }
   return value;
