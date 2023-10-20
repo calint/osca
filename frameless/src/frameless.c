@@ -583,22 +583,22 @@ int main(int argc, char **args, char **env) {
           xwin_bump(win_focused, WIN_BUMP_PX);
         }
         break;
-      case 12: // 3
+      case 10: // 1
         if (win_focused) {
           xwin_toggle_fullscreen(win_focused);
         }
         break;
-      case 13: // 4
+      case 11: // 2
         if (win_focused) {
           xwin_toggle_fullheight(win_focused);
         }
         break;
-      case 14: // 5
+      case 12: // 3
         if (win_focused) {
           xwin_toggle_fullwidth(win_focused);
         }
         break;
-      case 15: // 6
+      case 19: // 0: surprise
         if (win_focused) {
           xwin_bump(win_focused, WIN_BUMP_PX);
         }

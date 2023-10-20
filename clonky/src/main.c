@@ -261,9 +261,9 @@ static void render_cheetsheet(void) {
       "+shift+down    move-down", "", "window", "+esc               close",
       "+b                  bump", "+s                center",
       "+w                 wider", "+W               thinner",
-      "+r                resize", "+3            fullscreen",
-      "+4           full height", "+5            full width",
-      "+6   i-am-bored-surprise", "...                  ...", NULL};
+      "+r                resize", "+1            fullscreen",
+      "+2           full height", "+3            full width",
+      "+0   i-am-bored-surprise", "...                  ...", NULL};
 
   char **str_ptr = keysheet;
   while (*str_ptr) {
