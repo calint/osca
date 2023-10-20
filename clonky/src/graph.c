@@ -63,12 +63,14 @@ void graph_draw(const struct graph *self, struct dc *dc,
   }
 }
 
-static long long graphd_cap_value(long long v, const int height) {
-  if (v > height)
-    v = height;
-  if (v < 0)
-    v = 0;
-  return v;
+static long long graphd_cap_value(const long long value, const int height) {
+  if (value > height){
+    return height;
+  }
+  if (value < 0){
+    return 0;
+  }
+  return value;
 }
 
 void graph_draw2(const struct graph *self, struct dc *dc, const int height,
