@@ -455,13 +455,11 @@ static void render_swaps(void) {
   }
   // Filename         Type       Size     Used   Priority
   // /dev/mmcblk0p3   partition  2096124  16568  s-1
-  char bbuf[1024];
-  fgets(bbuf, sizeof bbuf, file);
-  char dev[64] = "";
-  char type[32] = "";
-  long long size = 0;
-  long long used = 0;
-  if (!fscanf(file, "%63s %31s %lld %lld", dev, type, &size, &used)) {
+  char bbuf[256];
+  fgets(bbuf, sizeof(bbuf), file);
+  long long size_kb = 0;
+  long long used_kb = 0;
+  if (!fscanf(file, "%*s %*s %lld %lld", &size_kb, &used_kb)) {
     fclose(file);
     return;
   }
@@ -472,10 +470,11 @@ static void render_swaps(void) {
   if (strb_p(&sb, "swapped ")) {
     return;
   }
-  if (strb_p_nbytes(&sb, used << 10)) {
+  if (strb_p_nbytes(&sb, used_kb << 10)) {
     return;
   }
   pl(sb.chars);
+  // puts(sb.chars);s
 }
 
 static void auto_config_battery(void) {
