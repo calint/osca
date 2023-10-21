@@ -1,3 +1,6 @@
+export OSCA=$HOME/w/osca
+export PATH=$PATH:$OSCA/sh
+
 # set background
 xsetroot -bitmap $OSCA/bmp/sq.bmp
 

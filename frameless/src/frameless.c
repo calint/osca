@@ -577,6 +577,10 @@ int main(int argc, char **args, char **env) {
           } else {
             xwin_wider(win_focused);
           }
+          // if window was full width then turn that bit off
+          if (win_focused->bits & XWIN_BIT_FULL_WIDTH) {
+            win_focused->bits &= ~XWIN_BIT_FULL_WIDTH;
+          }
         }
         break;
       case 56: // b
