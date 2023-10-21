@@ -280,7 +280,8 @@ static void render_df(void) {
   }
   char buf[256] = "";
   while (1) {
-    if (!fgets(buf, sizeof(buf), file)) {
+    // if (!fgets(buf, sizeof(buf), file)) {
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
     str_compact_spaces(buf);
@@ -346,12 +347,13 @@ static void render_dmsg(void) {
   if (!file) {
     return;
   }
-  char bbuf[1024];
+  char buf[512];
   while (1) {
-    if (!fgets(bbuf, sizeof(bbuf), file)) {
+    //    if (!fgets(buf, sizeof(buf), file)) {
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
-    pl(bbuf);
+    pl(buf);
   }
   pclose(file);
 }
@@ -363,14 +365,15 @@ static void render_acpi(void) {
     return;
   }
   while (1) {
-    char bbuf[512];
-    if (!fgets(bbuf, sizeof(bbuf), file)) {
+    char buf[512];
+    // if (!fgets(bbuf, sizeof(bbuf), file)) {
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
-    for (char *p = bbuf; *p; ++p) {
+    for (char *p = buf; *p; ++p) {
       *p = (char)tolower(*p);
     }
-    pl(bbuf);
+    pl(buf);
   }
   pclose(file);
 }
