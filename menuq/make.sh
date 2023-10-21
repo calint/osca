@@ -23,4 +23,4 @@ echo -n "   zipped:"
 cat $SRC | gzip | wc
 echo && ls -o $BIN
 echo
-valgrind --leak-check=full --show-leak-kinds=all ./$BIN
+#valgrind --leak-check=full --show-leak-kinds=all ./$BIN
