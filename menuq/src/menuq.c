@@ -6,7 +6,17 @@
 #include <string.h>
 #include <unistd.h>
 
-#define BORDER_WIDTH 1
+// frameless border width (assumed the default 1)
+#define FRAMELESS_BORDER_WIDTH 1
+
+// window height
+#define WIN_HEIGHT 41
+
+// effect: amount of random displacement of next character on y axis
+#define Y_WIGGLE 4
+
+// effect: displacement of y at next character
+#define Y_WIGGLE_UP -2
 
 int main(void) {
   Display *dpy = XOpenDisplay(NULL);
@@ -15,108 +25,139 @@ int main(void) {
     return 1;
   }
   const int scr = DefaultScreen(dpy);
-  const unsigned screen_width = (unsigned)DisplayWidth(dpy, scr);
-  const int win_height = 23;
-  const Window win = XCreateSimpleWindow(
-      dpy, RootWindow(dpy, scr), -BORDER_WIDTH, 0, screen_width, win_height, 0,
-      BlackPixel(dpy, scr), BlackPixel(dpy, scr));
-  //	XSelectInput(dpy,win,ExposureMask|KeyPressMask);
+  const unsigned scr_width = (unsigned)DisplayWidth(dpy, scr);
+
+  // frameless will center the window, set width to screen width plus 2 borders
+  const Window win =
+      XCreateSimpleWindow(dpy, RootWindow(dpy, scr), 0, 0,
+                          scr_width + (FRAMELESS_BORDER_WIDTH << 1), WIN_HEIGHT,
+                          0, BlackPixel(dpy, scr), BlackPixel(dpy, scr));
+
+  // XSelectInput(dpy, win, ExposureMask | KeyPressMask);
   XSelectInput(dpy, win, KeyPressMask);
   XMapWindow(dpy, win);
+
   const GC gc = XCreateGC(dpy, win, 0, NULL);
-  const int x_init =
-      (int)((screen_width >> 1) - (screen_width >> 2) + (screen_width >> 3));
-  int x = x_init;
-  const int y_init = (win_height >> 1) + (win_height >> 2);
-  int y = y_init;
-  const char cursor_str[1] = "_";
+
+  // load and set font
+  XFontStruct *font =
+      XLoadQueryFont(dpy, "-misc-fixed-*-*-*-*-24-*-*-*-*-*-*-*");
+  if (font == NULL) {
+    fprintf(stderr, "unable to load font.\n");
+    return 1;
+  }
+  XSetFont(dpy, gc, font->fid);
+
+  // initial x and y
+  int x = (int)((scr_width >> 1) - (scr_width >> 2) + (scr_width >> 3));
+  int y = (WIN_HEIGHT >> 1) + (WIN_HEIGHT >> 2);
+  const char cursor_str[] = "_";
   XSetForeground(dpy, gc, WhitePixel(dpy, scr));
-  XDrawString(dpy, win, gc, x, y, cursor_str, 1);
-  char buf[32];
-  unsigned bufi = 0;
-  char *bufp = buf;
-  *bufp = 0;
-  const int char_width = 7;
-  const int char_y_wiggle = 3;
-  const int char_y_wiggle_up = -1;
-  const unsigned options_start_x = (screen_width >> 1) + (screen_width >> 2);
+  // -1 to exclude '\0'
+  XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
+  // the buffer that accumulates the string to be executed
+  char buf[32] = "";
+  char *buf_ptr = buf;
+  unsigned buf_ix = 0;
+  const unsigned char_width = (unsigned)font->max_bounds.width;
+  const unsigned options_start_x = (scr_width >> 1) + (scr_width >> 3);
   int go = 1;
-  XEvent e;
+  XEvent ev;
   while (go) {
-    XNextEvent(dpy, &e);
-    switch (e.type) {
+    XNextEvent(dpy, &ev);
+    switch (ev.type) {
     default:
       break;
-    case Expose:
-      //			XSetForeground(dpy,gc,BlackPixel(dpy,scr));
-      //			XFillRectangle(dpy,win,gc,0,0,screen_width,win_height);
-      //			XSetForeground(dpy,gc,WhitePixel(dpy,scr));
-      //			const int buflen=strlen(buf);
-      //			printf("%d   [%s]\n",buflen,buf);
-      //			XDrawString(dpy,win,gc,x_init,y_init,buf,buflen);
-      //			x=x_init+char_width*buflen;
-      //			XDrawString(dpy,win,gc,x,y,cursor_str,1);
-      break;
+    // case Expose:
+    //   XSetForeground(dpy, gc, BlackPixel(dpy, scr));
+    //   XFillRectangle(dpy, win, gc, 0, 0, screen_width, WIN_HEIGHT);
+    //   XSetForeground(dpy, gc, WhitePixel(dpy, scr));
+    //   const int buflen = strlen(buf);
+    //   printf("%d   [%s]\n", buflen, buf);
+    //   XDrawString(dpy, win, gc, x_init, y_init, buf, buflen);
+    //   x = x_init + char_width * buflen;
+    //   XDrawString(dpy, win, gc, x, y, cursor_str, 1);
+    //   break;
     case DestroyNotify:
       go = 0;
       break;
     case KeyPress: {
-      unsigned keycode = 0;
-      // printf("KeyPress %d %d\n",e.xbutton.button,e.xbutton.state);
-      keycode = e.xkey.keycode;
+      unsigned keycode = ev.xkey.keycode;
       if (keycode == 9) { // esc
         go = 0;
-        bufp = buf;
-        *bufp = 0;
+        buf_ptr = buf;
+        *buf_ptr = 0;
         break;
       }
-      keycode = e.xkey.keycode;
       if (keycode == 36) { // return
         go = 0;
-        *bufp = 0;
+        *buf_ptr = 0;
         break;
       }
       if (keycode == 22) { // backspace
-        if (bufi == 0)
+        if (buf_ix == 0) {
           break;
-        x -= char_width;
+        }
+        // back one character
+        x -= (int)char_width;
+        // erase the character and cursor
         XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-        XFillRectangle(dpy, win, gc, x, 0, char_width << 1, win_height);
+        XFillRectangle(dpy, win, gc, x, 0, char_width << 1, WIN_HEIGHT);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
+        // draw cursor
         XDrawString(dpy, win, gc, x, y, "_", 1);
-        bufi--;
-        bufp--;
-        *bufp = 0;
+        buf_ix--;
+        buf_ptr--;
+        *buf_ptr = 0;
       } else {
-        // clear cursor
+        // clear cursor print
         XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-        XFillRectangle(dpy, win, gc, x, 0, char_width, win_height);
+        XFillRectangle(dpy, win, gc, x, 0, char_width, WIN_HEIGHT);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // get printable character
-        char buffer[4] = "";
-        KeySym keysym;
-        XLookupString(&e.xkey, buffer, sizeof buffer, &keysym, NULL);
-        if (!buffer[0]) // printable character ?
+        char printable_char[4] = "";
+        KeySym keysym = 0;
+        XLookupString(&ev.xkey, printable_char, sizeof(printable_char), &keysym,
+                      NULL);
+        if (!printable_char[0]) { // printable character ?
+          // -1 to exclude the '\0'
+          XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
           break;
-        XDrawString(dpy, win, gc, x, y, buffer, 1);
-        x += char_width;
-        *bufp++ = buffer[0];
-        bufi++;
-        if ((bufi + 1) >= sizeof(buf)) // buffer full ?
+        }
+        // draw character
+        XDrawString(dpy, win, gc, x, y, printable_char, 1);
+        // append to string
+        *buf_ptr++ = printable_char[0];
+        buf_ix++;
+        // +2 to leave space for '&' and '\0'
+        if ((buf_ix + 2) >= sizeof(buf)) {
+          // buffer full
           go = 0;
-        y += char_y_wiggle_up + rand() % char_y_wiggle;
-        XDrawString(dpy, win, gc, x, y, cursor_str, 1);
+        }
+        // update x, y and draw cursor
+        x += (int)char_width;
+        y += Y_WIGGLE_UP + rand() % Y_WIGGLE;
+        // -1 to exclude '\0'
+        XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
       }
+      // draw the effect
       XFillRectangle(dpy, win, gc, (int)options_start_x, 0,
-                     screen_width - options_start_x - 1, win_height - 1);
+                     scr_width - options_start_x - 1, WIN_HEIGHT - 1);
       break;
     }
     }
   }
+  // clean-up
+  XFreeFont(dpy, font);
   XFreeGC(dpy, gc);
   XCloseDisplay(dpy);
-  if (!*buf)
-    return 0; // empty string
-  strcat(buf, "&");
+  if (buf[0] == '\0') {
+    // empty string
+    return 0;
+  }
+  // append '&' and execute
+  *buf_ptr++ = '&';
+  *buf_ptr = '\0';
+  puts(buf);
   return system(buf);
 }
