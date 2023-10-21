@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// when True events written to file "~/frameless.log"
+#define FRAMELESS_DEBUG True
+#define DEBUG_FILE "frameless.log"
+
 // maximum number of windows
 #define WIN_MAX_COUNT 128
 
@@ -86,23 +90,25 @@ static unsigned dragging_button;
 // True while switching desktop after False after any key release
 static char is_switching_desktop;
 
-// static char *ix_evnames[LASTEvent] = {
-//     "unknown",          "unknown",       // 0
-//     "KeyPress",         "KeyRelease",    // 2
-//     "ButtonPress",      "ButtonRelease", // 4
-//     "MotionNotify",                      // 6
-//     "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
-//     "FocusIn",          "FocusOut",      // 9 from XSetFocus
-//     "KeymapNotify",                      // 11
-//     "Expose",           "GraphicsExpose",   "NoExpose", // 12
-//     "VisibilityNotify", "CreateNotify",     "DestroyNotify",
-//     "UnmapNotify",      "MapNotify", // 15
-//     "MapRequest",       "ReparentNotify",   "ConfigureNotify",
-//     "ConfigureRequest", "GravityNotify",    "ResizeRequest",
-//     "CirculateNotify",  "CirculateRequest", "PropertyNotify",
-//     "SelectionClear",   "SelectionRequest", "SelectionNotify",
-//     "ColormapNotify",   "ClientMessage",    "MappingNotify",
-//     "GenericEvent"};
+#ifdef FRAMELESS_DEBUG
+static char *ix_evnames[LASTEvent] = {
+    "unknown",          "unknown",       // 0
+    "KeyPress",         "KeyRelease",    // 2
+    "ButtonPress",      "ButtonRelease", // 4
+    "MotionNotify",                      // 6
+    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
+    "FocusIn",          "FocusOut",      // 9 from XSetFocus
+    "KeymapNotify",                      // 11
+    "Expose",           "GraphicsExpose",   "NoExpose", // 12
+    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
+    "UnmapNotify",      "MapNotify", // 15
+    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
+    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
+    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
+    "SelectionClear",   "SelectionRequest", "SelectionNotify",
+    "ColormapNotify",   "ClientMessage",    "MappingNotify",
+    "GenericEvent"};
+#endif
 
 static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
@@ -118,7 +124,9 @@ static xwin *xwin_get_by_window(Window w) {
     }
   }
   if (first_avail == -1) {
+#ifdef FRAMELESS_DEBUG
     fprintf(flog, "!!! no free windows\n");
+#endif
     exit(-1);
   }
   xwin *xw = &wins[first_avail];
@@ -447,33 +455,38 @@ static void free_window_and_adjust_focus(Window w) {
 }
 
 static int error_handler(Display *d, XErrorEvent *e) {
-  char buffer_return[1024] = "";
-  XGetErrorText(d, e->error_code, buffer_return, sizeof(buffer_return));
+#ifdef FRAMELESS_DEBUG
+  char buf[1024] = "";
+  XGetErrorText(d, e->error_code, buf, sizeof(buf));
   fprintf(flog, "!!! x11 error\n");
-  fprintf(flog, "!!!       text: %s\n", buffer_return);
+  fprintf(flog, "!!!       text: %s\n", buf);
   fprintf(flog, "!!!       type: %d\n", e->type);
   fprintf(flog, "!!! resourceid: %p\n", (void *)e->resourceid);
   fprintf(flog, "!!! error code: %d\n", (unsigned)e->error_code);
   fflush(flog);
+#endif
   return 0;
 }
 
 int main(int argc, char **args, char **env) {
-  while (argc--) {
-    puts(*args++);
-  }
-  while (*env) {
-    puts(*env++);
-  }
-
-  puts("frameless window manager");
-
-  XSetErrorHandler(error_handler);
-
-  flog = stdout; // fopen(logfile,"a");
+#ifdef FRAMELESS_DEBUG
+  flog = fopen(DEBUG_FILE, "a");
   if (!flog) {
     exit(1);
   }
+  fprintf(flog, "frameless window manager\n");
+  fprintf(flog, "\narguments:\n");
+  while (argc--) {
+    fprintf(flog, "%s\n", *args++);
+  }
+  fprintf(flog, "\nenvironment:\n");
+  while (*env) {
+    fprintf(flog, "%s\n", *env++);
+  }
+  fflush(flog);
+#endif
+
+  XSetErrorHandler(error_handler);
 
   dpy = XOpenDisplay(NULL);
   if (!dpy) {
@@ -498,13 +511,17 @@ int main(int argc, char **args, char **env) {
   xwin *xw = NULL;
   XEvent ev;
   while (!XNextEvent(dpy, &ev)) {
-    // fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
-    //         (void *)ev.xany.window);
-    // fflush(flog);
+#ifdef FRAMELESS_DEBUG
+    fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
+            (void *)ev.xany.window);
+    fflush(flog);
+#endif
     switch (ev.type) {
     default:
-      // fprintf(flog, "  unhandled\n");
-      // fflush(flog);
+#ifdef FRAMELESS_DEBUG
+      fprintf(flog, "  unhandled\n");
+      fflush(flog);
+#endif
       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
