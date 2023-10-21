@@ -9,8 +9,9 @@ Exec=/etc/X11/Xsession
 --------------------------
 this will launch '~/.xsession' at login
 
-to enable tap and natural scrolling see '1-after-login.sh'
+* to enable tap and natural scrolling see '1-after-login.sh'
 
-packages:
-sudo apt install mousepad thunar libinput-tools
+* press Fn+Esc will toggle between enabling/disabling Fn-key functions.
 
+* packages:
+sudo apt install mousepad thunar libinput-tools xbacklight

@@ -545,19 +545,19 @@ int main(int argc, char **args, char **env) {
         system("xii-editor");
         break;
       case 68: // F2
-        system("xii-decrease-screen-brightness");
+        system("xii-screen-brightness-down");
         break;
       case 69: // F3
-        system("xii-increase-screen-brightness");
+        system("xii-screen-brightness-up");
         break;
       case 72: // F6
-        system("xii-vol-toggle");
+        system("xii-volume-toggle");
         break;
       case 73: // F7
-        system("xii-vol-down");
+        system("xii-volume-down");
         break;
       case 74: // F8
-        system("xii-vol-up");
+        system("xii-volume-up");
         break;
       case 9:  // esc
       case 49: // §
@@ -616,6 +616,10 @@ int main(int argc, char **args, char **env) {
         focus_next_window();
         break;
       case 119: // del
+        if (ev.xkey.state & ShiftMask) {
+          // log-out
+          return 0;
+        }
         XKillClient(dpy, ev.xkey.subwindow);
         break;
       case 38:  // a
