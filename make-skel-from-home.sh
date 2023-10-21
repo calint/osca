@@ -4,20 +4,17 @@ set -e
 # change to directory of the script
 cd $(dirname "$0")
 
-SKEL=etc/skel
+SKEL="$(pwd)/etc/skel"
 echo "     source: $HOME"
-echo destination: $SKEL
+echo "destination: $SKEL"
 
-rm -rf $SKEL
-mkdir $SKEL
-cp -av $HOME/.profile $SKEL
-cp -av $HOME/.bashrc $SKEL
-cp -av $HOME/.xinitrc $SKEL
-cp -av $HOME/.nanorc $SKEL
-mkdir $SKEL/.config
-cp -rav $HOME/.config/leafpad $SKEL/.config
-cp -rav $HOME/.config/libfm $SKEL/.config
-cp -rav $HOME/.config/pcmanfm $SKEL/.config
-cp -rav $HOME/.config/gtk-3.0 $SKEL/.config
-
-echo done
+rm -rf "$SKEL"
+mkdir -p "$SKEL/.config"
+cd $HOME
+cp -av .bashrc "$SKEL"
+cp -av .xinitrc "$SKEL"
+cp -rav .config/gtk-3.0 "$SKEL/.config"
+cp -rav .config/xfce4 "$SKEL/.config"
+cd "$SKEL"
+ln -s .bashrc .profile
+ln -s .xinitrc .xsession
