@@ -83,6 +83,9 @@ static int dragging_start_x;
 static int dragging_start_y;
 static unsigned dragging_button;
 
+// True while switching desktop after False after any key release
+static char is_switching_desktop;
+
 // static char *ix_evnames[LASTEvent] = {
 //     "unknown",          "unknown",       // 0
 //     "KeyPress",         "KeyRelease",    // 2
@@ -128,7 +131,7 @@ static xwin *xwin_get_by_window(Window w) {
   return xw;
 }
 
-static void xwin_focus(xwin *this) {
+static void xwin_focus_on(xwin *this) {
   if (win_focused) {
     XSetWindowBorder(dpy, win_focused->win, WIN_BORDER_INACTIVE_COLOR);
     win_focused->bits &= ~XWIN_BIT_FOCUSED;
@@ -137,6 +140,14 @@ static void xwin_focus(xwin *this) {
   XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
   this->bits |= XWIN_BIT_FOCUSED;
   win_focused = this;
+}
+
+static void xwin_focus_off(xwin *this) {
+  XSetWindowBorder(dpy, this->win, WIN_BORDER_INACTIVE_COLOR);
+  this->bits &= ~XWIN_BIT_FOCUSED;
+  if (win_focused == this) {
+    win_focused = NULL;
+  }
 }
 
 static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
@@ -307,7 +318,7 @@ static char xwin_focus_try_by_index(unsigned ix) {
   xwin *xw = &wins[ix];
   if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
     xwin_raise(xw);
-    xwin_focus(xw);
+    xwin_focus_on(xw);
     return True;
   }
   return False;
@@ -339,7 +350,7 @@ static void focus_first_window_on_desk(void) {
     xwin *xw = &wins[i];
     if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
       xwin_raise(xw);
-      xwin_focus(xw);
+      xwin_focus_on(xw);
       return;
     }
   }
@@ -358,7 +369,7 @@ static void focus_on_only_window_on_desk(void) {
     }
   }
   if (focus) {
-    xwin_focus(focus);
+    xwin_focus_on(focus);
   }
 }
 
@@ -382,7 +393,19 @@ static void focus_window_after_desk_switch(void) {
     // didn't find any window to focus
     return;
   }
-  xwin_focus(focus);
+  xwin_focus_on(focus);
+}
+
+// turns off focus for window on this desktop
+// used when switching desktop and moving window
+static void turn_off_window_focus_on_desk(int dsk) {
+  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+    xwin *xw = &wins[i];
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk) &&
+        (xw->bits & XWIN_BIT_FOCUSED)) {
+      xwin_focus_off(xw);
+    }
+  }
 }
 
 static void focus_next_window(void) {
@@ -487,7 +510,7 @@ int main(int argc, char **args, char **env) {
       }
       xw = xwin_get_by_window(ev.xmap.window);
       xwin_center(xw);
-      xwin_focus(xw);
+      xwin_focus_on(xw);
       XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
                   GrabModeAsync, GrabModeAsync, None, None);
       XSelectInput(dpy, xw->win, EnterWindowMask);
@@ -501,15 +524,14 @@ int main(int argc, char **args, char **env) {
       focus_on_only_window_on_desk();
       break;
     case EnterNotify:
-      if (is_dragging || key_pressed) {
+      if (is_dragging || is_switching_desktop) {
         // if dragging then it is resizing, don't change focus
-        // if key pressed then it is switching desktop, ignore
-        //   focus on the window that is under the pointer
-        //? todo. check that keys for switching desktop are pressed
+        // if switching desktop, don't focus on the window that is under the
+        // pointer
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
-      xwin_focus(xw);
+      xwin_focus_on(xw);
       break;
     case KeyPress:
       key_pressed = ev.xkey.keycode;
@@ -624,10 +646,13 @@ int main(int argc, char **args, char **env) {
         break;
       case 38:  // a
       case 111: // up
+        is_switching_desktop = True;
         dsk_prv = dsk;
         dsk++;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
+            turn_off_window_focus_on_desk(dsk);
+            // change desk
             win_focused->desk = dsk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
@@ -641,10 +666,13 @@ int main(int argc, char **args, char **env) {
         break;
       case 40:  // d
       case 116: // down
+        is_switching_desktop = True;
         dsk_prv = dsk;
         dsk--;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
+            turn_off_window_focus_on_desk(dsk);
+            // change desk
             win_focused->desk = dsk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
@@ -662,6 +690,7 @@ int main(int argc, char **args, char **env) {
       if (key_pressed == ev.xkey.keycode) {
         key_pressed = 0;
       }
+      is_switching_desktop = False;
       break;
     case ButtonPress:
       is_dragging = True;
@@ -669,7 +698,7 @@ int main(int argc, char **args, char **env) {
       dragging_start_y = ev.xbutton.y_root;
       dragging_button = ev.xbutton.button;
       xw = xwin_get_by_window(ev.xbutton.window);
-      xwin_focus(xw);
+      xwin_focus_on(xw);
       XGrabPointer(dpy, xw->win, True, PointerMotionMask | ButtonReleaseMask,
                    GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
       xwin_raise(xw);
