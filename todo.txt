@@ -10,6 +10,8 @@
 [ ] frameless: "scrot -s" to select screenshot area
 [ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
+[ ] clonky: valgrind
+[ ] menuq: valgrind
 [ ] clang-tidy: basic
 [x]     frameless
 [ ]     clonky
