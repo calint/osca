@@ -1,5 +1,5 @@
 export OSCA=$HOME/w/osca
-export PATH=$PATH:$OSCA/sh
+export PATH=$HOME/bin:$OSCA/sh:$PATH
 
 export PS1=' :: '
 

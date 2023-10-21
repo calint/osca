@@ -1,5 +1,5 @@
 export OSCA=$HOME/w/osca
-export PATH=$PATH:$OSCA/sh
+export PATH=$HOME/bin:$OSCA/sh:$PATH
 
 # for faster start of xterm
 export SESSION_MANAGER=
