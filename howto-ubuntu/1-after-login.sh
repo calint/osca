@@ -1,11 +1,12 @@
 #!/bin/sh
 # notes.
-# change .xinitrc
-# ln -s .xinitrc .xsession
-# systemctl status display-manager
-# sudo apt install mousepad thunar libinput-tools
+#   change .xinitrc
+#   ln -s .xinitrc .xsession
+#   systemctl status display-manager
+#   sudo systemctl stop gdm3
+#   sudo apt install mousepad thunar libinput-tools
 # touchpad
-# xinput - to list devices
+# xinput : to list devices
 # xinput list-props [id]
 # look for "Tapping Enabled"
 xinput set-prop 10 305 1
