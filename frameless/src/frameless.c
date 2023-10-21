@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// when True events written to file "~/frameless.log"
-#define FRAMELESS_DEBUG True
-#define DEBUG_FILE "frameless.log"
+// debugging log written to file "~/frameless.log"
+// #define FRAMELESS_DEBUG
+// #define DEBUG_FILE "frameless.log"
 
 // maximum number of windows
 #define WIN_MAX_COUNT 128
@@ -308,6 +308,7 @@ static void focus_on_window(xwin *xw) {
   win_focused = xw;
 }
 
+// returns True if window got focus False otherwise
 static char focus_window_by_index_try(unsigned ix) {
   xwin *xw = &wins[ix];
   if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
@@ -324,10 +325,7 @@ static void desk_show(int dsk_id, int dsk_prv) {
     if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
       continue;
     }
-    if (xw->win == 0) {
-      continue;
-    }
-    if (xw->win == root) {
+    if (xw->win == 0 || xw->win == root) {
       continue;
     }
     if (xw->desk == dsk_prv) {
@@ -339,17 +337,17 @@ static void desk_show(int dsk_id, int dsk_prv) {
   }
 }
 
-static void focus_first_window_on_desk(void) {
-  for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-    xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
-      xwin_raise(xw);
-      focus_on_window(xw);
-      return;
-    }
-  }
-  win_focused = NULL;
-}
+// static void focus_first_window_on_desk(void) {
+//   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
+//     xwin *xw = &wins[i];
+//     if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+//       xwin_raise(xw);
+//       focus_on_window(xw);
+//       return;
+//     }
+//   }
+//   win_focused = NULL;
+// }
 
 static void focus_on_only_window_on_desk(void) {
   xwin *focus = NULL;
@@ -367,7 +365,8 @@ static void focus_on_only_window_on_desk(void) {
   }
 }
 
-// focus on previously focused window or some window on this desktop
+// focus on previously focused window if available or some window on this
+// desktop
 static void focus_window_after_desk_switch(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
@@ -390,8 +389,8 @@ static void focus_window_after_desk_switch(void) {
   focus_on_window(focus);
 }
 
-// turns off focus for window on this desktop
-// used when switching desktop and moving window
+// turns off focus for window on desktop 'dsk'
+// used when switching desktop with window (shift + meta + up/down)
 static void turn_off_window_focus_on_desk(int dsk) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
@@ -414,13 +413,13 @@ static void focus_next_window(void) {
     }
   }
   i = 0;
+  // '<= i0' not '< i0' to focus on same window if no other window available
   while (i <= i0) {
     if (focus_window_by_index_try((unsigned)i)) {
       return;
     }
     i++;
   }
-  focus_first_window_on_desk();
 }
 
 static void focus_previous_window(void) {
@@ -432,12 +431,12 @@ static void focus_previous_window(void) {
     }
   }
   i = WIN_MAX_COUNT;
-  while (--i >= 0) {
+  // '>= i0' not '> i0' to focus on same window if no other window available
+  while (--i >= i0) {
     if (focus_window_by_index_try((unsigned)i)) {
       return;
     }
   }
-  focus_first_window_on_desk();
 }
 
 static void free_window_and_adjust_focus(Window w) {
@@ -445,13 +444,12 @@ static void free_window_and_adjust_focus(Window w) {
   if (!win) {
     return;
   }
-  if (win->bits & XWIN_BIT_ALLOCATED) {
-    win->bits = 0; // mark free
-    xwin_count--;
-  }
+  win->bits = 0; // mark free
+  xwin_count--;
   if (win_focused == win) {
     win_focused = NULL;
   }
+  focus_on_only_window_on_desk();
 }
 
 static int error_handler(Display *d, XErrorEvent *e) {
@@ -459,10 +457,10 @@ static int error_handler(Display *d, XErrorEvent *e) {
   char buf[1024] = "";
   XGetErrorText(d, e->error_code, buf, sizeof(buf));
   fprintf(flog, "!!! x11 error\n");
-  fprintf(flog, "!!!       text: %s\n", buf);
-  fprintf(flog, "!!!       type: %d\n", e->type);
-  fprintf(flog, "!!! resourceid: %p\n", (void *)e->resourceid);
-  fprintf(flog, "!!! error code: %d\n", (unsigned)e->error_code);
+  fprintf(flog, "!!!        text: %s\n", buf);
+  fprintf(flog, "!!!        type: %d\n", e->type);
+  fprintf(flog, "!!! resource id: %p\n", (void *)e->resourceid);
+  fprintf(flog, "!!!  error code: %d\n", (unsigned)e->error_code);
   fflush(flog);
 #endif
   return 0;
@@ -541,7 +539,6 @@ int main(int argc, char **args, char **env) {
         break;
       }
       free_window_and_adjust_focus(ev.xmap.window);
-      focus_on_only_window_on_desk();
       break;
     case EnterNotify:
       if (is_dragging || is_switching_desktop) {
