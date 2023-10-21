@@ -1,7 +1,5 @@
 #!/bin/sh
 set -e
-
-# change to directory of the script
 cd $(dirname "$0")
 
 SKEL="$(pwd)/etc/skel"
