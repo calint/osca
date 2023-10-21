@@ -274,13 +274,12 @@ static void render_cheetsheet(void) {
 }
 
 static void render_df(void) {
-  FILE *file = popen("df -h 2>/dev/null", "r");
+  FILE *file = popen("df -h 2> /dev/null", "r");
   if (!file) {
     return;
   }
   char buf[256] = "";
   while (1) {
-    // if (!fgets(buf, sizeof(buf), file)) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -342,14 +341,13 @@ static void render_io_stat(void) {
   prv_kb_written_total = kb_written_total;
 }
 
-static void render_dmsg(void) {
-  FILE *file = popen("journalctl --lines=15 --no-pager", "r");
+static void render_syslog(void) {
+  FILE *file = popen("journalctl -o cat -n 15 --no-pager", "r");
   if (!file) {
     return;
   }
   char buf[512];
   while (1) {
-    //    if (!fgets(buf, sizeof(buf), file)) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -366,7 +364,6 @@ static void render_acpi(void) {
   }
   while (1) {
     char buf[512];
-    // if (!fgets(bbuf, sizeof(bbuf), file)) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -697,7 +694,7 @@ static void render(void) {
   render_hr();
   render_acpi();
   render_hr();
-  render_dmsg();
+  render_syslog();
   render_hr();
   render_hr();
   render_cheetsheet();
