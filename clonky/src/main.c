@@ -350,7 +350,6 @@ static void render_syslog(void) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
-    buf[sizeof(buf) - 1] = '\0';
     pl(buf);
   }
   pclose(file);
