@@ -7,11 +7,13 @@ cd $(dirname "$0")
 BIN=menuq
 SRC=src/menuq.c
 CC="gcc"
+OPTS="-g"
 #CC="clang -Weverything -Wno-declaration-after-statement"
 CF="-Os -Wfatal-errors -Werror"
 CW="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"
-LIBS="-lX11"
-CMD="$CC $SRC -o $BIN $CF $CW $LIBS"
+LIBS="-lX11 -lXft"
+INCLUDES="-I/usr/include/freetype2/"
+CMD="$CC $SRC -o $BIN $OPTS $CF $CW $LIBS $INCLUDES"
 $CMD
 echo
 echo    "            lines   words   chars"
@@ -21,4 +23,4 @@ echo -n "   zipped:"
 cat $SRC | gzip | wc
 echo && ls -o $BIN
 echo
-#valgrind --leak-check=yes --leak-check=full --show-leak-kinds=all ./$BIN
+valgrind --leak-check=full --show-leak-kinds=all ./$BIN

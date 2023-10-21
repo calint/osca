@@ -1,3 +1,4 @@
+#include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -10,10 +11,10 @@
 #define FRAMELESS_BORDER_WIDTH 1
 
 // window height
-#define WIN_HEIGHT 41
+#define WIN_HEIGHT 57
 
 // effect: amount of random displacement of next character on y axis
-#define Y_WIGGLE 4
+#define Y_WIGGLE 5
 
 // effect: displacement of y at next character
 #define Y_WIGGLE_UP -2
@@ -40,13 +41,18 @@ int main(void) {
   const GC gc = XCreateGC(dpy, win, 0, NULL);
 
   // load and set font
-  XFontStruct *font =
-      XLoadQueryFont(dpy, "-misc-fixed-*-*-*-*-24-*-*-*-*-*-*-*");
+  Colormap cmap = DefaultColormap(dpy, scr);
+  XftFont *font = XftFontOpen(dpy, scr, XFT_FAMILY, XftTypeString, "monospace",
+                              XFT_SIZE, XftTypeDouble, 24.0, NULL);
+  const unsigned char_width = 20;
   if (font == NULL) {
     fprintf(stderr, "unable to load font.\n");
     return 1;
   }
-  XSetFont(dpy, gc, font->fid);
+  XftDraw *draw = XftDrawCreate(dpy, win, DefaultVisual(dpy, scr), cmap);
+  XRenderColor rendcol = {0xffff, 0xffff, 0xffff, 0xffff};
+  XftColor color;
+  XftColorAllocValue(dpy, DefaultVisual(dpy, scr), cmap, &rendcol, &color);
 
   // initial x and y
   int x = (int)((scr_width >> 1) - (scr_width >> 2) + (scr_width >> 3));
@@ -54,12 +60,12 @@ int main(void) {
   const char cursor_str[] = "_";
   XSetForeground(dpy, gc, WhitePixel(dpy, scr));
   // -1 to exclude '\0'
-  XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
+  XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
+                    (int)sizeof(cursor_str) - 1);
   // the buffer that accumulates the string to be executed
   char buf[32] = "";
   char *buf_ptr = buf;
   unsigned buf_ix = 0;
-  const unsigned char_width = (unsigned)font->max_bounds.width;
   const unsigned options_start_x = (scr_width >> 1) + (scr_width >> 3);
   int go = 1;
   XEvent ev;
@@ -105,7 +111,8 @@ int main(void) {
         XFillRectangle(dpy, win, gc, x, 0, char_width << 1, WIN_HEIGHT);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // draw cursor
-        XDrawString(dpy, win, gc, x, y, "_", 1);
+        XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
+                          (int)sizeof(cursor_str) - 1);
         buf_ix--;
         buf_ptr--;
         *buf_ptr = 0;
@@ -121,11 +128,14 @@ int main(void) {
                       NULL);
         if (!printable_char[0]) { // printable character ?
           // -1 to exclude the '\0'
-          XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
+          XftDrawStringUtf8(draw, &color, font, x, y,
+                            (const FcChar8 *)cursor_str,
+                            (int)sizeof(cursor_str) - 1);
           break;
         }
         // draw character
-        XDrawString(dpy, win, gc, x, y, printable_char, 1);
+        XftDrawStringUtf8(draw, &color, font, x, y,
+                          (const FcChar8 *)printable_char, 1);
         // append to string
         *buf_ptr++ = printable_char[0];
         buf_ix++;
@@ -138,7 +148,8 @@ int main(void) {
         x += (int)char_width;
         y += Y_WIGGLE_UP + rand() % Y_WIGGLE;
         // -1 to exclude '\0'
-        XDrawString(dpy, win, gc, x, y, cursor_str, sizeof(cursor_str) - 1);
+        XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
+                          (int)sizeof(cursor_str) - 1);
       }
       // draw the effect
       XFillRectangle(dpy, win, gc, (int)options_start_x, 0,
@@ -148,7 +159,8 @@ int main(void) {
     }
   }
   // clean-up
-  XFreeFont(dpy, font);
+  XftDrawDestroy(draw);
+  XftFontClose(dpy, font);
   XFreeGC(dpy, gc);
   XCloseDisplay(dpy);
   if (buf[0] == '\0') {
