@@ -21,5 +21,5 @@ contains:
 ![screenshot 2](screenshots/frameless-archlinux-2.png)
 
 
-![screenshot 3](screenshots/frameless-ubuntu-2.png)
+![screenshot 3](screenshots/frameless-ubuntu-1.png)
 
