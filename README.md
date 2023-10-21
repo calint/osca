@@ -5,6 +5,7 @@ experimental minimal X11 desktop environment
 intention:
 * a lightweight desktop environment for X11
 * targets archlinux minimal installation
+* runs on ubuntu
 * a somewhat tongue-in-cheek approach to classics
 
 contains:
@@ -30,41 +31,41 @@ contains:
    source:    789    2326   21005
    zipped:     14      98    5001
 
--rwxrwxr-x 1 c 21928 okt 21 21:39 frameless
+-rwxrwxr-x 1 c 21928 okt 21 21:53 frameless
 
 
             lines   words   chars
    source:   1138    3586   29909
    zipped:     18     158    7254
 
--rwxrwxr-x 1 c 37200 okt 21 21:39 clonky
+-rwxrwxr-x 1 c 37200 okt 21 21:53 clonky
 
 
             lines   words   chars
    source:    163     626    5011
    zipped:      8      43    1669
 
--rwxrwxr-x 1 c 16712 okt 21 21:39 menuq
+-rwxrwxr-x 1 c 16712 okt 21 21:53 menuq
 
 
             lines   words   chars
    source:     54     126    1724
    zipped:      1      15     810
 
--rwxrwxr-x 1 c 16960 okt 21 21:39 stickyo
+-rwxrwxr-x 1 c 16960 okt 21 21:53 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 21 21:39 snap
+-rwxrwxr-x 1 c 16144 okt 21 21:53 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16872 okt 21 21:39 mounte
+-rwxrwxr-x 1 c 16872 okt 21 21:53 mounte
 
 ```

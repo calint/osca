@@ -5,6 +5,7 @@ experimental minimal X11 desktop environment
 intention:
 * a lightweight desktop environment for X11
 * targets archlinux minimal installation
+* runs on ubuntu
 * a somewhat tongue-in-cheek approach to classics
 
 contains:

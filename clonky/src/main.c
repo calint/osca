@@ -130,30 +130,28 @@ static void str_compact_spaces(char *str) {
 static void render_hr(void) { dc_draw_hr(dc); }
 
 static void render_battery(void) {
-  char buf[128] = "";
+  char path[128] = "";
   const int nchars =
-      snprintf(buf, sizeof(buf), "%s%s/%s_", power_supply_path_prefix,
+      snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
                battery_name, battery_energy_or_charge_prefix);
-  if (nchars < 0 || (size_t)nchars >= sizeof(buf)) {
+  if (nchars < 0 || (size_t)nchars >= sizeof(path)) {
     return; // truncated
   }
-  const size_t maxlen = sizeof(buf) - (size_t)nchars;
-  char *p = buf + nchars;
-  strncpy(p, "full", maxlen);
-  const long long charge_full = get_sys_value_long(buf);
-  strncpy(p, "now", maxlen);
-  const long long charge_now = get_sys_value_long(buf);
-  snprintf(buf, sizeof(buf), "%s%s/status", power_supply_path_prefix,
+  const size_t maxlen = sizeof(path) - (size_t)nchars;
+  char *path_prefix_end = path + nchars;
+  strncpy(path_prefix_end, "full", maxlen);
+  const long long charge_full = get_sys_value_long(path);
+  strncpy(path_prefix_end, "now", maxlen);
+  const long long charge_now = get_sys_value_long(path);
+  snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
            battery_name);
-  get_sys_value_str_tolower(buf, buf, sizeof(buf));
+  get_sys_value_str_tolower(path, path, sizeof(path));
   dc_newline(dc);
-  char bbuf[1024];
-  snprintf(bbuf, sizeof(bbuf), "battery %s  %lld/%lld mAh", buf,
+  char buf[256];
+  snprintf(buf, sizeof(buf), "battery %s  %lld/%lld mAh", path,
            charge_now / 1000, charge_full / 1000);
-  dc_draw_str(dc, bbuf);
-  if (charge_full) {
-    dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
-  }
+  dc_draw_str(dc, buf);
+  dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
 }
 
 static void render_cpu_load(void) {
