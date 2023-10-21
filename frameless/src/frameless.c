@@ -560,13 +560,13 @@ int main(int argc, char **args, char **env) {
         system("xii-sticky");
         break;
       case 54: // c
-        system("xii-term");
+        system("xii-console");
         break;
       case 33: // p
         system("xii-screenshot");
         break;
-      case 24: // q
-        system("xii-bin");
+      case 27: // r
+        system("xii-binaries");
         break;
       case 31: // i
         system("xii-internet");
@@ -661,7 +661,7 @@ int main(int argc, char **args, char **env) {
         }
         XKillClient(dpy, ev.xkey.subwindow);
         break;
-      case 38:  // a
+      case 24:  // q
       case 111: // up
         is_switching_desktop = True;
         dsk_prv = dsk;
@@ -681,7 +681,7 @@ int main(int argc, char **args, char **env) {
         // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
         // fflush(flog);
         break;
-      case 40:  // d
+      case 38:  // a
       case 116: // down
         is_switching_desktop = True;
         dsk_prv = dsk;

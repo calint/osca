@@ -252,7 +252,7 @@ static void render_cheetsheet(void) {
       "ĸey", "+c               console", "+f                 files",
       "+e                editor", "+m                 media",
       "+v                 mixer", "+i              internet",
-      "+x                sticky", "+q              binaries",
+      "+x                sticky", "+r              binaries",
       //	"+prtsc          snapshot",
       "+p              snapshot", "", "đesktop", "+up                   up",
       "+down               down", "+shift+up        move-up",
@@ -345,10 +345,12 @@ static void render_syslog(void) {
     return;
   }
   char buf[512];
-  while (1) {
+  unsigned i = 15;
+  while (i--) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
+    buf[sizeof(buf) - 1] = '\0';
     pl(buf);
   }
   pclose(file);
