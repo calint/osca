@@ -21,7 +21,28 @@
 
 #define FONT_NAME "monospace"
 #define FONT_SIZE 24.0 // parameter is double
-#define FONT_WIDTH 20 // approximated
+#define FONT_WIDTH 20  // approximated
+
+// #define MENUQ_DEBUG
+#ifdef MENUQ_DEBUG
+static char *ix_evnames[LASTEvent] = {
+    "unknown",          "unknown",       // 0
+    "KeyPress",         "KeyRelease",    // 2
+    "ButtonPress",      "ButtonRelease", // 4
+    "MotionNotify",                      // 6
+    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
+    "FocusIn",          "FocusOut",      // 9 from XSetFocus
+    "KeymapNotify",                      // 11
+    "Expose",           "GraphicsExpose",   "NoExpose", // 12
+    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
+    "UnmapNotify",      "MapNotify", // 15
+    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
+    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
+    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
+    "SelectionClear",   "SelectionRequest", "SelectionNotify",
+    "ColormapNotify",   "ClientMessage",    "MappingNotify",
+    "GenericEvent"};
+#endif
 
 int main(void) {
   Display *dpy = XOpenDisplay(NULL);
@@ -37,8 +58,6 @@ int main(void) {
       XCreateSimpleWindow(dpy, RootWindow(dpy, scr), 0, 0,
                           scr_width + (FRAMELESS_BORDER_WIDTH << 1), WIN_HEIGHT,
                           0, BlackPixel(dpy, scr), BlackPixel(dpy, scr));
-
-  // XSelectInput(dpy, win, ExposureMask | KeyPressMask);
   XSelectInput(dpy, win, KeyPressMask);
   XMapWindow(dpy, win);
 
@@ -70,25 +89,28 @@ int main(void) {
   char *buf_ptr = buf;
   unsigned buf_ix = 0;
   const unsigned options_start_x = (scr_width >> 1) + (scr_width >> 3);
-  int go = 1;
+
+  // loop condition
+  char go = True;
+  // True if window received WM_DELETE_WINDOW
+  char closed = False;
+
   XEvent ev;
   while (go) {
     XNextEvent(dpy, &ev);
+#ifdef MENUQ_DEBUG
+    printf("event %s\n", ix_evnames[ev.xany.type]);
+#endif
     switch (ev.type) {
     default:
       break;
-    // case Expose:
-    //   XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-    //   XFillRectangle(dpy, win, gc, 0, 0, screen_width, WIN_HEIGHT);
-    //   XSetForeground(dpy, gc, WhitePixel(dpy, scr));
-    //   const int buflen = strlen(buf);
-    //   printf("%d   [%s]\n", buflen, buf);
-    //   XDrawString(dpy, win, gc, x_init, y_init, buf, buflen);
-    //   x = x_init + char_width * buflen;
-    //   XDrawString(dpy, win, gc, x, y, cursor_str, 1);
-    //   break;
-    case DestroyNotify:
-      go = 0;
+    case ClientMessage:
+      if (ev.xclient.message_type == XInternAtom(dpy, "WM_PROTOCOLS", False) &&
+          ev.xclient.data.l[0] ==
+              (long)XInternAtom(dpy, "WM_DELETE_WINDOW", False)) {
+        go = False;
+        closed = True;
+      }
       break;
     case KeyPress: {
       unsigned keycode = ev.xkey.keycode;
@@ -112,48 +134,52 @@ int main(void) {
         // erase the character and cursor
         XSetForeground(dpy, gc, BlackPixel(dpy, scr));
         XFillRectangle(dpy, win, gc, x, 0, FONT_WIDTH << 1, WIN_HEIGHT);
-        XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // draw cursor
+        XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
                           (int)sizeof(cursor_str) - 1);
+        // adjust buffer pointer and indexs
         buf_ix--;
         buf_ptr--;
         *buf_ptr = 0;
-      } else {
-        // clear cursor print
-        XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-        XFillRectangle(dpy, win, gc, x, 0, FONT_WIDTH, WIN_HEIGHT);
-        XSetForeground(dpy, gc, WhitePixel(dpy, scr));
-        // get printable character
-        char printable_char[4] = "";
-        KeySym keysym = 0;
-        XLookupString(&ev.xkey, printable_char, sizeof(printable_char), &keysym,
-                      NULL);
-        if (!printable_char[0]) { // printable character ?
-          // -1 to exclude the '\0'
-          XftDrawStringUtf8(draw, &color, font, x, y,
-                            (const FcChar8 *)cursor_str,
-                            (int)sizeof(cursor_str) - 1);
-          break;
-        }
-        // draw character
-        XftDrawStringUtf8(draw, &color, font, x, y,
-                          (const FcChar8 *)printable_char, 1);
-        // append to string
-        *buf_ptr++ = printable_char[0];
-        buf_ix++;
-        // +2 to leave space for '&' and '\0'
-        if ((buf_ix + 2) >= sizeof(buf)) {
-          // buffer full
-          go = 0;
-        }
-        // update x, y and draw cursor
-        x += FONT_WIDTH;
-        y += Y_WIGGLE_UP + rand() % Y_WIGGLE;
-        // -1 to exclude '\0'
+        break;
+      }
+      // not escape, return or backspace
+      // erase cursor
+      XSetForeground(dpy, gc, BlackPixel(dpy, scr));
+      XFillRectangle(dpy, win, gc, x, 0, FONT_WIDTH, WIN_HEIGHT);
+      // get printable character
+      char printable_char[4] = "";
+      KeySym keysym = 0;
+      XLookupString(&ev.xkey, printable_char, sizeof(printable_char), &keysym,
+                    NULL);
+      XSetForeground(dpy, gc, WhitePixel(dpy, scr));
+      if (!printable_char[0]) {
+        // not printable character, print cursor
+        // -1 to exclude the '\0'
         XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
                           (int)sizeof(cursor_str) - 1);
+        break;
       }
+      // printable character, draw
+      XftDrawStringUtf8(draw, &color, font, x, y,
+                        (const FcChar8 *)printable_char, 1);
+      // append to string
+      *buf_ptr++ = printable_char[0];
+      buf_ix++;
+      // +2 to leave space for '&' and '\0'
+      if ((buf_ix + 2) >= sizeof(buf)) {
+        // buffer full
+        go = 0;
+      }
+      // update x, y and draw cursor
+      x += FONT_WIDTH;
+      y += Y_WIGGLE_UP + rand() % Y_WIGGLE;
+      // draw cursor
+      // -1 to exclude '\0'
+      XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
+                        (int)sizeof(cursor_str) - 1);
+
       // draw the effect
       XFillRectangle(dpy, win, gc, (int)options_start_x, 0,
                      scr_width - options_start_x - 1, WIN_HEIGHT - 1);
@@ -166,6 +192,10 @@ int main(void) {
   XftFontClose(dpy, font);
   XFreeGC(dpy, gc);
   XCloseDisplay(dpy);
+  if (closed) {
+    // windows was closed through message
+    return 0;
+  }
   if (buf[0] == '\0') {
     // empty string
     return 0;
@@ -173,6 +203,8 @@ int main(void) {
   // append '&' and execute
   *buf_ptr++ = '&';
   *buf_ptr = '\0';
+#ifdef MENUQ_DEBUG
   puts(buf);
+#endif
   return system(buf);
 }
