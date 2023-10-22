@@ -67,6 +67,10 @@ static void str_to_lower(char *str) {
   }
 }
 
+// returns string value from /sys/ file system without new line or "" if
+// anything goes wrong
+// path is full path of file value is destination returns
+// value without '\n' or "" if anything goes wrong
 static void sys_value_str_line(const char *path, char *value,
                                const unsigned value_buf_size) {
   int fd = open(path, O_RDONLY);
@@ -81,30 +85,36 @@ static void sys_value_str_line(const char *path, char *value,
     return;
   }
   // assumes last character is '\n'
-  value[nbytes - 1] = '\0';
+  if (value[nbytes - 1] == '\n') {
+    value[nbytes - 1] = '\0';
+  } else {
+    value[0] = '\0';
+  }
   close(fd);
 }
 
 static int sys_value_int(const char *path) {
-  FILE *file = fopen(path, "r");
-  if (!file) {
+  char str[64] = "";
+  sys_value_str_line(path, str, sizeof(str));
+
+  char *endptr = NULL;
+  long result = strtol(str, &endptr, 10);
+  if (endptr == str) {
     return 0;
   }
-  int num = 0;
-  fscanf(file, "%d", &num);
-  fclose(file);
-  return num;
+  return (int)result;
 }
 
 static long long sys_value_long(const char *path) {
-  FILE *file = fopen(path, "r");
-  if (!file) {
+  char str[64] = "";
+  sys_value_str_line(path, str, sizeof(str));
+
+  char *endptr = NULL;
+  long long result = strtoll(str, &endptr, 10);
+  if (endptr == str) {
     return 0;
   }
-  long long num = 0;
-  fscanf(file, "%lld\n", &num);
-  fclose(file);
-  return num;
+  return result;
 }
 
 static int sys_value_exists(const char *path) { return !access(path, F_OK); }
@@ -137,6 +147,9 @@ static void str_compact_spaces(char *str) {
 static void render_hr(void) { dc_draw_hr(dc); }
 
 static void render_battery(void) {
+  if (battery_name[0] == '\0') {
+    return;
+  }
   char path[128] = "";
   const int nchars =
       snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
