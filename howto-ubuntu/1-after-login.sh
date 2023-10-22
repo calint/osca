@@ -1,6 +1,6 @@
 #!/bin/sh
 # enabling settings on touchpad
-# xinput : to list devisces
+# 'xinput' to list devisces
 # xinput list-props [id]
 
 # look for "Tapping Enabled"
@@ -10,8 +10,8 @@ xinput set-prop 10 305 1
 xinput set-prop 10 284 1
 
 # use gnome-keyring-daemon to manage keys
-/usr/bin/gnome-keyring-daemon --start --components=gpg
-/usr/bin/gnome-keyring-daemon --start --components=ssh
+#/usr/bin/gnome-keyring-daemon --start --components=gpg
+#/usr/bin/gnome-keyring-daemon --start --components=ssh
 
 # visual code
 #   when pushing to github have the default browser open for the
