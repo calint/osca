@@ -1,5 +1,6 @@
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
+[ ] frameless: capture XF86... keys
 [ ] frameless: capture button 3 and swipe up / down motion to switch desktop
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] frameless: when closing window and no focused windows on desk then focus
