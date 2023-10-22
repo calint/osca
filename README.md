@@ -6,6 +6,7 @@ intention:
 * a lightweight desktop environment for X11
 * targets archlinux minimal installation
 * runs on ubuntu
+* simplicity in source and extensions
 * a somewhat tongue-in-cheek approach to classics
 
 contains:
@@ -31,41 +32,41 @@ contains:
    source:    846    2449   23187
    zipped:     22     135    5448
 
--rwxrwxr-x 1 c 21928 okt 22 14:01 frameless
+-rwxrwxr-x 1 c 21928 okt 22 15:41 frameless
 
 
             lines   words   chars
-   source:   1175    3639   31188
-   zipped:     20     164    7350
+   source:   1179    3669   31287
+   zipped:     37     179    7489
 
--rwxrwxr-x 1 c 37224 okt 22 14:01 clonky
+-rwxrwxr-x 1 c 37352 okt 22 15:41 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      52    2290
 
--rwxrwxr-x 1 c 16816 okt 22 14:01 menuq
+-rwxrwxr-x 1 c 16816 okt 22 15:41 menuq
 
 
             lines   words   chars
    source:     54     126    1724
    zipped:      1      15     810
 
--rwxrwxr-x 1 c 16960 okt 22 14:01 stickyo
+-rwxrwxr-x 1 c 16960 okt 22 15:41 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 22 14:01 snap
+-rwxrwxr-x 1 c 16144 okt 22 15:41 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16872 okt 22 14:01 mounte
+-rwxrwxr-x 1 c 16872 okt 22 15:41 mounte
 
 ```

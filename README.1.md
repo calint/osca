@@ -6,6 +6,7 @@ intention:
 * a lightweight desktop environment for X11
 * targets archlinux minimal installation
 * runs on ubuntu
+* simplicity in source and extensions
 * a somewhat tongue-in-cheek approach to classics
 
 contains:
