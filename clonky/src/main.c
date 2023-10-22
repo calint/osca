@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
 #include <linux/if_link.h>
 #include <netdb.h>
@@ -61,22 +62,27 @@ static unsigned netifcs_len;
 
 static void str_to_lower(char *str) {
   while (*str) {
-    *str++ = (char)tolower(*str);
+    *str = (char)tolower(*str);
+    str++;
   }
 }
 
 static void sys_value_str_line(const char *path, char *value,
-                                   const int size) {
-  FILE *file = fopen(path, "r");
-  if (!file) {
+                               const unsigned value_buf_size) {
+  int fd = open(path, O_RDONLY);
+  if (fd == -1) {
     value[0] = '\0';
     return;
   }
-  char fmt[32] = "";
-  // -1 to leave space for '\0'
-  snprintf(fmt, sizeof(fmt), "%%%d[^\n]%%*c", size - 1);
-  fscanf(file, fmt, value);
-  fclose(file);
+  ssize_t nbytes = read(fd, value, value_buf_size);
+  if (nbytes == -1) {
+    value[0] = '\0';
+    close(fd);
+    return;
+  }
+  // assumes last character is '\n'
+  value[nbytes - 1] = '\0';
+  close(fd);
 }
 
 static int sys_value_int(const char *path) {
