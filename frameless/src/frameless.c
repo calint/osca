@@ -4,10 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// debugging log written to file "~/frameless.log"
-// #define FRAMELESS_DEBUG
-// #define DEBUG_FILE "frameless.log"
-
 // maximum number of windows
 #define WIN_MAX_COUNT 128
 
@@ -21,18 +17,52 @@
 #define WIN_BORDER_WIDTH 1
 
 #define WIN_BORDER_ACTIVE_COLOR 0x00008000
+
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
 
 // pixels to 'bump' a window
 #define WIN_BUMP_PX 200
 
-// xwin.bits
-#define XWIN_BIT_FULL_HEIGHT 1
-#define XWIN_BIT_FULL_WIDTH 2
-#define XWIN_BIT_ALLOCATED 4
-#define XWIN_BIT_FOCUSED 8
-#define XWIN_BITS_FULL_SCREEN 3
-#define XWIN_MIN_WIDTH_HEIGHT 4
+// key bindings (use 'xev' to find out keycode for key)
+#define KEY_LAUNCH_CONSOLE 54  // c
+#define KEY_LAUNCH_FILES 41    // f
+#define KEY_LAUNCH_EDITOR 26   // e
+#define KEY_LAUNCH_MEDIA 58    // m
+#define KEY_LAUNCH_MIXER 55    // v
+#define KEY_LAUNCH_INTERNET 31 // i
+#define KEY_LAUNCH_STICKY 53   // x
+#define KEY_LAUNCH_BINARIES 32 // o
+#define KEY_LAUNCH_SNAPSHOT 33 // p
+
+#define KEY_FN_SCREEN_BRIGHTNESS_DOWN 68 // F2
+#define KEY_FN_SCREEN_BRIGHTNESS_UP 69   // F3
+#define KEY_FN_VOLUME_TOGGLE 72          // F6
+#define KEY_FN_VOLUME_DOWN 73            // F7
+#define KEY_FN_VOLUME_UP 74              // F8
+
+#define KEY_WINDOW_CLOSE 9            // esc
+#define KEY_WINDOW_CLOSE_ALT 49       // §
+#define KEY_WINDOW_BUMP 56            // b
+#define KEY_WINDOW_CENTER 39          // s
+#define KEY_WINDOW_WIDER 25           // w
+#define KEY_WINDOW_RESIZE 27          // r
+#define KEY_WINDOW_FULLSCREEN 10      // 1
+#define KEY_WINDOW_FULLHEIGHT 11      // 2
+#define KEY_WINDOW_FULLWIDTH 12       // 3
+#define KEY_WINDOW_SURPRISE 19        // 0
+#define KEY_WINDOW_FOCUS_PREVIOUS 113 // left
+#define KEY_WINDOW_FOCUS_NEXT 114     // right
+#define KEY_WINDOW_FOCUS_NEXT_ALT 52  // z
+#define KEY_WINDOW_KILL 119           // del
+
+#define KEY_DESKTOP_UP 111      // up
+#define KEY_DESKTOP_UP_ALT 24   // q
+#define KEY_DESKTOP_DOWN 116    // down
+#define KEY_DESKTOP_DOWN_ALT 38 // a
+
+// debugging log written to file "~/frameless.log"
+// #define FRAMELESS_DEBUG
+// #define DEBUG_FILE "frameless.log"
 
 typedef struct xwin {
   Window win;     // x11 window handle
@@ -49,6 +79,14 @@ typedef struct xwin {
   // bit 1: fullheight  bit 2: fullwidth  bit 3: allocated, bit 4: focused
   char bits;
 } xwin;
+
+// xwin.bits
+#define XWIN_BIT_FULL_HEIGHT 1
+#define XWIN_BIT_FULL_WIDTH 2
+#define XWIN_BIT_ALLOCATED 4
+#define XWIN_BIT_FOCUSED 8
+#define XWIN_BITS_FULL_SCREEN 3
+#define XWIN_MIN_WIDTH_HEIGHT 4
 
 // mapped xwin to X11 Window
 static xwin wins[WIN_MAX_COUNT];
@@ -556,60 +594,65 @@ int main(int argc, char **args, char **env) {
         xw = xwin_get_by_window(ev.xkey.subwindow);
       }
       switch (key_pressed) {
-      case 53: // x
-        system("xii-sticky");
-        break;
-      case 54: // c
+      case KEY_LAUNCH_CONSOLE:
         system("xii-console");
         break;
-      case 33: // p
-        system("xii-screenshot");
-        break;
-      case 27: // r
-        system("xii-binaries");
-        break;
-      case 31: // i
-        system("xii-internet");
-        break;
-      case 58: // m
-        system("xii-media");
-        break;
-      case 41: // f
+      case KEY_LAUNCH_FILES:
         system("xii-files");
         break;
-      case 55: // v
-        system("xii-mixer");
-        break;
-      case 26: // e
+      case KEY_LAUNCH_EDITOR:
         system("xii-editor");
         break;
-      case 68: // F2
+      case KEY_LAUNCH_MEDIA:
+        system("xii-media");
+        break;
+      case KEY_LAUNCH_MIXER:
+        system("xii-mixer");
+        break;
+      case KEY_LAUNCH_INTERNET:
+        system("xii-internet");
+        break;
+      case KEY_LAUNCH_STICKY:
+        system("xii-sticky");
+        break;
+      case KEY_LAUNCH_BINARIES:
+        system("xii-binaries");
+        break;
+      case KEY_LAUNCH_SNAPSHOT:
+        system("xii-screenshot");
+        break;
+      case KEY_FN_SCREEN_BRIGHTNESS_DOWN:
         system("xii-screen-brightness-down");
         break;
-      case 69: // F3
+      case KEY_FN_SCREEN_BRIGHTNESS_UP:
         system("xii-screen-brightness-up");
         break;
-      case 72: // F6
+      case KEY_FN_VOLUME_TOGGLE:
         system("xii-volume-toggle");
         break;
-      case 73: // F7
+      case KEY_FN_VOLUME_DOWN:
         system("xii-volume-down");
         break;
-      case 74: // F8
+      case KEY_FN_VOLUME_UP:
         system("xii-volume-up");
         break;
-      case 9:  // esc
-      case 49: // §
+      case KEY_WINDOW_CLOSE:
+      case KEY_WINDOW_CLOSE_ALT:
         if (win_focused) {
           xwin_close(win_focused);
         }
         break;
-      case 39: // s
+      case KEY_WINDOW_BUMP:
+        if (win_focused) {
+          xwin_bump(win_focused, WIN_BUMP_PX);
+        }
+        break;
+      case KEY_WINDOW_CENTER:
         if (win_focused) {
           xwin_center(win_focused);
         }
         break;
-      case 25: // w
+      case KEY_WINDOW_WIDER:
         if (win_focused) {
           if (ev.xkey.state & ShiftMask) {
             xwin_thinner(win_focused);
@@ -622,47 +665,42 @@ int main(int argc, char **args, char **env) {
           }
         }
         break;
-      case 56: // b
-        if (win_focused) {
-          xwin_bump(win_focused, WIN_BUMP_PX);
-        }
-        break;
-      case 10: // 1
+      case KEY_WINDOW_FULLSCREEN:
         if (win_focused) {
           xwin_toggle_fullscreen(win_focused);
         }
         break;
-      case 11: // 2
+      case KEY_WINDOW_FULLHEIGHT:
         if (win_focused) {
           xwin_toggle_fullheight(win_focused);
         }
         break;
-      case 12: // 3
+      case KEY_WINDOW_FULLWIDTH:
         if (win_focused) {
           xwin_toggle_fullwidth(win_focused);
         }
         break;
-      case 19: // 0: surprise
+      case KEY_WINDOW_SURPRISE:
         if (win_focused) {
           xwin_bump(win_focused, WIN_BUMP_PX);
         }
         break;
-      case 113: // left
+      case KEY_WINDOW_FOCUS_PREVIOUS:
         focus_previous_window();
         break;
-      case 52:  // z
-      case 114: // right
+      case KEY_WINDOW_FOCUS_NEXT:
+      case KEY_WINDOW_FOCUS_NEXT_ALT:
         focus_next_window();
         break;
-      case 119: // del
+      case KEY_WINDOW_KILL:
         if (ev.xkey.state & ShiftMask) {
           // log-out
           return 0;
         }
         XKillClient(dpy, ev.xkey.subwindow);
         break;
-      case 24:  // q
-      case 111: // up
+      case KEY_DESKTOP_UP:
+      case KEY_DESKTOP_UP_ALT:
         is_switching_desktop = True;
         dsk_prv = dsk;
         dsk++;
@@ -681,8 +719,8 @@ int main(int argc, char **args, char **env) {
         // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
         // fflush(flog);
         break;
-      case 38:  // a
-      case 116: // down
+      case KEY_DESKTOP_DOWN:
+      case KEY_DESKTOP_DOWN_ALT:
         is_switching_desktop = True;
         dsk_prv = dsk;
         dsk--;
@@ -762,7 +800,7 @@ int main(int argc, char **args, char **env) {
         xw->y = new_y;
         xwin_set_geom(xw);
         break;
-      case 27: // r (resizing window)
+      case KEY_WINDOW_RESIZE:
         if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
           new_wi = XWIN_MIN_WIDTH_HEIGHT;
         }

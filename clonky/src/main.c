@@ -248,20 +248,36 @@ static void pl(const char *str) {
 }
 
 static void render_cheetsheet(void) {
-  static char *keysheet[] = {
-      "ĸey", "+c               console", "+f                 files",
-      "+e                editor", "+m                 media",
-      "+v                 mixer", "+i              internet",
-      "+x                sticky", "+r              binaries",
-      //	"+prtsc          snapshot",
-      "+p              snapshot", "", "đesktop", "+up                   up",
-      "+down               down", "+shift+up        move-up",
-      "+shift+down    move-down", "", "window", "+esc               close",
-      "+b                  bump", "+s                center",
-      "+w                 wider", "+W               thinner",
-      "+r                resize", "+1            fullscreen",
-      "+2           full height", "+3            full width",
-      "+0   i-am-bored-surprise", "...                  ...", NULL};
+  static char *keysheet[] = {"ĸey",
+                             "+c               console",
+                             "+f                 files",
+                             "+e                editor",
+                             "+m                 media",
+                             "+v                 mixer",
+                             "+i              internet",
+                             "+x                sticky",
+                             "+o              binaries",
+                             "+p              snapshot",
+                             "",
+                             "đesktop",
+                             "+up                   up",
+                             "+down               down",
+                             "+shift+up        move-up",
+                             "+shift+down    move-down",
+                             "",
+                             "window",
+                             "+esc               close",
+                             "+b                  bump",
+                             "+s                center",
+                             "+w                 wider",
+                             "+W               thinner",
+                             "+r                resize",
+                             "+1            fullscreen",
+                             "+2           full height",
+                             "+3            full width",
+                             "+0   i-am-bored-surprise",
+                             "...                  ...",
+                             NULL};
 
   char **str_ptr = keysheet;
   while (*str_ptr) {
