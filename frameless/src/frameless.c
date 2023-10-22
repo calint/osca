@@ -147,31 +147,24 @@ static xwin *win_focused;
 
 // dragging state
 static char is_dragging;
-static int dragging_start_x;
-static int dragging_start_y;
+static int dragging_prev_x;
+static int dragging_prev_y;
 static unsigned dragging_button;
 
-// True while switching desktop after False after any key release
+// True while switching desktop, False after any key release
 static char is_switching_desktop;
 
 #ifdef FRAMELESS_DEBUG
 static char *ix_evnames[LASTEvent] = {
-    "unknown",          "unknown",       // 0
-    "KeyPress",         "KeyRelease",    // 2
-    "ButtonPress",      "ButtonRelease", // 4
-    "MotionNotify",                      // 6
-    "EnterNotify",      "LeaveNotify",   // 7 LeaveWindowMask LeaveWindowMask
-    "FocusIn",          "FocusOut",      // 9 from XSetFocus
-    "KeymapNotify",                      // 11
-    "Expose",           "GraphicsExpose",   "NoExpose", // 12
-    "VisibilityNotify", "CreateNotify",     "DestroyNotify",
-    "UnmapNotify",      "MapNotify", // 15
-    "MapRequest",       "ReparentNotify",   "ConfigureNotify",
-    "ConfigureRequest", "GravityNotify",    "ResizeRequest",
-    "CirculateNotify",  "CirculateRequest", "PropertyNotify",
-    "SelectionClear",   "SelectionRequest", "SelectionNotify",
-    "ColormapNotify",   "ClientMessage",    "MappingNotify",
-    "GenericEvent"};
+    "unknown",        "unknown",        "KeyPress",         "KeyRelease",
+    "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
+    "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
+    "Expose",         "GraphicsExpose", "NoExpose",         "VisibilityNotify",
+    "CreateNotify",   "DestroyNotify",  "UnmapNotify",      "MapNotify",
+    "MapRequest",     "ReparentNotify", "ConfigureNotify",  "ConfigureRequest",
+    "GravityNotify",  "ResizeRequest",  "CirculateNotify",  "CirculateRequest",
+    "PropertyNotify", "SelectionClear", "SelectionRequest", "SelectionNotify",
+    "ColormapNotify", "ClientMessage",  "MappingNotify",    "GenericEvent"};
 #endif
 
 static xwin *xwin_get_by_window(Window w) {
@@ -775,8 +768,8 @@ int main(int argc, char **args, char **env) {
       break;
     case ButtonPress:
       is_dragging = True;
-      dragging_start_x = ev.xbutton.x_root;
-      dragging_start_y = ev.xbutton.y_root;
+      dragging_prev_x = ev.xbutton.x_root;
+      dragging_prev_y = ev.xbutton.y_root;
       dragging_button = ev.xbutton.button;
       xw = xwin_get_by_window(ev.xbutton.window);
       focus_on_window(xw);
@@ -788,10 +781,10 @@ int main(int argc, char **args, char **env) {
     case MotionNotify:
       while (XCheckTypedEvent(dpy, MotionNotify, &ev))
         ;
-      int xdiff = ev.xbutton.x_root - dragging_start_x;
-      int ydiff = ev.xbutton.y_root - dragging_start_y;
-      dragging_start_x = ev.xbutton.x_root;
-      dragging_start_y = ev.xbutton.y_root;
+      int xdiff = ev.xbutton.x_root - dragging_prev_x;
+      int ydiff = ev.xbutton.y_root - dragging_prev_y;
+      dragging_prev_x = ev.xbutton.x_root;
+      dragging_prev_y = ev.xbutton.y_root;
       if (!xw) {
         // case should not happen because 'xw' is set when dragging starts
         break;
