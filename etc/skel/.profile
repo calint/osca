@@ -15,6 +15,8 @@ alias ll='ls --color -lAF'
 alias lt='ls --color -lAtF'
 # print
 alias p='cat'
+# ps in 2-columns, id and name
+alias psa=$'ps ax|awk \'{print $1 "\t" $5}\''
 # install package
 alias pki='sudo pacman -S'
 # list installed packages
@@ -31,5 +33,3 @@ alias pkr='sudo pacman -Rsn'
 alias pku='sudo pacman -Syu'
 # list files in package
 alias pkf='pkgfile -l'
-# ps in 2-columns, id and name
-alias psa=$'ps ax|awk \'{print $1 "\t" $5}\''

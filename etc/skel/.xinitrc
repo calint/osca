@@ -1,10 +1,10 @@
-# osca path
+# path to osca
 export OSCA=$HOME/w/osca
 
-# path
+# executables path
 export PATH=$HOME/bin:$OSCA/sh:$PATH
 
-# for faster start of xterm
+# no session manager
 export SESSION_MANAGER=
 
 # turn off 'caps lock'
