@@ -24,21 +24,47 @@
 #define WIN_BUMP_PX 200
 
 // key bindings (use 'xev' to find out keycode for key)
-#define KEY_LAUNCH_CONSOLE 54  // c
-#define KEY_LAUNCH_FILES 41    // f
-#define KEY_LAUNCH_EDITOR 26   // e
-#define KEY_LAUNCH_MEDIA 58    // m
-#define KEY_LAUNCH_MIXER 55    // v
+#define KEY_LAUNCH_CONSOLE 54 // c
+#define CMD_LAUNCH_CONSOLE "xii-console"
+
+#define KEY_LAUNCH_FILES 41 // f
+#define CMD_LAUNCH_FILES "xii-files"
+
+#define KEY_LAUNCH_EDITOR 26 // e
+#define CMD_LAUNCH_EDITOR "xii-editor"
+
+#define KEY_LAUNCH_MEDIA 58 // m
+#define CMD_LAUNCH_MEDIA "xii-media"
+
+#define KEY_LAUNCH_MIXER 55 // v
+#define CMD_LAUNCH_MIXER "xii-mixer"
+
 #define KEY_LAUNCH_INTERNET 31 // i
-#define KEY_LAUNCH_STICKY 53   // x
+#define CMD_LAUNCH_INTERNET "xii-internet"
+
+#define KEY_LAUNCH_STICKY 53 // x
+#define CMD_LAUNCH_STICKY "xii-sticky"
+
 #define KEY_LAUNCH_BINARIES 32 // o
+#define CMD_LAUNCH_BINARIES "xii-binaries"
+
 #define KEY_LAUNCH_SNAPSHOT 33 // p
+#define CMD_LAUNCH_SNAPSHOT "xii-screenshot"
 
 #define KEY_FN_SCREEN_BRIGHTNESS_DOWN 68 // F2
-#define KEY_FN_SCREEN_BRIGHTNESS_UP 69   // F3
-#define KEY_FN_VOLUME_TOGGLE 72          // F6
-#define KEY_FN_VOLUME_DOWN 73            // F7
-#define KEY_FN_VOLUME_UP 74              // F8
+#define CMD_FN_SCREEN_BRIGHTNESS_DOWN "xii-screen-brightness-down"
+
+#define KEY_FN_SCREEN_BRIGHTNESS_UP 69 // F3
+#define CMD_FN_SCREEN_BRIGHTNESS_UP "xii-screen-brightness-up"
+
+#define KEY_FN_VOLUME_TOGGLE 72 // F6
+#define CMD_FN_VOLUME_TOGGLE "xii-volume-toggle"
+
+#define KEY_FN_VOLUME_DOWN 73 // F7
+#define CMD_FN_VOLUME_DOWN "xii-volume-down"
+
+#define KEY_FN_VOLUME_UP 74 // F8
+#define CMD_FN_VOLUME_UP "xii-volume-up"
 
 #define KEY_WINDOW_CLOSE 9            // esc
 #define KEY_WINDOW_CLOSE_ALT 49       // §
@@ -595,46 +621,46 @@ int main(int argc, char **args, char **env) {
       }
       switch (key_pressed) {
       case KEY_LAUNCH_CONSOLE:
-        system("xii-console");
+        system(CMD_LAUNCH_CONSOLE);
         break;
       case KEY_LAUNCH_FILES:
-        system("xii-files");
+        system(CMD_LAUNCH_FILES);
         break;
       case KEY_LAUNCH_EDITOR:
-        system("xii-editor");
+        system(CMD_LAUNCH_EDITOR);
         break;
       case KEY_LAUNCH_MEDIA:
-        system("xii-media");
+        system(CMD_LAUNCH_MEDIA);
         break;
       case KEY_LAUNCH_MIXER:
-        system("xii-mixer");
+        system(CMD_LAUNCH_MIXER);
         break;
       case KEY_LAUNCH_INTERNET:
-        system("xii-internet");
+        system(CMD_LAUNCH_INTERNET);
         break;
       case KEY_LAUNCH_STICKY:
-        system("xii-sticky");
+        system(CMD_LAUNCH_STICKY);
         break;
       case KEY_LAUNCH_BINARIES:
-        system("xii-binaries");
+        system(CMD_LAUNCH_BINARIES);
         break;
       case KEY_LAUNCH_SNAPSHOT:
-        system("xii-screenshot");
+        system(CMD_LAUNCH_SNAPSHOT);
         break;
       case KEY_FN_SCREEN_BRIGHTNESS_DOWN:
-        system("xii-screen-brightness-down");
+        system(CMD_FN_SCREEN_BRIGHTNESS_DOWN);
         break;
       case KEY_FN_SCREEN_BRIGHTNESS_UP:
-        system("xii-screen-brightness-up");
+        system(CMD_FN_SCREEN_BRIGHTNESS_UP);
         break;
       case KEY_FN_VOLUME_TOGGLE:
-        system("xii-volume-toggle");
+        system(CMD_FN_VOLUME_TOGGLE);
         break;
       case KEY_FN_VOLUME_DOWN:
-        system("xii-volume-down");
+        system(CMD_FN_VOLUME_DOWN);
         break;
       case KEY_FN_VOLUME_UP:
-        system("xii-volume-up");
+        system(CMD_FN_VOLUME_UP);
         break;
       case KEY_WINDOW_CLOSE:
       case KEY_WINDOW_CLOSE_ALT:
@@ -771,16 +797,16 @@ int main(int argc, char **args, char **env) {
         break;
       }
       int new_x = xw->x + xdiff;
-      unsigned new_wi = (unsigned)((int)xw->wi + xdiff);
+      int new_wi = (int)xw->wi + xdiff;
       int new_y = xw->y + ydiff;
-      unsigned new_hi = (unsigned)((int)xw->hi + ydiff);
+      int new_hi = (int)xw->hi + ydiff;
       if (xw->bits & XWIN_BIT_FULL_WIDTH) {
         new_x = -WIN_BORDER_WIDTH;
-        new_wi = screen.wi;
+        new_wi = (int)screen.wi;
       }
       if (xw->bits & XWIN_BIT_FULL_HEIGHT) {
         new_y = -WIN_BORDER_WIDTH;
-        new_hi = screen.hi;
+        new_hi = (int)screen.hi;
       }
       if (dragging_button == 3) {
         if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
@@ -789,8 +815,8 @@ int main(int argc, char **args, char **env) {
         if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
           new_hi = XWIN_MIN_WIDTH_HEIGHT;
         }
-        xw->wi = new_wi;
-        xw->hi = new_hi;
+        xw->wi = (unsigned)new_wi;
+        xw->hi = (unsigned)new_hi;
         xwin_set_geom(xw);
         break;
       }
@@ -807,8 +833,8 @@ int main(int argc, char **args, char **env) {
         if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
           new_hi = XWIN_MIN_WIDTH_HEIGHT;
         }
-        xw->wi = new_wi;
-        xw->hi = new_hi;
+        xw->wi = (unsigned)new_wi;
+        xw->hi = (unsigned)new_hi;
         xwin_set_geom(xw);
         break;
       }
