@@ -19,6 +19,10 @@
 // effect: displacement of y at next character
 #define Y_WIGGLE_UP -2
 
+#define FONT_NAME "monospace"
+#define FONT_SIZE 24.0
+#define FONT_WIDTH 20 // approximated
+
 int main(void) {
   Display *dpy = XOpenDisplay(NULL);
   if (!dpy) {
@@ -42,9 +46,8 @@ int main(void) {
 
   // load and set font
   Colormap cmap = DefaultColormap(dpy, scr);
-  XftFont *font = XftFontOpen(dpy, scr, XFT_FAMILY, XftTypeString, "monospace",
-                              XFT_SIZE, XftTypeDouble, 24.0, NULL);
-  const unsigned char_width = 20;
+  XftFont *font = XftFontOpen(dpy, scr, XFT_FAMILY, XftTypeString, FONT_NAME,
+                              XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
   if (font == NULL) {
     fprintf(stderr, "unable to load font.\n");
     return 1;
@@ -105,10 +108,10 @@ int main(void) {
           break;
         }
         // back one character
-        x -= (int)char_width;
+        x -= FONT_WIDTH;
         // erase the character and cursor
         XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-        XFillRectangle(dpy, win, gc, x, 0, char_width << 1, WIN_HEIGHT);
+        XFillRectangle(dpy, win, gc, x, 0, FONT_WIDTH << 1, WIN_HEIGHT);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // draw cursor
         XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
@@ -119,7 +122,7 @@ int main(void) {
       } else {
         // clear cursor print
         XSetForeground(dpy, gc, BlackPixel(dpy, scr));
-        XFillRectangle(dpy, win, gc, x, 0, char_width, WIN_HEIGHT);
+        XFillRectangle(dpy, win, gc, x, 0, FONT_WIDTH, WIN_HEIGHT);
         XSetForeground(dpy, gc, WhitePixel(dpy, scr));
         // get printable character
         char printable_char[4] = "";
@@ -145,7 +148,7 @@ int main(void) {
           go = 0;
         }
         // update x, y and draw cursor
-        x += (int)char_width;
+        x += FONT_WIDTH;
         y += Y_WIGGLE_UP + rand() % Y_WIGGLE;
         // -1 to exclude '\0'
         XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
