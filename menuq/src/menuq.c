@@ -20,7 +20,7 @@
 #define Y_WIGGLE_UP -2
 
 #define FONT_NAME "monospace"
-#define FONT_SIZE 24.0
+#define FONT_SIZE 24.0 // parameter is double
 #define FONT_WIDTH 20 // approximated
 
 int main(void) {
