@@ -59,7 +59,13 @@ static struct netifc {
 // used network interfaces
 static unsigned netifcs_len;
 
-static void get_sys_value_str_tolower(const char *path, char *value,
+static void str_to_lower(char *str) {
+  while (*str) {
+    *str++ = (char)tolower(*str);
+  }
+}
+
+static void get_sys_value_str(const char *path, char *value,
                                       const int size) {
   FILE *file = fopen(path, "r");
   if (!file) {
@@ -71,11 +77,20 @@ static void get_sys_value_str_tolower(const char *path, char *value,
   snprintf(fmt, sizeof(fmt), "%%%ds\\n", size - 1);
   fscanf(file, fmt, value);
   fclose(file);
-  char *p = value;
-  while (*p) {
-    *p = (char)tolower(*p);
-    p++;
+}
+
+static void get_sys_value_str_line(const char *path, char *value,
+                                   const int size) {
+  FILE *file = fopen(path, "r");
+  if (!file) {
+    value[0] = '\0';
+    return;
   }
+  char fmt[32] = "";
+  // -1 to leave space for '\0'
+  snprintf(fmt, sizeof(fmt), "%%%d[^\n]%%*c", size - 1);
+  fscanf(file, fmt, value);
+  fclose(file);
 }
 
 static int get_sys_value_int(const char *path) {
@@ -145,12 +160,17 @@ static void render_battery(void) {
   const long long charge_now = get_sys_value_long(path);
   snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
            battery_name);
-  get_sys_value_str_tolower(path, path, sizeof(path));
+
+  // read battery status
+  char status[64];
+  get_sys_value_str_line(path, status, sizeof(status));
+  str_to_lower(status);
+  // format output
+  char output[128];
+  snprintf(output, sizeof(output), "battery %u%%  %s",
+           (unsigned)(charge_now * 100 / charge_full), status);
   dc_newline(dc);
-  char buf[256];
-  snprintf(buf, sizeof(buf), "battery %s  %lld/%lld mAh", path,
-           charge_now / 1000, charge_full / 1000);
-  dc_draw_str(dc, buf);
+  dc_draw_str(dc, output);
   dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
 }
 
@@ -508,7 +528,8 @@ static void auto_config_battery(void) {
     char buf[128];
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%.*s/type", 64,
              entry->d_name);
-    get_sys_value_str_tolower(buf, buf, sizeof(buf));
+    get_sys_value_str(buf, buf, sizeof(buf));
+    str_to_lower(buf);
     if (strcmp(buf, "battery")) {
       continue;
     }
@@ -626,7 +647,8 @@ static void render_net_interfaces(void) {
     }
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
              entry->d_name);
-    get_sys_value_str_tolower(buf, operstate, sizeof(operstate));
+    get_sys_value_str(buf, operstate, sizeof(operstate));
+    str_to_lower(buf);
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
              entry->d_name);
     long long tx_bytes = get_sys_value_long(buf);
