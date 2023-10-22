@@ -7,7 +7,8 @@ cd $(dirname "$0")
 BIN=menuq
 SRC=src/menuq.c
 CC="gcc"
-OPTS="-g"
+OPTS=
+#OPTS="-g"
 #CC="clang -Weverything -Wno-declaration-after-statement"
 CF="-Os -Wfatal-errors -Werror"
 CW="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion"

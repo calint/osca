@@ -13,6 +13,10 @@
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clonky: valgrind
 [ ] menuq: valgrind
+[ ] menuq:  split path
+            search for starts with in every path element
+            display selectable options
+            select using keyboard arrows
 [ ] clang-tidy: basic
 [x]     frameless
 [ ]     clonky
