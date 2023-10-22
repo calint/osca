@@ -1,4 +1,7 @@
+# osca path
 export OSCA=$HOME/w/osca
+
+# path
 export PATH=$HOME/bin:$OSCA/sh:$PATH
 
 # for faster start of xterm
