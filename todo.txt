@@ -4,6 +4,7 @@
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
+[ ] frameless: resizing while entering a different window
 [ ] frameless: debugging turned on with FRAMELESS_DEBUG define
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] stickyo: upgrade to gtk4

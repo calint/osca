@@ -767,7 +767,7 @@ int main(int argc, char **args, char **env) {
       dragging_start_x = ev.xbutton.x_root;
       dragging_start_y = ev.xbutton.y_root;
       if (!xw) {
-        // case should not happen because 'xw' is set wind dragging startss
+        // case should not happen because 'xw' is set when dragging starts
         break;
       }
       int new_x = xw->x + xdiff;
