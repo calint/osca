@@ -65,8 +65,7 @@ static void str_to_lower(char *str) {
   }
 }
 
-static void get_sys_value_str(const char *path, char *value,
-                                      const int size) {
+static void get_sys_value_str(const char *path, char *value, const int size) {
   FILE *file = fopen(path, "r");
   if (!file) {
     value[0] = '\0';
@@ -392,19 +391,18 @@ static void render_syslog(void) {
 }
 
 static void render_acpi(void) {
-  FILE *file =
-      popen("acpi -V | grep -vi 'no state information available'", "r");
+  FILE *file = popen("acpi -atc", "r");
   if (!file) {
     return;
   }
-  while (1) {
+  // no-infinite loop, arbitrary limit
+  unsigned counter = 64;
+  while (counter--) {
     char buf[512];
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
-    for (char *p = buf; *p; ++p) {
-      *p = (char)tolower(*p);
-    }
+    str_to_lower(buf);
     pl(buf);
   }
   pclose(file);
