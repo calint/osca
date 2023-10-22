@@ -65,20 +65,7 @@ static void str_to_lower(char *str) {
   }
 }
 
-static void get_sys_value_str(const char *path, char *value, const int size) {
-  FILE *file = fopen(path, "r");
-  if (!file) {
-    value[0] = '\0';
-    return;
-  }
-  char fmt[32] = "";
-  // -1 to leave space for '\0'
-  snprintf(fmt, sizeof(fmt), "%%%ds\\n", size - 1);
-  fscanf(file, fmt, value);
-  fclose(file);
-}
-
-static void get_sys_value_str_line(const char *path, char *value,
+static void sys_value_str_line(const char *path, char *value,
                                    const int size) {
   FILE *file = fopen(path, "r");
   if (!file) {
@@ -92,7 +79,7 @@ static void get_sys_value_str_line(const char *path, char *value,
   fclose(file);
 }
 
-static int get_sys_value_int(const char *path) {
+static int sys_value_int(const char *path) {
   FILE *file = fopen(path, "r");
   if (!file) {
     return 0;
@@ -103,7 +90,7 @@ static int get_sys_value_int(const char *path) {
   return num;
 }
 
-static long long get_sys_value_long(const char *path) {
+static long long sys_value_long(const char *path) {
   FILE *file = fopen(path, "r");
   if (!file) {
     return 0;
@@ -154,15 +141,15 @@ static void render_battery(void) {
   const size_t maxlen = sizeof(path) - (size_t)nchars;
   char *path_prefix_end = path + nchars;
   strncpy(path_prefix_end, "full", maxlen);
-  const long long charge_full = get_sys_value_long(path);
+  const long long charge_full = sys_value_long(path);
   strncpy(path_prefix_end, "now", maxlen);
-  const long long charge_now = get_sys_value_long(path);
+  const long long charge_now = sys_value_long(path);
   snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
            battery_name);
 
   // read battery status
   char status[64];
-  get_sys_value_str_line(path, status, sizeof(status));
+  sys_value_str_line(path, status, sizeof(status));
   str_to_lower(status);
   // format output
   char output[128];
@@ -253,10 +240,10 @@ static void render_net_traffic(void) {
   char bbuf[128] = "";
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
            net_device);
-  long long tx_bytes = get_sys_value_long(bbuf);
+  long long tx_bytes = sys_value_long(bbuf);
   snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
            net_device);
-  long long rx_bytes = get_sys_value_long(bbuf);
+  long long rx_bytes = sys_value_long(bbuf);
   graphd_add_value(graph_net, tx_bytes + rx_bytes);
   graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
@@ -457,11 +444,11 @@ static void render_cpu_throttles(void) {
       snprintf(buf, sizeof(buf),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
                cpu_ix);
-      const long long max_freq = get_sys_value_long(buf);
+      const long long max_freq = sys_value_long(buf);
       snprintf(buf, sizeof(buf),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
                cpu_ix);
-      const long long cur_freq = get_sys_value_long(buf);
+      const long long cur_freq = sys_value_long(buf);
       strb_p_char(&sb, ' ');
       if (max_freq) {
         // if available render percent of max frequency
@@ -526,7 +513,7 @@ static void auto_config_battery(void) {
     char buf[128];
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%.*s/type", 64,
              entry->d_name);
-    get_sys_value_str(buf, buf, sizeof(buf));
+    sys_value_str_line(buf, buf, sizeof(buf));
     str_to_lower(buf);
     if (strcmp(buf, "battery")) {
       continue;
@@ -645,14 +632,14 @@ static void render_net_interfaces(void) {
     }
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
              entry->d_name);
-    get_sys_value_str(buf, operstate, sizeof(operstate));
+    sys_value_str_line(buf, operstate, sizeof(operstate));
     str_to_lower(buf);
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
              entry->d_name);
-    long long tx_bytes = get_sys_value_long(buf);
+    long long tx_bytes = sys_value_long(buf);
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
              entry->d_name);
-    long long rx_bytes = get_sys_value_long(buf);
+    long long rx_bytes = sys_value_long(buf);
 
     struct netifc *ifc = netifcs_get_by_name_or_create(entry->d_name);
     if (!ifc) {
