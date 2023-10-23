@@ -724,7 +724,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   str_to_lower(operstate);
 
   if (!strcmp(operstate, "unknown")) {
-    operstate[0] = '\0'; // empty string for 'lo'
+    operstate[0] = '\0';
   }
 
   char buf[256] = "";
