@@ -781,9 +781,11 @@ static void render_net_interfaces() {
   if (getifaddrs(&ifaddr) == -1) {
     return;
   }
+
   // first the graphed device
   for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL) {
+    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
+                                  ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
     }
     if (strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
@@ -793,7 +795,8 @@ static void render_net_interfaces() {
   }
   // then all others except 'lo'
   for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL) {
+    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
+                                  ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
     }
     if (!strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
@@ -806,7 +809,8 @@ static void render_net_interfaces() {
   }
   // then 'lo'
   for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL) {
+    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
+                                  ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
     }
     if (strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
