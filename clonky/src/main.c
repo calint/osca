@@ -719,13 +719,13 @@ static void render_net_interfaces() {
     if (ifa->ifa_addr == NULL) {
       continue;
     }
-    char host[NI_MAXHOST] = "";
-    if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST,
-                    NULL, 0, NI_NUMERICHOST)) {
+    char ip_addr[NI_MAXHOST] = "";
+    if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip_addr,
+                    NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
       continue;
     }
     char buf[256] = "";
-    snprintf(buf, sizeof(buf), "%.*s: %.*s", 32, ifa->ifa_name, 128, host);
+    snprintf(buf, sizeof(buf), "%.*s: %.*s", 32, ifa->ifa_name, 64, ip_addr);
     pl(buf);
 
     // get stats
@@ -774,8 +774,9 @@ static void render_net_interfaces() {
     if (!strcmp(ifa->ifa_name, "lo")) {
       operstate[0] = '\0'; // empty string for 'lo'
     }
-    snprintf(buf, sizeof(buf), " %.*s ↓ %lld %s ↑ %lld %s", 16, operstate,
-             delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
+    snprintf(buf, sizeof(buf), " %.*s ↓ %lld %s ↑ %lld %s",
+             (int)sizeof(operstate), operstate, delta_rx_bytes, rx_scale,
+             delta_tx_bytes, tx_scale);
     pl(buf);
   }
   freeifaddrs(ifaddr);
