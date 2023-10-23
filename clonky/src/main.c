@@ -12,6 +12,7 @@
 #include <ifaddrs.h>
 #include <linux/if_link.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -256,7 +257,7 @@ static void render_mem_info(void) {
   dc_draw_str(dc, bbuf);
 }
 
-static void render_net_traffic(void) {
+static void render_net_graph(void) {
   if (net_device[0] == '\0') {
     // if no network device to graph
     return;
@@ -644,31 +645,105 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
   return ni;
 }
 
-static void render_net_interfaces(void) {
-  DIR *dir = opendir("/sys/class/net/");
-  if (!dir) {
+// static void render_net_interfaces(void) {
+//   DIR *dir = opendir("/sys/class/net/");
+//   if (!dir) {
+//     return;
+//   }
+//   char operstate[32] = "";
+//   char buf[256] = "";
+//   for (struct dirent *entry = readdir(dir); entry; entry = readdir(dir)) {
+//     if (entry->d_name[0] == '.') {
+//       continue; // ignore '.' and '..'
+//     }
+//     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
+//              entry->d_name);
+//     sys_value_str_line(buf, operstate, sizeof(operstate));
+//     str_to_lower(buf);
+//     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
+//              entry->d_name);
+//     long long tx_bytes = sys_value_long(buf);
+//     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
+//              entry->d_name);
+//     long long rx_bytes = sys_value_long(buf);
+
+//     struct netifc *ifc = netifcs_get_by_name_or_create(entry->d_name);
+//     if (!ifc) {
+//       return;
+//     }
+//     long long delta_tx_bytes =
+//         tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
+//     long long delta_rx_bytes =
+//         rx_bytes - (ifc->rx_bytes_prv ? ifc->rx_bytes_prv : rx_bytes);
+
+//     ifc->tx_bytes_prv = tx_bytes;
+//     ifc->rx_bytes_prv = rx_bytes;
+
+//     const char *rx_scale = "B/s";
+//     if (delta_rx_bytes >> 20) {
+//       delta_rx_bytes >>= 20;
+//       rx_scale = "MB/s";
+//     } else if (delta_rx_bytes >> 10) {
+//       delta_rx_bytes >>= 10;
+//       rx_scale = "KB/s";
+//     }
+
+//     const char *tx_scale = "B/s";
+//     if (delta_tx_bytes >> 20) {
+//       delta_tx_bytes >>= 20;
+//       tx_scale = "MB/s";
+//     } else if (delta_tx_bytes >> 10) {
+//       delta_tx_bytes >>= 10;
+//       tx_scale = "KB/s";
+//     }
+
+//     if (!strcmp(entry->d_name, "lo")) {
+//       operstate[0] = '\0'; // empty string for 'lo'
+//     }
+//     snprintf(buf, sizeof(buf), "%.*s %s ↓ %lld %s ↑ %lld %s", 16,
+//     entry->d_name,
+//              operstate, delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
+//     // puts(buf);
+//     pl(buf);
+//   }
+//   closedir(dir);
+// }
+
+static void render_net_interfaces() {
+  struct ifaddrs *ifaddr;
+  if (getifaddrs(&ifaddr) == -1) {
     return;
   }
-  char operstate[32] = "";
-  char buf[256] = "";
-  for (struct dirent *entry = readdir(dir); entry; entry = readdir(dir)) {
-    if (entry->d_name[0] == '.') {
-      continue; // ignore '.' and '..'
+
+  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == NULL) {
+      continue;
     }
+    char host[NI_MAXHOST] = "";
+    if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST,
+                    NULL, 0, NI_NUMERICHOST)) {
+      continue;
+    }
+    char buf[256] = "";
+    snprintf(buf, sizeof(buf), "%.*s: %.*s", 32, ifa->ifa_name, 128, host);
+    pl(buf);
+
+    // get stats
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
-             entry->d_name);
+             ifa->ifa_name);
+    char operstate[32] = "";
     sys_value_str_line(buf, operstate, sizeof(operstate));
     str_to_lower(buf);
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
-             entry->d_name);
+             ifa->ifa_name);
     long long tx_bytes = sys_value_long(buf);
     snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
-             entry->d_name);
+             ifa->ifa_name);
     long long rx_bytes = sys_value_long(buf);
 
-    struct netifc *ifc = netifcs_get_by_name_or_create(entry->d_name);
+    struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
     if (!ifc) {
-      return;
+      continue;
     }
     long long delta_tx_bytes =
         tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
@@ -696,15 +771,14 @@ static void render_net_interfaces(void) {
       tx_scale = "KB/s";
     }
 
-    if (!strcmp(entry->d_name, "lo")) {
+    if (!strcmp(ifa->ifa_name, "lo")) {
       operstate[0] = '\0'; // empty string for 'lo'
     }
-    snprintf(buf, sizeof(buf), "%.*s %s ↓ %lld %s ↑ %lld %s", 16, entry->d_name,
-             operstate, delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
-    // puts(buf);
+    snprintf(buf, sizeof(buf), " %.*s ↓ %lld %s ↑ %lld %s", 16, operstate,
+             delta_rx_bytes, rx_scale, delta_tx_bytes, tx_scale);
     pl(buf);
   }
-  closedir(dir);
+  freeifaddrs(ifaddr);
 }
 
 static void signal_exit(int i) {
@@ -730,7 +804,7 @@ static void render(void) {
   render_hello_clonky();
   render_mem_info();
   render_swaps();
-  render_net_traffic();
+  render_net_graph();
   render_net_interfaces();
   render_hr();
   render_io_stat();

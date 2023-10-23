@@ -6,10 +6,8 @@
 [ ] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
 [ ] frameless: resizing while entering a different window
-[x] frameless: debugging turned on with FRAMELESS_DEBUG define
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] frameless: "scrot -s" to select screenshot area
-[ ] clonky: display IP addresses
 [ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clonky: valgrind
@@ -28,6 +26,8 @@
 [ ] stickyo save and remember state of stickies
 [ ] stickyo: upgrade to gtk4
 --------------------------------------------------------------
+[x] frameless: debugging turned on with FRAMELESS_DEBUG define
+[x] clonky: display IP addresses
 [x] frameless: remember focused window on each desk
 [x] frameless: review the somewhat messy state managing of focused windows
     and desktop changes
