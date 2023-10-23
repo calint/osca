@@ -5,6 +5,8 @@
         "dirent.h": "c",
         "if_link.h": "c",
         "netdb.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "keysym.h": "c",
+        "keysymdef.h": "c"
     }
 }

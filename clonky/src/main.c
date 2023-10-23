@@ -148,6 +148,7 @@ static void render_hr(void) { dc_draw_hr(dc); }
 
 static void render_battery(void) {
   if (battery_name[0] == '\0') {
+    // if no battery on the system
     return;
   }
   char path[128] = "";
@@ -176,6 +177,7 @@ static void render_battery(void) {
            (unsigned)(charge_now * 100 / charge_full), status);
   dc_newline(dc);
   dc_draw_str(dc, output);
+  // draw a separator for visual que of current battery charge
   dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
 }
 
@@ -255,14 +257,18 @@ static void render_mem_info(void) {
 }
 
 static void render_net_traffic(void) {
+  if (net_device[0] == '\0') {
+    // if no network device to graph
+    return;
+  }
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
-  char bbuf[128] = "";
-  snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/tx_bytes",
+  char buf[128] = "";
+  snprintf(buf, sizeof(buf), "/sys/class/net/%s/statistics/tx_bytes",
            net_device);
-  long long tx_bytes = sys_value_long(bbuf);
-  snprintf(bbuf, sizeof(bbuf), "/sys/class/net/%s/statistics/rx_bytes",
+  long long tx_bytes = sys_value_long(buf);
+  snprintf(buf, sizeof(buf), "/sys/class/net/%s/statistics/rx_bytes",
            net_device);
-  long long rx_bytes = sys_value_long(bbuf);
+  long long rx_bytes = sys_value_long(buf);
   graphd_add_value(graph_net, tx_bytes + rx_bytes);
   graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
