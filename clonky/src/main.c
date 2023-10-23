@@ -735,10 +735,10 @@ static void render_net_interface(struct ifaddrs *ifa) {
   // get stats from /sys
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
            ifa->ifa_name);
-  long long tx_bytes = sys_value_long(buf);
+  long long tx_bytes = sys_value_long(path);
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
            ifa->ifa_name);
-  long long rx_bytes = sys_value_long(buf);
+  long long rx_bytes = sys_value_long(path);
 
   // get or create entry
   struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
@@ -777,13 +777,13 @@ static void render_net_interface(struct ifaddrs *ifa) {
 }
 
 static void render_net_interfaces() {
-  struct ifaddrs *ifaddr;
-  if (getifaddrs(&ifaddr) == -1) {
+  struct ifaddrs *ifas;
+  if (getifaddrs(&ifas) == -1) {
     return;
   }
 
   // first the graphed device
-  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+  for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
     if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
                                   ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
@@ -794,7 +794,7 @@ static void render_net_interfaces() {
     render_net_interface(ifa);
   }
   // then all others except 'lo'
-  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+  for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
     if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
                                   ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
@@ -808,7 +808,7 @@ static void render_net_interfaces() {
     render_net_interface(ifa);
   }
   // then 'lo'
-  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+  for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
     if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
                                   ifa->ifa_addr->sa_family != AF_INET6)) {
       continue;
@@ -818,7 +818,7 @@ static void render_net_interfaces() {
     }
     render_net_interface(ifa);
   }
-  freeifaddrs(ifaddr);
+  freeifaddrs(ifas);
 }
 
 static void signal_exit(int i) {
