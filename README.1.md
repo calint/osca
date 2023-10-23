@@ -17,11 +17,9 @@ contains:
 * menuq: binary launcher
 * mounte: automatic mounter of USB
 
+
 ![screenshot 1](screenshots/frameless-archlinux-1.png)
 
 
-![screenshot 2](screenshots/frameless-archlinux-2.png)
-
-
-![screenshot 3](screenshots/frameless-ubuntu-1.png)
+![screenshot 3](screenshots/2023-10-23--18-59-54.png)
 
