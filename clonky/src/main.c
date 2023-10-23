@@ -708,76 +708,111 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
 //   }
 //   closedir(dir);
 // }
+static void render_net_interface(struct ifaddrs *ifa) {
+  char ip_addr[NI_MAXHOST] = "";
+  if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip_addr,
+                  NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+    return;
+  }
+
+  // get operational status of interface
+  char path[256] = "";
+  snprintf(path, sizeof(path), "/sys/class/net/%.*s/operstate", 32,
+           ifa->ifa_name);
+  char operstate[32] = "";
+  sys_value_str_line(path, operstate, sizeof(operstate));
+  str_to_lower(operstate);
+
+  if (!strcmp(operstate, "unknown")) {
+    operstate[0] = '\0'; // empty string for 'lo'
+  }
+
+  char buf[256] = "";
+  snprintf(buf, sizeof(buf), "%.*s: %.*s %.*s", 32, ifa->ifa_name, 64, ip_addr,
+           (int)sizeof(operstate), operstate);
+  pl(buf);
+
+  // get stats from /sys
+  snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
+           ifa->ifa_name);
+  long long tx_bytes = sys_value_long(buf);
+  snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
+           ifa->ifa_name);
+  long long rx_bytes = sys_value_long(buf);
+
+  // get or create entry
+  struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
+  if (!ifc) {
+    return;
+  }
+  long long delta_tx_bytes =
+      tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
+  long long delta_rx_bytes =
+      rx_bytes - (ifc->rx_bytes_prv ? ifc->rx_bytes_prv : rx_bytes);
+
+  ifc->tx_bytes_prv = tx_bytes;
+  ifc->rx_bytes_prv = rx_bytes;
+
+  const char *rx_scale = "B/s";
+  if (delta_rx_bytes >> 20) {
+    delta_rx_bytes >>= 20;
+    rx_scale = "MB/s";
+  } else if (delta_rx_bytes >> 10) {
+    delta_rx_bytes >>= 10;
+    rx_scale = "KB/s";
+  }
+
+  const char *tx_scale = "B/s";
+  if (delta_tx_bytes >> 20) {
+    delta_tx_bytes >>= 20;
+    tx_scale = "MB/s";
+  } else if (delta_tx_bytes >> 10) {
+    delta_tx_bytes >>= 10;
+    tx_scale = "KB/s";
+  }
+
+  snprintf(buf, sizeof(buf), " ↓ %lld %s ↑ %lld %s", delta_rx_bytes, rx_scale,
+           delta_tx_bytes, tx_scale);
+  pl(buf);
+}
 
 static void render_net_interfaces() {
   struct ifaddrs *ifaddr;
   if (getifaddrs(&ifaddr) == -1) {
     return;
   }
-
+  // first the graphed device
   for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
     if (ifa->ifa_addr == NULL) {
       continue;
     }
-    char ip_addr[NI_MAXHOST] = "";
-    if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip_addr,
-                    NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+    if (strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
       continue;
     }
-    char buf[256] = "";
-    snprintf(buf, sizeof(buf), "%.*s: %.*s", 32, ifa->ifa_name, 64, ip_addr);
-    pl(buf);
-
-    // get stats
-    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/operstate", 32,
-             ifa->ifa_name);
-    char operstate[32] = "";
-    sys_value_str_line(buf, operstate, sizeof(operstate));
-    str_to_lower(buf);
-    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
-             ifa->ifa_name);
-    long long tx_bytes = sys_value_long(buf);
-    snprintf(buf, sizeof(buf), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
-             ifa->ifa_name);
-    long long rx_bytes = sys_value_long(buf);
-
-    struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
-    if (!ifc) {
+    render_net_interface(ifa);
+  }
+  // then all others except 'lo'
+  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == NULL) {
       continue;
     }
-    long long delta_tx_bytes =
-        tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
-    long long delta_rx_bytes =
-        rx_bytes - (ifc->rx_bytes_prv ? ifc->rx_bytes_prv : rx_bytes);
-
-    ifc->tx_bytes_prv = tx_bytes;
-    ifc->rx_bytes_prv = rx_bytes;
-
-    const char *rx_scale = "B/s";
-    if (delta_rx_bytes >> 20) {
-      delta_rx_bytes >>= 20;
-      rx_scale = "MB/s";
-    } else if (delta_rx_bytes >> 10) {
-      delta_rx_bytes >>= 10;
-      rx_scale = "KB/s";
+    if (!strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
+      continue;
     }
-
-    const char *tx_scale = "B/s";
-    if (delta_tx_bytes >> 20) {
-      delta_tx_bytes >>= 20;
-      tx_scale = "MB/s";
-    } else if (delta_tx_bytes >> 10) {
-      delta_tx_bytes >>= 10;
-      tx_scale = "KB/s";
+    if (!strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
+      continue;
     }
-
-    if (!strcmp(ifa->ifa_name, "lo")) {
-      operstate[0] = '\0'; // empty string for 'lo'
+    render_net_interface(ifa);
+  }
+  // then 'lo'
+  for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == NULL) {
+      continue;
     }
-    snprintf(buf, sizeof(buf), " %.*s ↓ %lld %s ↑ %lld %s",
-             (int)sizeof(operstate), operstate, delta_rx_bytes, rx_scale,
-             delta_tx_bytes, tx_scale);
-    pl(buf);
+    if (strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
+      continue;
+    }
+    render_net_interface(ifa);
   }
   freeifaddrs(ifaddr);
 }
