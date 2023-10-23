@@ -176,10 +176,10 @@ static void render_battery(void) {
   char output[128];
   snprintf(output, sizeof(output), "battery %u%%  %s",
            (unsigned)(charge_now * 100 / charge_full), status);
+  dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
   dc_newline(dc);
   dc_draw_str(dc, output);
   // draw a separator for visual que of current battery charge
-  dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
 }
 
 static void render_cpu_load(void) {
@@ -325,7 +325,8 @@ static void render_df(void) {
     return;
   }
   char buf[256] = "";
-  while (1) {
+  unsigned lines = 64; // arbitrary limits
+  while (lines--) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -404,7 +405,7 @@ static void render_syslog(void) {
 }
 
 static void render_acpi(void) {
-  FILE *file = popen("acpi -atc", "r");
+  FILE *file = popen("acpi -at", "r");
   if (!file) {
     return;
   }
@@ -787,7 +788,6 @@ static void render(void) {
   render_hr();
   render_cpu_throttles();
   render_battery();
-  render_hr();
   render_acpi();
   render_hr();
   render_syslog();
