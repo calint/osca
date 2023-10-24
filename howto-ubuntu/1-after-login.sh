@@ -1,6 +1,6 @@
 #!/bin/sh
 # enabling settings on touchpad
-# 'xinput' to list devisces
+# 'xinput' to list devices
 # 'xinput list-props [id]' to list properties
 
 # look for "Tapping Enabled"
