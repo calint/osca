@@ -664,6 +664,7 @@ int main(int argc, char **args, char **env) {
       case KEY_WINDOW_BUMP:
         if (win_focused) {
           xwin_bump(win_focused, WIN_BUMP_PX);
+          //? turn of full width, height bits
         }
         break;
       case KEY_WINDOW_CENTER:
