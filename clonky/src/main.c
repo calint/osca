@@ -294,8 +294,6 @@ static void render_cheetsheet(void) {
                              "đesktop",
                              "+up                   up",
                              "+down               down",
-                             "+shift+up        move-up",
-                             "+shift+down    move-down",
                              "",
                              "window",
                              "+esc               close",
@@ -304,11 +302,15 @@ static void render_cheetsheet(void) {
                              "+w                 wider",
                              "+W               thinner",
                              "+r                resize",
-                             "+1            fullscreen",
-                             "+2           full height",
-                             "+3            full width",
+                             "+1           full-screen",
+                             "+2           full-height",
+                             "+3            full-width",
+                             "+right        focus-next",
+                             "+left     focus-previous",
+                             "+shift+up        move-up",
+                             "+shift+down    move-down",
                              "+0   i-am-bored-surprise",
-                             "...                  ...",
+                             " ...                ... ",
                              NULL};
 
   char **str_ptr = keysheet;
