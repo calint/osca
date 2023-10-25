@@ -1,3 +1,8 @@
+[ ] review clonky code
+[ ] review frameless code
+[ ] review menuq code
+[ ] review stickyo code
+[ ] review mounte code
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
 [ ] frameless: capture XF86... keys

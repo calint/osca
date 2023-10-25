@@ -649,6 +649,11 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
 }
 
 static void render_net_interface(struct ifaddrs *ifa) {
+  if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
+                                ifa->ifa_addr->sa_family != AF_INET6)) {
+    return;
+  }
+
   char ip_addr[NI_MAXHOST] = "";
   if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), ip_addr,
                   NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
@@ -722,10 +727,6 @@ static void render_net_interfaces() {
 
   // first the graphed device
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
-                                  ifa->ifa_addr->sa_family != AF_INET6)) {
-      continue;
-    }
     if (strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
       continue;
     }
@@ -733,24 +734,14 @@ static void render_net_interfaces() {
   }
   // then all others except 'lo'
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
-                                  ifa->ifa_addr->sa_family != AF_INET6)) {
-      continue;
-    }
-    if (!strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
-      continue;
-    }
-    if (!strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
+    if (!strncmp(ifa->ifa_name, net_device, sizeof(net_device)) ||
+        !strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
       continue;
     }
     render_net_interface(ifa);
   }
   // then 'lo'
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
-                                  ifa->ifa_addr->sa_family != AF_INET6)) {
-      continue;
-    }
     if (strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
       continue;
     }
