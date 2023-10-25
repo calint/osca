@@ -306,7 +306,7 @@ static void render_cheetsheet(void) {
                              "+2           full-height",
                              "+3            full-width",
                              "+right        focus-next",
-                             "+left     focus-previous",
+                             "+left         focus-prev",
                              "+shift+up        move-up",
                              "+shift+down    move-down",
                              "+0   i-am-bored-surprise",
