@@ -41,11 +41,11 @@ static const char power_supply_path_prefix[] = "/sys/class/power_supply/";
 // quirk for different names for battery charge indicator
 static const char *battery_energy_or_charge_prefix = "";
 
-// auto_config_battery() copies the battery entry in '/sys/class/power_supply/'I
+// auto_config_battery() copies the battery entry in '/sys/class/power_supply/'
 static char battery_name[32] = "";
 
 // auto_config_network_traffic() copies the device name found in
-// '/sys/class/net/' preferring wlan otherwise fallback on non loop-back device
+// '/sys/class/net/' preferring wlan otherwise fallback to non loop-back device
 static char net_device[32] = "";
 
 // network interfaces
@@ -85,7 +85,6 @@ static void sys_value_str_line(const char *path, char *value,
     close(fd);
     return;
   }
-  // assumes last character is '\n'
   if (value[nbytes - 1] == '\n') {
     value[nbytes - 1] = '\0';
   } else {
@@ -160,6 +159,7 @@ static void render_battery(void) {
     return; // truncated
   }
   const size_t maxlen = sizeof(path) - (size_t)nchars;
+  // construct paths to '..._full' and '..._now'
   char *path_prefix_end = path + nchars;
   strncpy(path_prefix_end, "full", maxlen);
   const long long charge_full = sys_value_long(path);
@@ -167,7 +167,6 @@ static void render_battery(void) {
   const long long charge_now = sys_value_long(path);
   snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
            battery_name);
-
   // read battery status
   char status[64];
   sys_value_str_line(path, status, sizeof(status));
@@ -176,37 +175,47 @@ static void render_battery(void) {
   char output[128];
   snprintf(output, sizeof(output), "battery %u%%  %s",
            (unsigned)(charge_now * 100 / charge_full), status);
+  // draw a separator for visual que of current battery charge
   dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
   dc_newline(dc);
   dc_draw_str(dc, output);
-  // draw a separator for visual que of current battery charge
 }
 
 static void render_cpu_load(void) {
-  static long long cpu_total_last = 0;
-  static long long cpu_usage_last = 0;
+  // previous reading
+  static long long cpu_total_prv = 0;
+  static long long cpu_usage_prv = 0;
 
   FILE *file = fopen("/proc/stat", "r");
   if (!file)
     return;
-  // user: normal processes executing in user mode
-  // nice: niced processes executing in user mode
-  // system: processes executing in kernel mode
-  // idle: twiddling thumbs
-  // iowait: waiting for I/O to complete
-  // irq: servicing interrupts
-  // softirq: servicing softirqs
-  long long user, nice, system, idle, iowait, irq, softirq;
-  char bbuf[1024] = "";
-  fscanf(file, "%1023s %lld %lld %lld %lld %lld %lld %lld\n", bbuf, &user,
-         &nice, &system, &idle, &iowait, &irq, &softirq);
+  // /proc/stat first line gives:
+  //  cpu  20254782 11358 9292446 480440419 187402 0 2833065 0 0 0
+  //   user: normal processes executing in user mode
+  //   nice: niced processes executing in user mode
+  //   system: processes executing in kernel mode
+  //   idle: twiddling thumbs
+  //   iowait: waiting for I/O to complete
+  //   irq: servicing interrupts
+  //   softirq: servicing softirqs
+  long long user = 0;
+  long long nice = 0;
+  long long system = 0;
+  long long idle = 0;
+  long long iowait = 0;
+  long long irq = 0;
+  long long softirq = 0;
+  char buf[32] = "";
+  // read first line
+  fscanf(file, "%31s %lld %lld %lld %lld %lld %lld %lld\n", buf, &user, &nice,
+         &system, &idle, &iowait, &irq, &softirq);
   fclose(file);
   const long long total = user + nice + system + idle + iowait + irq + softirq;
   const long long usage = total - idle;
-  const long long dtotal = total - cpu_total_last;
-  cpu_total_last = total;
-  const long long dusage = usage - cpu_usage_last;
-  cpu_usage_last = usage;
+  const long long dtotal = total - cpu_total_prv;
+  cpu_total_prv = total;
+  const long long dusage = usage - cpu_usage_prv;
+  cpu_usage_prv = usage;
   const long long usage_percent = dusage * 100 / dtotal;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, DELTA_Y_HR);
@@ -217,11 +226,11 @@ static void render_cpu_load(void) {
 static void render_hello_clonky(void) {
   static long long unsigned counter = 0;
   counter++;
-  char bbuf[128];
-  snprintf(bbuf, sizeof bbuf, "%llu hello%sclonky", counter,
+  char buf[128];
+  snprintf(buf, sizeof(buf), "%llu hello%sclonky", counter,
            counter != 1 ? "s " : " ");
   dc_newline(dc);
-  dc_draw_str(dc, bbuf);
+  dc_draw_str(dc, buf);
 }
 
 static void render_mem_info(void) {
@@ -229,18 +238,24 @@ static void render_mem_info(void) {
   if (!file) {
     return;
   }
+  // /proc/meminfo gives:
+  //  MemTotal:       15766756 kB
+  //  MemFree:         4058344 kB
+  //  MemAvailable:   10814308 kB
+  //  Buffers:          944396 kB
+  //  Cached:          5425168 kB
   char name[32] = "";
   char unit[16] = "";
   long long mem_total = 0;
   long long mem_avail = 0;
-  char bbuf[256] = "";
-  fgets(bbuf, sizeof(bbuf), file); //	MemTotal:        1937372 kB
-  sscanf(bbuf, "%31s %lld %15s", name, &mem_total, unit);
-  fgets(bbuf, sizeof(bbuf), file); //	MemFree:           99120 kB
-  fgets(bbuf, sizeof(bbuf), file); //	MemAvailable:     887512 kB
+  char buf[256] = "";
+  fgets(buf, sizeof(buf), file); //	MemTotal:        1937372 kB
+  sscanf(buf, "%31s %lld %15s", name, &mem_total, unit);
+  fgets(buf, sizeof(buf), file); //	MemFree:           99120 kB
+  fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
   fclose(file);
 
-  sscanf(bbuf, "%31s %lld %15s", name, &mem_avail, unit);
+  sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
   int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
@@ -249,12 +264,12 @@ static void render_mem_info(void) {
   if (mem_avail >> 10 != 0) {
     mem_avail >>= 10;
     mem_total >>= 10;
-    strcpy(unit, "MB");
+    strcpy(unit, "MB"); //? kB to MB not same as KB to MBs
   }
-  snprintf(bbuf, sizeof(bbuf), "freemem %llu of %llu %s", mem_avail, mem_total,
+  snprintf(buf, sizeof(buf), "freemem %llu of %llu %s", mem_avail, mem_total,
            unit);
   dc_newline(dc);
-  dc_draw_str(dc, bbuf);
+  dc_draw_str(dc, buf);
 }
 
 static void render_net_graph(void) {
@@ -263,13 +278,13 @@ static void render_net_graph(void) {
     return;
   }
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
-  char buf[128] = "";
-  snprintf(buf, sizeof(buf), "/sys/class/net/%s/statistics/tx_bytes",
+  char path[128] = "";
+  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/tx_bytes",
            net_device);
-  long long tx_bytes = sys_value_long(buf);
-  snprintf(buf, sizeof(buf), "/sys/class/net/%s/statistics/rx_bytes",
+  long long tx_bytes = sys_value_long(path);
+  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/rx_bytes",
            net_device);
-  long long rx_bytes = sys_value_long(buf);
+  long long rx_bytes = sys_value_long(path);
   graphd_add_value(graph_net, tx_bytes + rx_bytes);
   graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
@@ -326,10 +341,15 @@ static void render_df(void) {
   if (!file) {
     return;
   }
+  // df -h gives:
+  //  Filesystem      Size  Used Avail Use% Mounted on
+  //  tmpfs           1,6G  2,3M  1,6G   1% /run
+  //  /dev/nvme0n1p6  235G  166G   57G  75% /
+
   char buf[256] = "";
-  unsigned lines = 64; // arbitrary limits
+  unsigned lines = 64; // arbitrary limit
   while (lines--) {
-    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+    if (fscanf(file, "%255[^\n]%*c", buf) == EOF) {
       break;
     }
     str_compact_spaces(buf);
@@ -355,27 +375,27 @@ static void render_io_stat(void) {
   // loop0   0,00 0,00       0,00       0,00       21       0        0
 
   char buf[256] = "";
+  // read the header
   fgets(buf, sizeof(buf), file);
   fgets(buf, sizeof(buf), file);
   fgets(buf, sizeof(buf), file);
+  // sum values
   long long kb_read = 0;
   long long kb_read_total = 0;
   long long kb_written = 0;
   long long kb_written_total = 0;
-  char dev[64] = "";
   while (fgets(buf, sizeof(buf), file)) {
     if (buf[0] == '\0') {
       // break on empty line
       break;
     }
-    sscanf(buf, "%63s %*s %*s %*s %*s %lld %lld %*s\n", dev, &kb_read,
-           &kb_written);
-    // puts(buf);
-    // printf("read/written %lld  %lld\n", kb_read, kb_written);
+    char dev[64] = "";
+    sscanf(buf, "%63s %*s %*s %*s %*s %lld %lld", dev, &kb_read, &kb_written);
     kb_read_total += kb_read;
     kb_written_total += kb_written;
   }
   pclose(file);
+
   const char *unit = "kB/s";
   snprintf(buf, sizeof(buf), "read %lld %s wrote %lld %s",
            kb_read_total -
@@ -385,7 +405,7 @@ static void render_io_stat(void) {
                (prv_kb_written_total ? prv_kb_written_total : kb_written_total),
            unit);
   pl(buf);
-  // puts(buf);
+
   prv_kb_read_total = kb_read_total;
   prv_kb_written_total = kb_written_total;
 }
@@ -396,8 +416,8 @@ static void render_syslog(void) {
     return;
   }
   char buf[512];
-  unsigned i = 15;
-  while (i--) {
+  unsigned counter = 15; // maximum 15 line
+  while (counter--) {
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -414,7 +434,9 @@ static void render_acpi(void) {
   // no-infinite loop, arbitrary limit
   unsigned counter = 64;
   while (counter--) {
-    char buf[512];
+    char buf[512] = "";
+    // read at most 511 characters before a newline and read the newline
+    // characters
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -469,15 +491,15 @@ static void render_cpu_throttles(void) {
   unsigned cpu_ix = min;
   while (cpu_ix <= max) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
-      char buf[128];
-      snprintf(buf, sizeof(buf),
+      char path[128] = "";
+      snprintf(path, sizeof(path),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
                cpu_ix);
-      const long long max_freq = sys_value_long(buf);
-      snprintf(buf, sizeof(buf),
+      const long long max_freq = sys_value_long(path);
+      snprintf(path, sizeof(path),
                "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
                cpu_ix);
-      const long long cur_freq = sys_value_long(buf);
+      const long long cur_freq = sys_value_long(path);
       strb_p_char(&sb, ' ');
       if (max_freq) {
         // if available render percent of max frequency
@@ -503,8 +525,9 @@ static void render_swaps(void) {
   }
   // Filename         Type       Size     Used   Priority
   // /dev/mmcblk0p3   partition  2096124  16568  s-1
-  char bbuf[256];
-  fgets(bbuf, sizeof(bbuf), file);
+  char buf[256] = "";
+  // read column headers
+  fgets(buf, sizeof(buf), file);
   long long size_kb = 0;
   long long used_kb = 0;
   if (!fscanf(file, "%*s %*s %lld %lld", &size_kb, &used_kb)) {
@@ -522,24 +545,23 @@ static void render_swaps(void) {
     return;
   }
   pl(sb.chars);
-  // puts(sb.chars);
 }
 
 static void auto_config_battery(void) {
   DIR *dir = opendir("/sys/class/power_supply");
   if (!dir) {
-    puts("[!] battery: cannot open find dir '/sys/class/power_supply'");
+    puts("[!] battery: cannot open dir '/sys/class/power_supply'");
     return;
   }
-  struct dirent *entry;
-  *battery_name = 0;
+  struct dirent *entry = NULL;
+  battery_name[0] = '\0';
   while ((entry = readdir(dir))) {
     if (entry->d_name[0] == '.') {
       // skip hidden files
       continue;
     }
     // find out if type is battery
-    char buf[128];
+    char buf[128] = "";
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%.*s/type", 64,
              entry->d_name);
     sys_value_str_line(buf, buf, sizeof(buf));
@@ -567,7 +589,7 @@ static void auto_config_battery(void) {
     break;
   }
   closedir(dir);
-  if (!battery_name[0]) {
+  if (battery_name[0] == '\0') {
     puts("[!] no battery found in /sys/class/power_supply");
   }
   printf("· battery: ");
@@ -588,21 +610,25 @@ static int is_wlan_device(const char *sys_cls_net_wlan) {
   if (strb_p(&sb, "/wireless")) {
     return 0;
   }
-  struct stat st;
+  struct stat st; //? initial value
   return !stat(sb.chars, &st);
 }
 
 static void auto_config_network_traffic(void) {
   DIR *dir = opendir("/sys/class/net");
   if (!dir) {
-    puts("[!] wifi: cannot open find dir /sys/class/net");
+    puts("[!] wifi: cannot open dir /sys/class/net");
     return;
   }
-  struct dirent *entry;
+  struct dirent *entry = NULL;
   net_device[0] = '\0';
   while ((entry = readdir(dir))) {
     if (entry->d_name[0] == '.') {
       // ignore hidden files
+      continue;
+    }
+    if (!strcmp("lo", entry->d_name)) {
+      // skip loopback
       continue;
     }
     if (is_wlan_device(entry->d_name)) {
@@ -610,15 +636,11 @@ static void auto_config_network_traffic(void) {
       strncpy(net_device, entry->d_name, sizeof(net_device));
       break;
     }
-    if (!strcmp("lo", entry->d_name)) {
-      // skip loopback
-      continue;
-    }
     // network device (not preferred)
     strncpy(net_device, entry->d_name, sizeof(net_device));
   }
   closedir(dir);
-  if (!net_device[0]) {
+  if (!net_device[0]) { //? map 'lo'?
     puts("[!] no network device found in /sys/class/net");
   }
   printf("· graph network interface: ");
@@ -632,7 +654,7 @@ static void auto_config(void) {
 }
 
 static struct netifc *netifcs_get_by_name_or_create(const char *name) {
-  for (unsigned i = 0; i < NETIFC_ARRAY_SIZE; i++) {
+  for (unsigned i = 0; i < netifcs_len; i++) {
     struct netifc *ni = &netifcs[i];
     if (!strncmp(ni->name, name, sizeof(ni->name))) {
       return &netifcs[i];
@@ -661,7 +683,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   }
 
   // get operational status of interface
-  char path[256] = "";
+  char path[128] = "";
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/operstate", 32,
            ifa->ifa_name);
   char operstate[32] = "";
@@ -731,6 +753,8 @@ static void render_net_interfaces() {
       continue;
     }
     render_net_interface(ifa);
+    // not 'break' because the 'ifaddrs' have multiple entries while and only
+    // one of those entries gives result from 'getnameinfo'
   }
   // then all others except 'lo'
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
@@ -739,6 +763,7 @@ static void render_net_interfaces() {
       continue;
     }
     render_net_interface(ifa);
+    // not 'break' because see note above
   }
   // then 'lo'
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
@@ -746,6 +771,7 @@ static void render_net_interfaces() {
       continue;
     }
     render_net_interface(ifa);
+    // not 'break' because see note above
   }
   freeifaddrs(ifas);
 }

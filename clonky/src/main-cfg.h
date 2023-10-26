@@ -7,7 +7,7 @@
 // the size of a separator
 #define DELTA_Y_HR 3
 
-// start of clonky outputs
+// start of clonky output
 #define TOP_Y 0
 
 // width of clonky output

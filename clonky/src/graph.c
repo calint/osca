@@ -10,15 +10,15 @@ struct graph {
 };
 
 struct /*give*/ graph *graph_new(unsigned nvalues) {
-  struct graph *self = malloc(sizeof(struct graph));
+  struct graph *self = calloc(1, sizeof(struct graph));
   if (!self) {
-    printf("graphnew can not alloc\n");
+    printf("graph_new can not alloc\n");
     exit(1);
   }
   self->nvalues = nvalues;
   self->values = (long long *)calloc(nvalues, sizeof(long long));
   if (!self->values) {
-    puts("graphnew can not alloc array of ints %d\n");
+    puts("graph_new can not alloc array of size %d\n");
     exit(1);
   }
   self->ix = 0;
@@ -42,6 +42,9 @@ void graph_draw(const struct graph *self, struct dc *dc,
                 const int y_value_shift_right) {
   const int dc_x = dc_get_x(dc);
   const int dc_y = dc_get_y(dc);
+  //? fix the magic number 100 which works because function is called in one
+  // location from main.c with shift value of 2 which happens to be main-cfg.h
+  // DEFAULT_GRAPH_HEIGHT
   dc_draw_line(dc, dc_x, dc_y - (100 >> y_value_shift_right),
                dc_x + (int)self->nvalues, dc_y - (100 >> y_value_shift_right));
   int x = dc_x;
@@ -57,8 +60,9 @@ void graph_draw(const struct graph *self, struct dc *dc,
   // draw from 0 to current index
   for (unsigned i = 0; i < self->ix; i++) {
     long long value = self->values[i] >> y_value_shift_right;
-    if (value == 0 && self->values[i] != 0)
+    if (value == 0 && self->values[i] != 0) {
       value = 1;
+    }
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
@@ -88,8 +92,9 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
   // circular buffer, draw from current index to end
   for (unsigned i = self->ix; i < self->nvalues; i++) {
     long long value = self->values[i] * height / max_value;
-    if (value == 0 && self->values[i] != 0)
+    if (value == 0 && self->values[i] != 0) {
       value = 1;
+    }
     value = graphd_cap_value(value, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;

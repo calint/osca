@@ -55,10 +55,10 @@ inline int strb_p_int_with_width(strb *self, const int num, const int width) {
   return 0;
 }
 
-int strb_p_nbytes(strb *self, long long bytes) {
-  const long long kb = bytes >> 10;
+int strb_p_nbytes(strb *self, long long nbytes) {
+  const long long kb = nbytes >> 10;
   if (kb == 0) {
-    if (strb_p_long(self, bytes)) {
+    if (strb_p_long(self, nbytes)) {
       return -1;
     }
     if (strb_p(self, " B")) {
@@ -92,7 +92,7 @@ void strb_back(strb *self) {
   }
 }
 
-void strb_clear(strb *self) {
+void strb_clear(strb *self) { //? same as strb_init
   self->index = 0;
   self->chars[0] = '\0';
 }

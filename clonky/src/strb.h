@@ -31,7 +31,7 @@ int strb_p_int_with_width(strb *self, int num, int width);
 int strb_p_long(strb *self, long long num);
 
 // formats bytes to str. returns 0 if ok
-int strb_p_nbytes(strb *self, long long bytes);
+int strb_p_nbytes(strb *self, long long nbytes);
 
 // back and write '\0'
 void strb_back(strb *self);

@@ -83,13 +83,13 @@ void dc_draw_str(struct dc *self, const char *str) {
 }
 
 void dc_draw_hr(struct dc *self) {
-  self->doty += 3;
+  self->doty += 3; //? magic number from main-cfg.h DELTA_Y_HR
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
             self->xlft + (int)self->width, self->doty);
 }
 
 void dc_draw_hr1(struct dc *self, const int width) {
-  self->doty += 3;
+  self->doty += 3; //? magic number from main-cfg.h DELTA_Y_HR
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
             self->xlft + width, self->doty);
 }
@@ -110,6 +110,8 @@ void dc_set_y(struct dc *self, const int y) { self->doty = y; }
 
 unsigned dc_get_width(const struct dc *self) { return self->width; }
 
-void dc_set_width(struct dc *self, const unsigned width) { self->width = width; }
+void dc_set_width(struct dc *self, const unsigned width) {
+  self->width = width;
+}
 
 unsigned dc_get_screen_width(const struct dc *self) { return self->dpy_width; }
