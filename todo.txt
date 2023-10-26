@@ -1,4 +1,4 @@
-[ ] review clonky code
+[x] review clonky code
 [ ] review frameless code
 [ ] review menuq code
 [ ] review stickyo code
