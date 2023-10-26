@@ -306,7 +306,7 @@ static void render_cheetsheet(void) {
                              "+2           full-height",
                              "+3            full-width",
                              "+right        focus-next",
-                             "+left         focus-prev",
+                             "+left     focus-previous",
                              "+shift+up        move-up",
                              "+shift+down    move-down",
                              "+0   i-am-bored-surprise",
@@ -720,7 +720,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
 }
 
 static void render_net_interfaces() {
-  struct ifaddrs *ifas;
+  struct ifaddrs *ifas = NULL;
   if (getifaddrs(&ifas) == -1) {
     return;
   }
