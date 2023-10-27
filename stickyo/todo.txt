@@ -1,1 +1,0 @@
-[ ] fix deprecations from gtk2 to gtk3

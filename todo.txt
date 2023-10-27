@@ -1,5 +1,5 @@
 [x] review clonky code
-[ ] review frameless code
+[x] review frameless code
 [ ] review menuq code
 [ ] review stickyo code
 [ ] review mounte code
@@ -30,6 +30,7 @@
 [ ] clang-tidy: maxed
 [ ] stickyo save and remember state of stickies
 [ ] stickyo: upgrade to gtk4
+[ ] stickyo: fix deprecations from gtk2 to gtk3
 --------------------------------------------------------------
 [x] frameless: debugging turned on with FRAMELESS_DEBUG define
 [x] clonky: display IP addresses

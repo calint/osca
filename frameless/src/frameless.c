@@ -20,6 +20,9 @@
 
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
 
+// minimum width and height
+#define XWIN_MIN_WIDTH_HEIGHT 4
+
 // pixels to 'bump' a window
 #define WIN_BUMP_PX 200
 
@@ -112,7 +115,6 @@ typedef struct xwin {
 #define XWIN_BIT_ALLOCATED 4
 #define XWIN_BIT_FOCUSED 8
 #define XWIN_BITS_FULL_SCREEN 3
-#define XWIN_MIN_WIDTH_HEIGHT 4
 
 // mapped xwin to X11 Window
 static xwin wins[WIN_MAX_COUNT];
@@ -266,18 +268,16 @@ static void xwin_close(xwin *this) {
 }
 
 static void xwin_toggle_fullscreen(xwin *this) {
+  xwin_read_geom(this);
   if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
     // toggle from fullscreen
-    xwin_read_geom(this);
     this->x = this->x_pf;
     this->y = this->y_pf;
     this->wi = this->wi_pf;
     this->hi = this->hi_pf;
-    xwin_set_geom(this);
     this->bits &= ~XWIN_BITS_FULL_SCREEN;
   } else {
     // toggle to fullscreen
-    xwin_read_geom(this);
     this->x_pf = this->x;
     this->y_pf = this->y;
     this->wi_pf = this->wi;
@@ -286,26 +286,24 @@ static void xwin_toggle_fullscreen(xwin *this) {
     this->y = -WIN_BORDER_WIDTH;
     this->wi = screen.wi;
     this->hi = screen.hi;
-    xwin_set_geom(this);
     this->bits |= XWIN_BITS_FULL_SCREEN;
   }
+  xwin_set_geom(this);
 }
 
 static void xwin_toggle_fullheight(xwin *this) {
+  xwin_read_geom(this);
   if (this->bits & XWIN_BIT_FULL_HEIGHT) {
-    xwin_read_geom(this);
     this->y = this->y_pf;
     this->hi = this->hi_pf;
-    xwin_set_geom(this);
   } else {
-    xwin_read_geom(this);
     this->y_pf = this->y;
     this->hi_pf = this->hi;
     this->y = -WIN_BORDER_WIDTH;
     this->hi = screen.hi;
-    xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_HEIGHT;
+  xwin_set_geom(this);
 }
 
 static void xwin_toggle_fullwidth(xwin *this) {
@@ -394,18 +392,6 @@ static void desk_show(int dsk_id, int dsk_prv) {
   }
 }
 
-// static void focus_first_window_on_desk(void) {
-//   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-//     xwin *xw = &wins[i];
-//     if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
-//       xwin_raise(xw);
-//       focus_on_window(xw);
-//       return;
-//     }
-//   }
-//   win_focused = NULL;
-// }
-
 static void focus_on_only_window_on_desk(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
@@ -447,7 +433,7 @@ static void focus_window_after_desk_switch(void) {
 }
 
 // turns off focus for window on desktop 'dsk'
-// used when switching desktop with window (shift + meta + up/down)
+// used when switching desktop with window (host + shift + up/down)
 static void turn_off_window_focus_on_desk(int dsk) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
@@ -463,6 +449,7 @@ static void turn_off_window_focus_on_desk(int dsk) {
 
 static void focus_next_window(void) {
   int i0 = xwin_ix(win_focused);
+  // note. 'i0' might be -1 but incremented to 0
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
     if (focus_window_by_index_try((unsigned)i)) {
@@ -470,6 +457,7 @@ static void focus_next_window(void) {
     }
   }
   i = 0;
+  // note. if 'i0' is -1 then no window will be focused
   // '<= i0' not '< i0' to focus on same window if no other window available
   while (i <= i0) {
     if (focus_window_by_index_try((unsigned)i)) {
@@ -562,9 +550,9 @@ int main(int argc, char **args, char **env) {
 
   // previous desk
   int dsk_prv = 0;
-  // temporary
-  xwin *xw = NULL;
-  XEvent ev;
+
+  xwin *xw = NULL; // temporary used in event loop
+  XEvent ev;       // temporary used in event loop
   while (!XNextEvent(dpy, &ev)) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
@@ -726,18 +714,18 @@ int main(int argc, char **args, char **env) {
         dsk++;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
+            // 'win_focused' is the new focused window on desk 'dsk'
             turn_off_window_focus_on_desk(dsk);
-            // change desk
+            // change desk on focused window
             win_focused->desk = dsk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
+            // place focused window on top
             xwin_raise(win_focused);
           }
         }
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
-        // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
-        // fflush(flog);
         break;
       case KEY_DESKTOP_DOWN:
       case KEY_DESKTOP_DOWN_ALT:
@@ -746,18 +734,18 @@ int main(int argc, char **args, char **env) {
         dsk--;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
+            // 'win_focused' is the new focused window on desk 'dsk'
             turn_off_window_focus_on_desk(dsk);
-            // change desk
+            // change desk on focused window
             win_focused->desk = dsk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
+            // place focused window on top
             xwin_raise(win_focused);
           }
         }
         desk_show(dsk, dsk_prv);
         focus_window_after_desk_switch();
-        // fprintf(flog, "switched to desktop %d from %d\n", dsk, dsk_prv);
-        // fflush(flog);
         break;
       }
       break;
@@ -765,6 +753,7 @@ int main(int argc, char **args, char **env) {
       if (key_pressed == ev.xkey.keycode) {
         key_pressed = 0;
       }
+      //? should check that the key was switch desktop
       is_switching_desktop = False;
       break;
     case ButtonPress:
@@ -803,6 +792,7 @@ int main(int argc, char **args, char **env) {
         new_hi = (int)screen.hi;
       }
       if (dragging_button == 3) {
+        // right mouse button is pressed
         if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
           new_wi = XWIN_MIN_WIDTH_HEIGHT;
         }
@@ -837,6 +827,7 @@ int main(int argc, char **args, char **env) {
       is_dragging = False;
       dragging_button = 0;
       xw = xwin_get_by_window(ev.xbutton.window);
+      // in case a window was dragged from folded state (different desktop)
       xw->desk = dsk;
       XUngrabPointer(dpy, CurrentTime);
       break;
