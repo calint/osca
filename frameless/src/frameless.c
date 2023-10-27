@@ -307,20 +307,18 @@ static void xwin_toggle_fullheight(xwin *this) {
 }
 
 static void xwin_toggle_fullwidth(xwin *this) {
+  xwin_read_geom(this);
   if (this->bits & XWIN_BIT_FULL_WIDTH) {
-    xwin_read_geom(this);
     this->x = this->x_pf;
     this->wi = this->wi_pf;
-    xwin_set_geom(this);
   } else {
-    xwin_read_geom(this);
     this->x_pf = this->x;
     this->wi_pf = this->wi;
     this->x = -WIN_BORDER_WIDTH;
     this->wi = screen.wi;
-    xwin_set_geom(this);
   }
   this->bits ^= XWIN_BIT_FULL_WIDTH;
+  xwin_set_geom(this);
 }
 
 static void xwin_hide(xwin *this) {
