@@ -321,6 +321,7 @@ static void xwin_toggle_fullwidth(xwin *this) {
   xwin_set_geom(this);
 }
 
+// fold window to the right of screen
 static void xwin_hide(xwin *this) {
   xwin_read_geom(this);
   this->desk_x = this->x;
@@ -329,6 +330,7 @@ static void xwin_hide(xwin *this) {
   xwin_set_geom(this);
 }
 
+// unfold window from the right of screen
 static void xwin_show(xwin *this) {
   this->x = this->desk_x;
   xwin_set_geom(this);
