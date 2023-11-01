@@ -1,5 +1,7 @@
 notes about enabling frameless in ubuntu 23.04
 
+* to set up user home see 'init-user-home.sh'
+
 to enable option on login screen add file:
 /usr/share/xsessions/xsession.desktop
 --------------------------
