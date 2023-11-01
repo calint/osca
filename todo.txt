@@ -1,3 +1,4 @@
+[x] frameless: snapshot: select area
 [x] review clonky code
 [x] review frameless code
 [ ] review menuq code

@@ -53,6 +53,7 @@
 
 #define KEY_LAUNCH_SNAPSHOT 33 // p
 #define CMD_LAUNCH_SNAPSHOT "xii-screenshot"
+#define CMD_LAUNCH_SNAPSHOT_SHIFT "xii-screenshot-select"
 
 #define KEY_FN_SCREEN_BRIGHTNESS_DOWN 68 // F2
 #define CMD_FN_SCREEN_BRIGHTNESS_DOWN "xii-screen-brightness-down"
@@ -626,7 +627,11 @@ int main(int argc, char **args, char **env) {
         system(CMD_LAUNCH_BINARIES);
         break;
       case KEY_LAUNCH_SNAPSHOT:
-        system(CMD_LAUNCH_SNAPSHOT);
+        if (ev.xkey.state & ShiftMask) {
+          system(CMD_LAUNCH_SNAPSHOT_SHIFT);
+        } else {
+          system(CMD_LAUNCH_SNAPSHOT);
+        }
         break;
       case KEY_FN_SCREEN_BRIGHTNESS_DOWN:
         system(CMD_FN_SCREEN_BRIGHTNESS_DOWN);

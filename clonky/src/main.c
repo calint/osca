@@ -305,6 +305,7 @@ static void render_cheetsheet(void) {
                              "+x                sticky",
                              "+o              binaries",
                              "+p              snapshot",
+                             "+shift+p          select",
                              "",
                              "đesktop",
                              "+up                   up",

@@ -1,0 +1,2 @@
+#!/bin/sh
+scrot -s ~/screenshots/$(date '+%Y-%m-%d--%H-%M-%S').png
