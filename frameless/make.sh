@@ -14,7 +14,6 @@ SRC=src/frameless.c
 OPTS="-Os -pedantic-errors -Wfatal-errors -Werror"
 WARNINGS="-Wall -Wextra -Wconversion -Wsign-conversion -Wno-unused-result \
         -Wno-unused-parameter -Wno-unused-variable"
-        # -Wconversion 
 LIBS="-lX11"
 
 echo
