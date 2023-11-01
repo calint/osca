@@ -14,4 +14,4 @@ this will launch '~/.xsession' at login
 * press Fn+Esc will toggle between enabling/disabling Fn-key functions.
 
 * packages:
-sudo apt install mousepad thunar libinput-tools xbacklight
+sudo apt install mousepad thunar scrot libinput-tools xbacklight
