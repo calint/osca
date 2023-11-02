@@ -27,44 +27,44 @@ contains:
 ```
 
             lines   words   chars
-   source:    838    2497   23252
-   zipped:     24     126    5593
+   source:    843    2510   23425
+   zipped:     22     132    5621
 
--rwxrwxr-x 1 c 21928 okt 29 16:49 frameless
+-rwxrwxr-x 1 c 21928 nov  2 17:53 frameless
 
 
             lines   words   chars
-   source:   1260    4065   33995
-   zipped:     32     190    8354
+   source:   1261    4067   34054
+   zipped:     31     157    8371
 
--rwxrwxr-x 1 c 37424 okt 29 16:49 clonky
+-rwxrwxr-x 1 c 37432 nov  2 17:53 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      52    2290
 
--rwxrwxr-x 1 c 16816 okt 29 16:49 menuq
+-rwxrwxr-x 1 c 16816 nov  2 17:53 menuq
 
 
             lines   words   chars
    source:     54     126    1724
    zipped:      1      15     810
 
--rwxrwxr-x 1 c 16960 okt 29 16:49 stickyo
+-rwxrwxr-x 1 c 16960 nov  2 17:53 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16144 okt 29 16:49 snap
+-rwxrwxr-x 1 c 16144 nov  2 17:53 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16872 okt 29 16:49 mounte
+-rwxrwxr-x 1 c 16872 nov  2 17:53 mounte
 
 ```
