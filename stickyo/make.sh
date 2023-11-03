@@ -8,10 +8,10 @@ BIN=stickyo
 SRC=src/stickyo.c
 CC="gcc"
 #CC="clang -Weverything"
-CF="-Os -Wfatal-errors -Werror"
+CF="-Os -Wfatal-errors"
 CW="-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wconversion -Wsign-conversion"
-CMD="gcc $SRC -o $BIN $CF $CW $(pkg-config --cflags --libs gtk+-3.0)"
-#CMD="gcc $SRC -o $BIN $CF $CW $(pkg-config --cflags --libs gtk4)"
+CMD="$CC $SRC -o $BIN $CF $CW $(pkg-config --cflags --libs gtk+-3.0)"
+#CMD="$CC $SRC -o $BIN $CF $CW $(pkg-config --cflags --libs gtk4)"
 #echo
 #echo $CMD
 $CMD
