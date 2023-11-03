@@ -43,7 +43,8 @@ struct dc {
   self->gc = XCreateGC(self->dpy, self->win, 0, NULL);
   self->cmap = DefaultColormap(self->dpy, self->scr);
   self->font = XftFontOpen(self->dpy, self->scr, XFT_FAMILY, XftTypeString,
-                           "sans", XFT_SIZE, XftTypeDouble, 7.0, NULL);
+                           "dejavu sans", XFT_ENCODING, XftTypeString, "UTF-8",
+                           XFT_SIZE, XftTypeDouble, 7.0, NULL);
   self->draw = XftDrawCreate(self->dpy, self->win,
                              DefaultVisual(self->dpy, self->scr), self->cmap);
   XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};
