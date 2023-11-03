@@ -158,7 +158,7 @@ static unsigned dragging_button;
 static char is_switching_desktop;
 
 #ifdef FRAMELESS_DEBUG
-static char *ix_evnames[LASTEvent] = {
+static char *ix_event_names[LASTEvent] = {
     "unknown",        "unknown",        "KeyPress",         "KeyRelease",
     "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
     "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
@@ -393,20 +393,23 @@ static void desk_show(int dsk_id, int dsk_prv) {
   }
 }
 
-static void focus_on_only_window_on_desk(void) {
+// returns True if there is only one window and is focused
+static Bool focus_on_only_window_on_desk(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
     if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
       if (focus) {
-        return; // there are more than 1 window on this desk
+        return False; // there are more than 1 window on this desk
       }
       focus = xw;
     }
   }
   if (focus) {
     focus_on_window(focus);
+    return True;
   }
+  return False;
 }
 
 // focus on previously focused window if available or some window on this
@@ -495,7 +498,31 @@ static void free_window_and_adjust_focus(Window w) {
   if (win_focused == win) {
     win_focused = NULL;
   }
-  focus_on_only_window_on_desk();
+  if (focus_on_only_window_on_desk()) {
+    return;
+  }
+  // focus on window under pointer
+  Window root_return, child_return;
+  int root_x, root_y, win_x, win_y;
+  unsigned mask_return;
+  if (!XQueryPointer(dpy, root, &root_return, &child_return, &root_x, &root_y,
+                     &win_x, &win_y, &mask_return)) {
+    return;
+  }
+#ifdef FRAMELESS_DEBUG
+  fprintf(flog, "  root_return=%p  child_return=%p\n", (void *)root_return,
+          (void *)child_return);
+  fflush(flog);
+#endif
+  if (child_return == None) {
+    return;
+  }
+  xwin *xw = xwin_get_by_window(child_return);
+  focus_on_window(xw);
+#ifdef FRAMELESS_DEBUG
+  fprintf(flog, "  focused on %p\n", (void *)xw->win);
+  fflush(flog);
+#endif
 }
 
 static int error_handler(Display *d, XErrorEvent *e) {
@@ -556,8 +583,8 @@ int main(int argc, char **args, char **env) {
   XEvent ev;       // temporary used in event loop
   while (!XNextEvent(dpy, &ev)) {
 #ifdef FRAMELESS_DEBUG
-    fprintf(flog, "event: %s   win=%p\n", ix_evnames[ev.type],
-            (void *)ev.xany.window);
+    fprintf(flog, "%lu: event: %s   win=%p\n", ev.xany.serial,
+            ix_event_names[ev.type], (void *)ev.xany.window);
     fflush(flog);
 #endif
     switch (ev.type) {
@@ -593,7 +620,11 @@ int main(int argc, char **args, char **env) {
         //   pointer. focus on previously focused window
         // * when launching a new window and pointer is outside that window an
         //   EnterNotify for the window under the pointer is triggered. ignore
-        //   that event if key is pressed assuming it was a lunch. fix.
+        //   that event if key is pressed assuming it was a launch. fix.
+#ifdef FRAMELESS_DEBUG
+        fprintf(flog, "  event ignored\n");
+        fflush(flog);
+#endif
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
