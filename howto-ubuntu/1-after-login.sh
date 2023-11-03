@@ -4,10 +4,10 @@
 # 'xinput list-props [id]' to list properties
 
 # look for "Tapping Enabled"
-xinput set-prop 10 305 1
+xinput set-prop 9 319 1
 
 # look for "Natural Scrolling Enabled"
-xinput set-prop 10 284 1
+xinput set-prop 9 292 1
 
 # visual code
 #   when pushing to github have the default browser open for the

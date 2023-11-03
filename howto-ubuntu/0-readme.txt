@@ -17,3 +17,9 @@ this will launch '~/.xsession' at login
 
 * packages:
 sudo apt install mousepad thunar scrot libinput-tools xbacklight
+
+Note. ubuntu 23.10
+if thunar, mousepad or firefox startup takes 10-20 seconds then a timeout is generated and
+can be view in /var/log/syslog
+fix is:
+    systemctl --user mask xdg-desktop-portal-gnome
