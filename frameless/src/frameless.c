@@ -604,9 +604,6 @@ int main(int argc, char **args, char **env) {
       break;
     case KeyPress:
       key_pressed = ev.xkey.keycode;
-      if (ev.xkey.subwindow) {
-        xw = xwin_get_by_window(ev.xkey.subwindow);
-      }
       switch (key_pressed) {
       case KEY_LAUNCH_CONSOLE:
         system(CMD_LAUNCH_CONSOLE);

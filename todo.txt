@@ -1,5 +1,3 @@
-[ ] frameless: resizing while entering a different window
-[x] frameless: new window does not focus when pointer is in youtube screen area
 [ ] review menuq code
 [ ] review stickyo code
 [ ] review mounte code
@@ -28,6 +26,8 @@
 [ ]     stickyo
 [ ] clang-tidy: maxed
 --------------------------------------------------------------
+[x] frameless: resizing while entering a different window
+[x] frameless: new window does not focus when pointer is in youtube screen area
 [x] frameless: "scrot -s" to select screenshot area
 [x] frameless: snapshot: select area
 [x] review clonky code
