@@ -587,16 +587,13 @@ int main(int argc, char **args, char **env) {
       free_window_and_adjust_focus(ev.xmap.window);
       break;
     case EnterNotify:
-      if (is_dragging || is_switching_desktop) {
-        // if dragging then it is resizing, don't change focus
-        // if switching desktop, don't focus on the window that is under the
-        // pointer
-        break;
-      }
-      if (key_pressed) {
-        // when launching a new window and pointer is outside that window a
-        // EnterNotify on the window under the pointer is triggered. ignore that
-        // event if key is pressed. fix.
+      if (is_dragging || is_switching_desktop || key_pressed) {
+        // * if dragging then it is resizing, don't change focus
+        // * if switching desktop, don't focus on the window that is under the
+        //   pointer. focus on previously focused window
+        // * when launching a new window and pointer is outside that window an
+        //   EnterNotify for the window under the pointer is triggered. ignore
+        //   that event if key is pressed assuming it was a lunch. fix.
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);
