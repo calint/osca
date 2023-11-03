@@ -4,11 +4,11 @@
 #define WINDOW_HEIGHT 200
 
 static void command_line(GApplication *app, GApplicationCommandLine *cmdline) {
-  gint argc;
+  gint argc = 0;
   gchar **argv = g_application_command_line_get_arguments(cmdline, &argc);
 
   GtkWidget *window = gtk_application_window_new(GTK_APPLICATION(app));
-  gtk_window_set_title(GTK_WINDOW(window), "stickyo");
+  gtk_window_set_title(GTK_WINDOW(window), "sticky");
   gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
 
   GtkWidget *text_view = gtk_text_view_new();
@@ -43,10 +43,13 @@ static void command_line(GApplication *app, GApplicationCommandLine *cmdline) {
 }
 
 int main(int argc, char **argv) {
-  GtkApplication *app = gtk_application_new("com.github.calint.stickyo",
-                                            G_APPLICATION_HANDLES_COMMAND_LINE);
-  g_signal_connect(app, "command-line", G_CALLBACK(command_line), NULL);
-  int status = g_application_run(G_APPLICATION(app), argc, argv);
-  g_object_unref(app);
+  GtkApplication *application = gtk_application_new(
+      "com.github.calint.osca.stickyo", G_APPLICATION_HANDLES_COMMAND_LINE);
+
+  g_signal_connect(application, "command-line", G_CALLBACK(command_line), NULL);
+
+  int status = g_application_run(G_APPLICATION(application), argc, argv);
+
+  g_object_unref(application);
   return status;
 }
