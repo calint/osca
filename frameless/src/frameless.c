@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// debugging log written to file "~/frameless.log"
+#define FRAMELESS_DEBUG
+#define DEBUG_FILE "frameless.log"
+
 // maximum number of windows
 #define WIN_MAX_COUNT 128
 
@@ -89,10 +93,6 @@
 #define KEY_DESKTOP_UP_ALT 24   // q
 #define KEY_DESKTOP_DOWN 116    // down
 #define KEY_DESKTOP_DOWN_ALT 38 // a
-
-// debugging log written to file "~/frameless.log"
-// #define FRAMELESS_DEBUG
-// #define DEBUG_FILE "frameless.log"
 
 typedef struct xwin {
   Window win;     // x11 window handle
@@ -591,6 +591,12 @@ int main(int argc, char **args, char **env) {
         // if dragging then it is resizing, don't change focus
         // if switching desktop, don't focus on the window that is under the
         // pointer
+        break;
+      }
+      if (key_pressed) {
+        // when launching a new window and pointer is outside that window a
+        // EnterNotify on the window under the pointer is triggered. ignore that
+        // event if key is pressed. fix.
         break;
       }
       xw = xwin_get_by_window(ev.xcrossing.window);

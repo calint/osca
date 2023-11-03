@@ -1,4 +1,5 @@
 [ ] frameless: resizing while entering a different window
+[ ] frameless: new window does not focus when pointer is in youtube screen area
 [ ] review menuq code
 [ ] review stickyo code
 [ ] review mounte code
