@@ -1,7 +1,7 @@
-export OSCA=$HOME/w/osca
-export PATH=$HOME/bin:$OSCA/sh:$PATH
+export OSCA="$HOME/w/osca"
+export PATH="$HOME/bin:$OSCA/sh:$PATH"
 
-export PS1=' :: '
+export PS1=" :: "
 
 # launch frameleses window manager
 alias start-frameless='xinit -- :1 -nolisten tcp vt$XDG_VTNR'

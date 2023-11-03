@@ -1,3 +1,2 @@
 #!/bin/sh
 xterm -e alsamixer &
-
