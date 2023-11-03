@@ -20,9 +20,13 @@ static void command_line(GApplication *app, GApplicationCommandLine *cmdline) {
     gtk_text_buffer_set_text(buffer, argv[1], -1);
   }
 
-  const char *css = "textview {font: 9pt monospace; background-color: "
-                    "yellow; padding: 5pt;} textview text {background: "
-                    "yellow; color: black; caret-color: black;}";
+  const char *css = "textview {"
+                    "  padding: 5pt;"
+                    "  font: 9pt monospace;"
+                    "  background-color: yellow;"
+                    "  color: black;"
+                    "  caret-color: black;"
+                    "}";
 
   GtkCssProvider *css_provider = gtk_css_provider_new();
   gtk_css_provider_load_from_string(css_provider, css);
