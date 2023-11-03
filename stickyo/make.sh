@@ -23,3 +23,4 @@ cat $SRC | gzip | wc
 echo
 ls -o $BIN
 echo
+#valgrind --leak-check=full --show-leak-kinds=all $BIN

@@ -1,3 +1,4 @@
+[ ] frameless: resizing while entering a different window
 [ ] review menuq code
 [ ] review stickyo code
 [ ] review mounte code
@@ -8,9 +9,8 @@
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
-[ ] frameless: resizing while entering a different window
+[ ] stickyo save and remember state of stickies
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
-[ ] frameless: "scrot -s" to select screenshot area
 [ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clonky: valgrind
@@ -26,8 +26,8 @@
 [x]     snap
 [ ]     stickyo
 [ ] clang-tidy: maxed
-[ ] stickyo save and remember state of stickies
 --------------------------------------------------------------
+[x] frameless: "scrot -s" to select screenshot area
 [x] frameless: snapshot: select area
 [x] review clonky code
 [x] review frameless code
