@@ -9,12 +9,12 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   const char *file_name = argv[1];
-  Display *disp = XOpenDisplay(NULL);
-  int scr = DefaultScreen(disp);
-  Window root = DefaultRootWindow(disp);
+  Display *dsp = XOpenDisplay(NULL);
+  int scr = DefaultScreen(dsp);
+  Window root = DefaultRootWindow(dsp);
   cairo_surface_t *surface = cairo_xlib_surface_create(
-      disp, root, DefaultVisual(disp, scr), DisplayWidth(disp, scr),
-      DisplayHeight(disp, scr));
+      dsp, root, DefaultVisual(dsp, scr), DisplayWidth(dsp, scr),
+      DisplayHeight(dsp, scr));
   cairo_surface_write_to_png(surface, file_name);
   cairo_surface_destroy(surface);
   return 0;
