@@ -5,8 +5,8 @@
 #include <string.h>
 
 // debugging log written to file "~/frameless.log"
-#define FRAMELESS_DEBUG
-#define DEBUG_FILE "frameless.log"
+// #define FRAMELESS_DEBUG
+// #define DEBUG_FILE "frameless.log"
 
 // maximum number of windows
 #define WIN_MAX_COUNT 128
