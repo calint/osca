@@ -4,8 +4,8 @@ set -e
 # change to directory of the script
 cd $(dirname "$0")
 
-BIN=stickyo
-SRC=src/stickyo.c
+BIN="stickyo"
+SRC="src/stickyo.c"
 CC="gcc"
 #CC="clang -Weverything"
 CF="-Os -Wfatal-errors"

@@ -30,41 +30,41 @@ contains:
    source:    843    2510   23425
    zipped:     22     132    5621
 
--rwxrwxr-x 1 c 21920 nov  3 19:33 frameless
+-rwxrwxr-x 1 c 21920 nov  3 19:57 frameless
 
 
             lines   words   chars
    source:   1262    4072   34126
    zipped:     29     179    8401
 
--rwxrwxr-x 1 c 37432 nov  3 19:33 clonky
+-rwxrwxr-x 1 c 37432 nov  3 19:57 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      52    2290
 
--rwxrwxr-x 1 c 16808 nov  3 19:33 menuq
+-rwxrwxr-x 1 c 16808 nov  3 19:57 menuq
 
 
             lines   words   chars
-   source:     48     117    1788
-   zipped:      5      20     800
+   source:     52     118    1850
+   zipped:      6      22     793
 
--rwxrwxr-x 1 c 16936 nov  3 19:33 stickyo
+-rwxrwxr-x 1 c 16936 nov  3 19:57 stickyo
 
 
             lines   words   chars
    source:     21      60     596
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16136 nov  3 19:33 snap
+-rwxrwxr-x 1 c 16136 nov  3 19:57 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16864 nov  3 19:33 mounte
+-rwxrwxr-x 1 c 16864 nov  3 19:57 mounte
 
 ```
