@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 
-#define WIDTH 200
-#define HEIGHT 200
+#define WINDOW_WIDTH 200
+#define WINDOW_HEIGHT 200
 
 static void command_line(GApplication *app, GApplicationCommandLine *cmdline) {
   gint argc;
@@ -9,20 +9,19 @@ static void command_line(GApplication *app, GApplicationCommandLine *cmdline) {
 
   GtkWidget *window = gtk_application_window_new(GTK_APPLICATION(app));
   gtk_window_set_title(GTK_WINDOW(window), "stickyo");
-  gtk_window_set_default_size(GTK_WINDOW(window), WIDTH, HEIGHT);
+  gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
 
   GtkWidget *text_view = gtk_text_view_new();
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD_CHAR);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), TRUE);
 
-  // Set the text of the text view
   if (argc > 1) {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
     gtk_text_buffer_set_text(buffer, argv[1], -1);
   }
 
-  const char *css = "textview { font: 9pt monospace; background-color: "
-                    "yellow;padding: 5pt; } textview text { background: "
+  const char *css = "textview {font: 9pt monospace; background-color: "
+                    "yellow; padding: 5pt;} textview text {background: "
                     "yellow; color: black; caret-color: black;}";
 
   GtkCssProvider *css_provider = gtk_css_provider_new();
