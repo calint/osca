@@ -1,6 +1,3 @@
-[x] frameless: snapshot: select area
-[x] review clonky code
-[x] review frameless code
 [ ] review menuq code
 [ ] review stickyo code
 [ ] review mounte code
@@ -30,9 +27,13 @@
 [ ]     stickyo
 [ ] clang-tidy: maxed
 [ ] stickyo save and remember state of stickies
-[ ] stickyo: upgrade to gtk4
-[ ] stickyo: fix deprecations from gtk2 to gtk3
 --------------------------------------------------------------
+[x] frameless: snapshot: select area
+[x] review clonky code
+[x] review frameless code
+[x] stickyo: upgrade to gtk4
+[-] stickyo: fix deprecations from gtk2 to gtk3
+    => upgraded to gtk4
 [x] frameless: debugging turned on with FRAMELESS_DEBUG define
 [x] clonky: display IP addresses
 [x] frameless: remember focused window on each desk
