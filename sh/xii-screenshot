@@ -1,5 +1,5 @@
 #!/bin/sh
-DEST=~/screenshots/
+DEST="$HOME/screenshots/"
 FN="$(date +%Y-%m-%d--%H-%M-%S).png"
 mkdir -p "$DEST" &&
 cd "$DEST" &&
