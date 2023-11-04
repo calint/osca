@@ -5,8 +5,8 @@
 #include <string.h>
 
 // debugging log written to file "~/frameless.log"
-// #define FRAMELESS_DEBUG
-// #define DEBUG_FILE "frameless.log"
+#define FRAMELESS_DEBUG
+#define DEBUG_FILE "frameless.log"
 
 // maximum number of windows
 #define WIN_MAX_COUNT 128
@@ -488,9 +488,10 @@ static void focus_previous_window(void) {
   }
 }
 
-static void free_window_and_adjust_focus(Window w) {
+static void free_window_and_resolve_focus(Window w) {
   xwin *win = winx_find_by_window(w);
   if (!win) {
+    // window not found
     return;
   }
   win->bits = 0; // mark free
@@ -498,31 +499,20 @@ static void free_window_and_adjust_focus(Window w) {
   if (win_focused == win) {
     win_focused = NULL;
   }
-  if (focus_on_only_window_on_desk()) {
-    return;
-  }
-  // focus on window under pointer
+  // try to focus window under pointer
   Window root_return, child_return;
   int root_x, root_y, win_x, win_y;
   unsigned mask_return;
-  if (!XQueryPointer(dpy, root, &root_return, &child_return, &root_x, &root_y,
-                     &win_x, &win_y, &mask_return)) {
-    return;
+  if (XQueryPointer(dpy, root, &root_return, &child_return, &root_x, &root_y,
+                    &win_x, &win_y, &mask_return)) {
+    if (child_return != None) {
+      xwin *xw = xwin_get_by_window(child_return);
+      focus_on_window(xw);
+      return;
+    }
   }
-#ifdef FRAMELESS_DEBUG
-  fprintf(flog, "  root_return=%p  child_return=%p\n", (void *)root_return,
-          (void *)child_return);
-  fflush(flog);
-#endif
-  if (child_return == None) {
-    return;
-  }
-  xwin *xw = xwin_get_by_window(child_return);
-  focus_on_window(xw);
-#ifdef FRAMELESS_DEBUG
-  fprintf(flog, "  focused on %p\n", (void *)xw->win);
-  fflush(flog);
-#endif
+  // if there is just one window on desk focus it
+  focus_on_only_window_on_desk();
 }
 
 static int error_handler(Display *d, XErrorEvent *e) {
@@ -597,32 +587,27 @@ int main(int argc, char **args, char **env) {
       fflush(flog);
 #endif
       break;
-      //     case CreateNotify:
-      //       if (ev.xcreatewindow.parent != root ||
-      //           ev.xcreatewindow.override_redirect) {
-      // #ifdef FRAMELESS_DEBUG
-      //         fprintf(flog, "  ignored\n");
-      //         fflush(flog);
-      // #endif
-      //         break;
-      //       }
-      //       xw = xwin_get_by_window(ev.xcreatewindow.window);
-      //       xwin_center(xw);
-      //       focus_on_window(xw);
-      //       XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True,
-      //       ButtonPressMask,
-      //                   GrabModeAsync, GrabModeAsync, None, None);
-      //       XSelectInput(dpy, xw->win, EnterWindowMask);
-      //       break;
-      //     case DestroyNotify:
-      //       if (ev.xcreatewindow.parent != root ||
-      //           ev.xcreatewindow.override_redirect) {
-      //         break;
-      //       }
-      //       free_window_and_adjust_focus(ev.xdestroywindow.window);
-      //       break;
+    case CreateNotify:
+#ifdef FRAMELESS_DEBUG
+      fprintf(flog, "  parent=%p  win=%p  parent_is_root=%s\n",
+              (void *)ev.xcreatewindow.parent, (void *)ev.xcreatewindow.window,
+              ev.xcreatewindow.parent == root ? "yes" : "no");
+      fflush(flog);
+#endif
+      break;
+    case DestroyNotify:
+#ifdef FRAMELESS_DEBUG
+      fprintf(flog, "  win=%p\n", (void *)ev.xdestroywindow.window);
+      fflush(flog);
+#endif
+      break;
     case MapNotify:
-      if (ev.xmap.window == root || ev.xmap.window == 0 ||
+#ifdef FRAMELESS_DEBUG
+      fprintf(flog, "  win=%p  is_root=%s\n", (void *)ev.xmap.window,
+              ev.xmap.window == root ? "yes" : "no");
+      fflush(flog);
+#endif
+      if (ev.xmap.window == root || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
@@ -644,10 +629,9 @@ int main(int argc, char **args, char **env) {
         fprintf(flog, "  ignored\n");
         fflush(flog);
 #endif
-
         break;
       }
-      free_window_and_adjust_focus(ev.xmap.window);
+      free_window_and_resolve_focus(ev.xmap.window);
       break;
     case EnterNotify:
       if (is_dragging || is_switching_desktop || key_pressed) {
