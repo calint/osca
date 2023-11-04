@@ -2,6 +2,11 @@
 set -e
 cd $(dirname "$0")
 
+#!/bin/sh
+set -e
+cd $(dirname "$0")
+
+# install some basic text editors and sudo
 pacman -S --noconfirm vi nano sudo
 
 # create user 'c' and home directory
