@@ -1,2 +1,5 @@
 #!/bin/sh
-scrot -s "$HOME/screenshots/$(date '+%Y-%m-%d--%H-%M-%S').png"
+DEST="$HOME/screenshots"
+FILE="$(date +%Y-%m-%d--%H-%M-%S).png"
+mkdir -p "$DEST" &&
+scrot -s "$DEST/$FILE"

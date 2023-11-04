@@ -1,6 +1,6 @@
 #!/bin/sh
-DEST="$HOME/screenshots/"
-FN="$(date +%Y-%m-%d--%H-%M-%S).png"
+DEST="$HOME/screenshots"
+FILE="$(date +%Y-%m-%d--%H-%M-%S).png"
 mkdir -p "$DEST" &&
 cd "$DEST" &&
-"$OSCA/snap/snap" "$FN"
+"$OSCA/snap/snap" "$FILE"
