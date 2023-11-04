@@ -6,27 +6,26 @@ cd $(dirname "$0")
 
 source ~/.bashrc
 
-# compiler
-sudo pacman -S --noconfirm gcc
-
 # X11
-sudo pacman -S --noconfirm xorg xorg-xinit xterm
+sudo pacman -S --noconfirm xorg xorg-xinit
 
 # clonky dependencies
-sudo pacman -S --noconfirm libxft acpi sysstat
+sudo pacman -S --noconfirm libxft acpi sysstat ttf-dejavu
 
 # stickyo dependencies
-sudo pacman -S --noconfirm pkg-config gtk3
+sudo pacman -S --noconfirm pkg-config gtk4
+
+# compiler
+sudo pacman -S --noconfirm gcc
 
 # compile all
 ~/w/osca/make-all.sh
 
 # frameless launched applications
-sudo pacman -S --noconfirm firefox thunar mousepad alsa-utils rhythmbox
+sudo pacman -S --noconfirm xterm thunar mousepad rhythmbox alsa-utils firefox scrot
 
-# utils
-sudo pacman -S --noconfirm wget htop feh scrot pkgfile ttf-dejavu
-# faenza-icon-theme 
+# miscellaneous utils
+sudo pacman -S --noconfirm wget htop feh pkgfile
 
 echo
 echo start X11 with 'start-frameless'

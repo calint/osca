@@ -2,5 +2,6 @@
 DEST="$HOME/screenshots"
 FILE="$(date +%Y-%m-%d--%H-%M-%S).png"
 mkdir -p "$DEST" &&
-cd "$DEST" &&
-"$OSCA/snap/snap" "$FILE"
+scrot "$DEST/$FILE"
+#cd "$DEST" &&
+#"$OSCA/snap/snap" "$FILE"
