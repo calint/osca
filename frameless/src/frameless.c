@@ -5,8 +5,8 @@
 #include <string.h>
 
 // debugging log written to file "~/frameless.log"
-#define FRAMELESS_DEBUG
-#define DEBUG_FILE "frameless.log"
+// #define FRAMELESS_DEBUG
+// #define DEBUG_FILE "frameless.log"
 
 // maximum number of windows
 #define WIN_MAX_COUNT 128
@@ -587,26 +587,7 @@ int main(int argc, char **args, char **env) {
       fflush(flog);
 #endif
       break;
-    case CreateNotify:
-#ifdef FRAMELESS_DEBUG
-      fprintf(flog, "  parent=%p  win=%p  parent_is_root=%s\n",
-              (void *)ev.xcreatewindow.parent, (void *)ev.xcreatewindow.window,
-              ev.xcreatewindow.parent == root ? "yes" : "no");
-      fflush(flog);
-#endif
-      break;
-    case DestroyNotify:
-#ifdef FRAMELESS_DEBUG
-      fprintf(flog, "  win=%p\n", (void *)ev.xdestroywindow.window);
-      fflush(flog);
-#endif
-      break;
     case MapNotify:
-#ifdef FRAMELESS_DEBUG
-      fprintf(flog, "  win=%p  is_root=%s\n", (void *)ev.xmap.window,
-              ev.xmap.window == root ? "yes" : "no");
-      fflush(flog);
-#endif
       if (ev.xmap.window == root || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
@@ -623,7 +604,7 @@ int main(int argc, char **args, char **env) {
       XSelectInput(dpy, xw->win, EnterWindowMask);
       break;
     case UnmapNotify:
-      if (ev.xmap.window == root || ev.xmap.window == 0 ||
+      if (ev.xmap.window == root || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
