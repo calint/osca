@@ -530,10 +530,13 @@ static int error_handler(Display *d, XErrorEvent *e) {
   char buf[1024] = "";
   XGetErrorText(d, e->error_code, buf, sizeof(buf));
   fprintf(flog, "!!! x11 error\n");
-  fprintf(flog, "!!!        text: %s\n", buf);
-  fprintf(flog, "!!!        type: %d\n", e->type);
-  fprintf(flog, "!!! resource id: %p\n", (void *)e->resourceid);
-  fprintf(flog, "!!!  error code: %d\n", (unsigned)e->error_code);
+  fprintf(flog, "!!!         text: %s\n", buf);
+  fprintf(flog, "!!!       serial: %lu\n", e->serial);
+  fprintf(flog, "!!!         type: %d\n", e->type);
+  fprintf(flog, "!!!   error code: %d\n", (unsigned)e->error_code);
+  fprintf(flog, "!!! request code: %d\n", e->request_code);
+  fprintf(flog, "!!!   minor code: %d\n", e->minor_code);
+  fprintf(flog, "!!!  resource id: %p\n", (void *)e->resourceid);
   fflush(flog);
 #endif
   return 0;
@@ -594,9 +597,37 @@ int main(int argc, char **args, char **env) {
       fflush(flog);
 #endif
       break;
+      //     case CreateNotify:
+      //       if (ev.xcreatewindow.parent != root ||
+      //           ev.xcreatewindow.override_redirect) {
+      // #ifdef FRAMELESS_DEBUG
+      //         fprintf(flog, "  ignored\n");
+      //         fflush(flog);
+      // #endif
+      //         break;
+      //       }
+      //       xw = xwin_get_by_window(ev.xcreatewindow.window);
+      //       xwin_center(xw);
+      //       focus_on_window(xw);
+      //       XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True,
+      //       ButtonPressMask,
+      //                   GrabModeAsync, GrabModeAsync, None, None);
+      //       XSelectInput(dpy, xw->win, EnterWindowMask);
+      //       break;
+      //     case DestroyNotify:
+      //       if (ev.xcreatewindow.parent != root ||
+      //           ev.xcreatewindow.override_redirect) {
+      //         break;
+      //       }
+      //       free_window_and_adjust_focus(ev.xdestroywindow.window);
+      //       break;
     case MapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
           ev.xmap.override_redirect) {
+#ifdef FRAMELESS_DEBUG
+        fprintf(flog, "  ignored\n");
+        fflush(flog);
+#endif
         break;
       }
       xw = xwin_get_by_window(ev.xmap.window);
@@ -609,6 +640,11 @@ int main(int argc, char **args, char **env) {
     case UnmapNotify:
       if (ev.xmap.window == root || ev.xmap.window == 0 ||
           ev.xmap.override_redirect) {
+#ifdef FRAMELESS_DEBUG
+        fprintf(flog, "  ignored\n");
+        fflush(flog);
+#endif
+
         break;
       }
       free_window_and_adjust_focus(ev.xmap.window);
@@ -617,12 +653,12 @@ int main(int argc, char **args, char **env) {
       if (is_dragging || is_switching_desktop || key_pressed) {
         // * if dragging then it is resizing, don't change focus
         // * if switching desktop, don't focus on the window that is under the
-        //   pointer. focus on previously focused window
+        //   pointer. focus on previously focused window on that desktop.
         // * when launching a new window and pointer is outside that window an
         //   EnterNotify for the window under the pointer is triggered. ignore
-        //   that event if key is pressed assuming it was a launch. fix.
+        //   that event if key is pressed (assuming it was a launch, fix).
 #ifdef FRAMELESS_DEBUG
-        fprintf(flog, "  event ignored\n");
+        fprintf(flog, "  ignored\n");
         fflush(flog);
 #endif
         break;

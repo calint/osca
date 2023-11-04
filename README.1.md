@@ -6,11 +6,14 @@ intention:
 * a lightweight desktop environment for X11
 * targets archlinux minimal installation
 * runs on ubuntu
-* simplicity in source and extensions
 * a somewhat tongue-in-cheek approach to classics
+* multiple desktops
+* left hand on the keyboard, right hand on the mouse or touchpad
+* intuitive move, resize, maximize windows without frames
+* simplicity in source and extensions
 
 contains:
-* frameless: one source file window manager
+* frameless: window manager, one source file
 * clonky: system overview
 * snap: screenshot
 * stickyo: sticky notes

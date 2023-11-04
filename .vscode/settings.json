@@ -7,6 +7,9 @@
         "netdb.h": "c",
         "time.h": "c",
         "keysym.h": "c",
-        "keysymdef.h": "c"
+        "keysymdef.h": "c",
+        "cursorfont.h": "c",
+        "xlib.h": "c",
+        "x.h": "c"
     }
 }
