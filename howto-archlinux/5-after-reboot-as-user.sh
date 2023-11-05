@@ -2,6 +2,8 @@
 set -e
 cd $(dirname "$0")
 
+sudo pacman -S --noconfirm dconf
+
 ../init-user-home.sh
 
 source ~/.bashrc
