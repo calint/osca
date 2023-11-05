@@ -25,7 +25,7 @@
 #define WIN_BORDER_INACTIVE_COLOR 0x00000000
 
 // minimum width and height
-#define XWIN_MIN_WIDTH_HEIGHT 4
+#define WIN_MIN_WIDTH_HEIGHT 4
 
 // pixels to 'bump' a window
 #define WIN_BUMP_PX 200
@@ -250,8 +250,8 @@ static void xwin_thinner(xwin *this) {
   xwin_read_geom(this);
   unsigned wi_prv = this->wi;
   this->wi = ((this->wi << 1) + this->wi) >> 2;
-  if (this->wi < XWIN_MIN_WIDTH_HEIGHT) {
-    this->wi = XWIN_MIN_WIDTH_HEIGHT;
+  if (this->wi < WIN_MIN_WIDTH_HEIGHT) {
+    this->wi = WIN_MIN_WIDTH_HEIGHT;
   }
   this->x = this->x - (int)((this->wi - wi_prv) >> 1);
   xwin_set_geom(this);
@@ -830,11 +830,11 @@ int main(int argc, char **args, char **env) {
       }
       if (dragging_button == 3) {
         // right mouse button is pressed
-        if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
-          new_wi = XWIN_MIN_WIDTH_HEIGHT;
+        if (new_wi < WIN_MIN_WIDTH_HEIGHT) {
+          new_wi = WIN_MIN_WIDTH_HEIGHT;
         }
-        if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
-          new_hi = XWIN_MIN_WIDTH_HEIGHT;
+        if (new_hi < WIN_MIN_WIDTH_HEIGHT) {
+          new_hi = WIN_MIN_WIDTH_HEIGHT;
         }
         xw->wi = (unsigned)new_wi;
         xw->hi = (unsigned)new_hi;
@@ -848,11 +848,11 @@ int main(int argc, char **args, char **env) {
         xwin_set_geom(xw);
         break;
       case KEY_WINDOW_RESIZE:
-        if (new_wi < XWIN_MIN_WIDTH_HEIGHT) {
-          new_wi = XWIN_MIN_WIDTH_HEIGHT;
+        if (new_wi < WIN_MIN_WIDTH_HEIGHT) {
+          new_wi = WIN_MIN_WIDTH_HEIGHT;
         }
-        if (new_hi < XWIN_MIN_WIDTH_HEIGHT) {
-          new_hi = XWIN_MIN_WIDTH_HEIGHT;
+        if (new_hi < WIN_MIN_WIDTH_HEIGHT) {
+          new_hi = WIN_MIN_WIDTH_HEIGHT;
         }
         xw->wi = (unsigned)new_wi;
         xw->hi = (unsigned)new_hi;
