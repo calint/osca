@@ -24,11 +24,11 @@ sudo pacman -S --noconfirm gcc
 ~/w/osca/make-all.sh
 
 # frameless launched applications
-sudo pacman -S --noconfirm xterm thunar mousepad rhythmbox alsa-utils firefox scrot
+sudo pacman -S --noconfirm xterm thunar tumbler mousepad rhythmbox alsa-utils firefox scrot
 
 # miscellaneous utils
 sudo pacman -S --noconfirm wget htop feh pkgfile
 
 echo
-echo start X11 with 'start-frameless'
+echo log-out, log-in and start X11 with 'start-frameless'
 echo
