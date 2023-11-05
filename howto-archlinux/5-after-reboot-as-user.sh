@@ -30,5 +30,5 @@ sudo pacman -S --noconfirm xterm thunar tumbler mousepad rhythmbox alsa-utils fi
 sudo pacman -S --noconfirm wget htop feh pkgfile
 
 echo
-echo log-out, log-in and start X11 with 'start-frameless'
+echo log-out, log-in and start X11 with \'start-frameless\'
 echo
