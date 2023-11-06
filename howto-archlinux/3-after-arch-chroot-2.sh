@@ -15,4 +15,5 @@ passwd c
 
 nano /etc/sudoers
 
+# add user 'c' to group 'wheel'
 gpasswd -a c wheel
