@@ -1,0 +1,5 @@
+# info about active wifi connection
+nmcli con show --active | grep wifi | awk '{print $1, $3, $4}'
+
+# to display errors only (-p3)
+journalctl -p3 -o cat -n 15 --no-pager

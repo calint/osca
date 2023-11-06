@@ -9,7 +9,7 @@ intention:
 * a somewhat tongue-in-cheek approach to classics
 * multiple desktops
 * left hand on the keyboard, right hand on the mouse or touchpad
-* intuitive move, resize, maximize windows without frames
+* intuitive move, resize, maximize, close windows without frames
 * simplicity in source and extensions
 
 contains:
