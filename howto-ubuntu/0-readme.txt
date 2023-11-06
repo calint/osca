@@ -6,6 +6,11 @@ notes on enabling frameless in ubuntu 23.10
     systemctl --user mask xdg-desktop-portal-gnome
     systemctl --user stop xdg-desktop-portal-gnome
 
+    :: ll .config/systemd/user/
+    total 0
+    lrwxrwxrwx 1 c c 9 nov  6 13:13 ubuntu-report.service -> /dev/null
+    lrwxrwxrwx 1 c c 9 nov  6 11:21 xdg-desktop-portal-gnome.service -> /dev/null
+
 * to set up user home see 'init-user-home.sh'
 
 * to enable option on login screen add file: /usr/share/xsessions/xsession.desktop
