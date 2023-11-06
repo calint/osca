@@ -2,7 +2,9 @@ notes on enabling frameless in ubuntu 23.10
 
 * if thunar, mousepad and firefox startup takes 10-20 seconds then a timeout
   is generated and can be view in /var/log/syslog
-  fix is: systemctl --user mask xdg-desktop-portal-gnome
+  fix is:
+    systemctl --user mask xdg-desktop-portal-gnome
+    systemctl --user stop xdg-desktop-portal-gnome
 
 * to set up user home see 'init-user-home.sh'
 
