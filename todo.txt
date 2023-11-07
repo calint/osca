@@ -1,3 +1,5 @@
+[ ] frameless: consider hiding windows from other desktops instead of "folding"
+    them to the right
 [ ] osca: xii volume and screen brightness controls
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
