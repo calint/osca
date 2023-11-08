@@ -4,7 +4,8 @@
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
 [ ] frameless: capture XF86... keys
-[ ] stickyo save and remember state of stickies
+[ ] stickyo: use of resources is exuberant (35 MB  res - shared)
+[ ] stickyo: save and remember state of stickies
 [ ] frameless: capture button 3 and swipe up / down motion to switch desktop
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] review menuq code
