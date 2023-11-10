@@ -15,3 +15,5 @@ journalctl -p3 -o cat -n 15 --no-pager
 #           shown. If a range is specified, all messages within the range are
 #           shown, including both the start and the end value of the range.
 #           This will add "PRIORITY=" matches for the specified priorities.
+
+TAG=$(date "+%Y-%m-%d--%H-%M") && git tag $TAG && git push origin $TAG
