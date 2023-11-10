@@ -412,7 +412,7 @@ static void render_io_stat(void) {
 }
 
 static void render_syslog(void) {
-  FILE *file = popen("journalctl -o cat -n 15 --no-pager", "r");
+  FILE *file = popen("journalctl -p6 -o cat -n 15 --no-pager", "r");
   if (!file) {
     return;
   }
