@@ -482,8 +482,8 @@ static void render_cpu_throttles(void) {
   if (ncpus != 1) {
     strb_p_char(&sb, 's');
   }
-  if (ncpus > 4) {
-    // if more than 4 cpus display throttles on new line
+  if (ncpus > 2) {
+    // if more than 2 cpus display throttles on new line
     pl(sb.chars);
     // puts(sb.chars);
     strb_clear(&sb);
