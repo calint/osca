@@ -27,6 +27,7 @@
 [x]     snap
 [ ]     stickyo
 [ ] clang-tidy: maxed
+[ ] frameless: different shades on desktop depending on id
 --------------------------------------------------------------
 [x] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
