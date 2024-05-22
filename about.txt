@@ -30,7 +30,8 @@
 
 
 # additional ubuntu packages for osca
-sudo apt-get install scrot leafpad alsamixer vlc thunar alsa-utils chromium-browser xbacklight
+sudo apt-get install scrot leafpad alsamixer vlc thunar alsa-utils xbacklight
+sudo snap install brave
 
 # enable alsamixer
 sudo addgroup `id -un` audio
