@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Frameless Session
+Comment=Use this session to run Frameless as your desktop environment
+Exec=/etc/X11/Xsession
+Icon=
+Type=Application
+DesktopNames=Frameless

@@ -30,7 +30,7 @@
 
 
 # additional ubuntu packages for osca
-sudo apt-get install scrot leafpad alsamixer vlc thunar alsa-utils xbacklight
+sudo apt-get install scrot mousepad alsamixergui vlc thunar alsa-utils xbacklight
 sudo snap install brave
 
 # enable alsamixer
