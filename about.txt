@@ -53,3 +53,9 @@ sudo apt-get install qemu wine
 
 # enable qemu kvm
 sudo adduser `id -un` libvirtd
+
+# notes
+# 1. to enable Frameless session at login to Xorg:
+#    copy 'usr/share/xsessions/frameless.desktop' to '/usr/share/xsessions/'
+# 2. wifi module rtl8723be needs configuration to resolve connectivity issues
+#    copy 'etc/modprobe.d/rtl8723be.conf' to '/etc/modprobe.d/'
