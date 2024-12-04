@@ -5,7 +5,9 @@ set -e
 sudo apt update
 sudo apt upgrade
 
-# install frameless
+echo
+echo install frameless
+echo
 mkdir w
 cd w
 git clone https://github.com/calint/osca
@@ -18,4 +20,16 @@ cd osca/
 sudo cp -a usr/share/xsessions/frameless.desktop /usr/share/xsessions/
 ./init-user-home.sh
 
-# logout and login to xsession frameless
+echo
+echo logout and login to xsession frameless
+echo open terminal: key Super + c
+echo xinput to find touchpad
+echo xinput list-props x to find properties:
+echo  - "Tapping Enabled"
+echo  - "Natural Scrolling Enabled"
+echo xinput set-prop x y 1
+echo  save in script and run at login
+echo example for HP Stream Notebook PC 11
+echo xinput set-prop 9 306 1
+echo xinput set-prop 9 314 1
+echo
