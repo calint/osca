@@ -23,7 +23,7 @@ struct dc {
 };
 
 /*give*/ struct dc *dc_new(void) {
-  struct dc *self = calloc(sizeof(struct dc), 1);
+  struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
   if (!self->dpy) {
