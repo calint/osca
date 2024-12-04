@@ -2,6 +2,12 @@
 * install using profile Xorg
 * run install-packages.sh
 * install yay
+```
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+yay --version
+```
 * install brave browser: `yay -S brave-bin`
 * `git clone http://github.com/calint/osca` in ~/w/
 * `cd ~/w/osca && ./make-all.sh && ./init-user-home.sh`
