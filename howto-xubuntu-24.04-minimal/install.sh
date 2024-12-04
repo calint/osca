@@ -22,7 +22,10 @@ sudo cp -a usr/share/xsessions/frameless.desktop /usr/share/xsessions/
 
 echo
 echo logout and login to xsession frameless
-echo open terminal: key Super + c
+echo
+echo to configure touchpad see 1-after-login.sh
+echo
+echo or open terminal: key Super + c
 echo xinput to find touchpad
 echo xinput list-props x to find properties:
 echo  - "Tapping Enabled"
@@ -30,6 +33,6 @@ echo  - "Natural Scrolling Enabled"
 echo xinput set-prop x y 1
 echo  save in script and run at login
 echo example for HP Stream Notebook PC 11
-echo xinput set-prop 9 306 1
-echo xinput set-prop 9 314 1
+echo xinput set-prop 9 305 1
+echo xinput set-prop 9 313 1
 echo
