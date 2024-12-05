@@ -33,41 +33,41 @@ contains:
    source:    875    2666   24686
    zipped:     20     142    5945
 
--rwxrwxr-x 1 c 21960 nov 10 12:52 frameless
+-rwxrwxr-x 1 c 21960 Dec  5 15:45 frameless
 
 
             lines   words   chars
-   source:   1262    4073   34130
-   zipped:     33     181    8404
+   source:   1263    4076   34152
+   zipped:     37     180    8403
 
--rwxrwxr-x 1 c 37432 nov 10 12:52 clonky
+-rwxrwxr-x 1 c 37440 Dec  5 15:45 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      52    2290
 
--rwxrwxr-x 1 c 16808 nov 10 12:52 menuq
+-rwxrwxr-x 1 c 16808 Dec  5 15:45 menuq
 
 
             lines   words   chars
    source:     55     121    1856
    zipped:      1      15     802
 
--rwxrwxr-x 1 c 16936 nov 10 12:52 stickyo
+-rwxrwxr-x 1 c 16936 Dec  5 15:45 stickyo
 
 
             lines   words   chars
    source:     21      60     589
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16136 nov 10 12:52 snap
+-rwxrwxr-x 1 c 16136 Dec  5 15:45 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      24    1141
 
--rwxrwxr-x 1 c 16864 nov 10 12:52 mounte
+-rwxrwxr-x 1 c 16864 Dec  5 15:45 mounte
 
 ```
