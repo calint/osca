@@ -1,27 +1,12 @@
 #!/bin/sh
 set -e
 
-# update installation
-sudo apt update
-sudo apt upgrade
-
-echo
-echo install frameless
-echo
-
-sudo apt install git
-
-mkdir w
-cd w
-
-git clone https://github.com/calint/osca
-
 sudo apt install gcc libx11-dev libxft-dev gnome-devel dconf-cli scrot \
                  mousepad alsamixergui dconf-cli thunar feh alsa-utils \
                  xbacklight vlc rhythmbox
 snap install brave
 
-cd osca/
+cd ~/w/osca/
 ./make-all.sh
 ./init-user-home.sh
 sudo cp -a usr/share/xsessions/frameless.desktop /usr/share/xsessions/
@@ -29,7 +14,7 @@ sudo cp -a usr/share/xsessions/frameless.desktop /usr/share/xsessions/
 echo
 echo logout and login to xsession frameless
 echo
-echo to configure touchpad see 1-after-login.sh
+echo to configure touchpad see config-touchpad.sh
 echo
 echo or open terminal: key Super + c
 echo xinput to find touchpad x
