@@ -19,7 +19,3 @@ xinput set-prop $TOUCH_ID $PROP_ID 1
 PROP_ID=$(xinput list-props $TOUCH_ID | grep 'Natural Scrolling Enabled (' | grep -oP '\(\K\d+(?=\))')
 echo "Set property Natural Scrolling Enabled ($PROP_ID) to 1"
 xinput set-prop $TOUCH_ID $PROP_ID 1
-
-# visual code
-#   when pushing to github have the default browser open for the
-#   interaction between visual code and github to work
