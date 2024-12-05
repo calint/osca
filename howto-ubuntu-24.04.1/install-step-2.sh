@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-sudo apt install gcc libx11-dev libxft-dev gnome-devel dconf-cli scrot \
+sudo apt -y install gcc libx11-dev libxft-dev gnome-devel dconf-cli scrot \
                  mousepad alsamixergui dconf-cli thunar feh alsa-utils \
                  xbacklight vlc rhythmbox xterm
 snap install brave
