@@ -2,6 +2,7 @@
 # enabling settings on touchpad
 # 'xinput' to list devices
 # 'xinput list-props [id]' to list properties
+set -e
 
 TOUCH_ID=$(xinput | grep -E "Touchpad|Synaptics" | awk -F'id=' '{print $2}' | awk '{print $1}')
 echo Touchpad device ID: $TOUCH_ID

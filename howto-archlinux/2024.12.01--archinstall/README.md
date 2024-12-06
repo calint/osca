@@ -1,4 +1,5 @@
 # notes
+* on HP Stream 11: at iwctl power off and on the device for scan to work
 * install using profile Xorg
 * run `install-packages.sh`
 * install yay
