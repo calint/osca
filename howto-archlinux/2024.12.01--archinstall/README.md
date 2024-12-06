@@ -1,5 +1,5 @@
 # notes
-* on HP Stream Notebook PC 11 at install: at iwctl power off and on the device for scan to work
+* on HP Stream Notebook PC 11 at install at iwctl power off and on the device for scan to work
 * install using profile Xorg with pipewire sound
 * run `install-step-1.sh`
 * run `install-step-2.sh`
@@ -26,7 +26,8 @@ yay --version
 xinput set-prop 9 306 1
 xinput set-prop 9 314 1
 ```
-* to configure bluetooth speaker:
+
+## configure bluetooth speaker
 ```
 bluetoothctl
 [bluetooth]# power on
