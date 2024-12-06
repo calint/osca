@@ -37,22 +37,19 @@ int strb_p_char(strb *self, char ch) {
 inline int strb_p_long(strb *self, const long long num) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%lld", num);
-  strb_p(self, buf);
-  return 0;
+  return strb_p(self, buf);
 }
 
 inline int strb_p_int(strb *self, const int num) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%d", num);
-  strb_p(self, buf);
-  return 0;
+  return strb_p(self, buf);
 }
 
 inline int strb_p_int_with_width(strb *self, const int num, const int width) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%*d", width, num);
-  strb_p(self, buf);
-  return 0;
+  return strb_p(self, buf);
 }
 
 int strb_p_nbytes(strb *self, long long nbytes) {
