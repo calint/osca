@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-sudo pacman --needed -S nano less libxft gtk4 thunar tumbler mousepad \
+sudo pacman --needed -S nano less xterm libxft gtk4 thunar tumbler mousepad \
                         rhythmbox alsa-utils xorg-xsetroot scrot xorg-xinput \
                         ttf-dejavu htop feh
 
