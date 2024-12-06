@@ -3,7 +3,7 @@
 * install using profile Xorg with pipewire sound
 * run `install-step-1.sh`
 * run `install-step-2.sh`
-* install `yay`
+* install `yay`:
 ```
 git clone https://aur.archlinux.org/yay.git
 cd yay
@@ -20,7 +20,7 @@ yay --version
   - "Natural Scrolling Enabled"
 * `xinput set-prop x y 1`
   save in script and run at login
-* example for: HP Stream Notebook PC 11
+* example for HP Stream Notebook PC 11:
 ```
 #/bin/sh
 xinput set-prop 9 306 1
@@ -28,6 +28,7 @@ xinput set-prop 9 314 1
 ```
 
 ## configure bluetooth speaker
+from `https://wiki.archlinux.org/title/Bluetooth_headset`
 ```
 bluetoothctl
 [bluetooth]# power on
