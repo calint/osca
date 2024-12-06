@@ -6,5 +6,5 @@ sudo pacman --needed -S nano less xterm libxft gtk4 thunar tumbler mousepad \
                         ttf-dejavu htop feh
 
 cd ~/w/osca
-./make-all.sh
 ./init-user-home.sh
+./make-all.sh

@@ -1,8 +1,9 @@
 # notes
-* on HP Stream 11: at iwctl power off and on the device for scan to work
+* on HP Stream Notebook PC 11 at install: at iwctl power off and on the device for scan to work
 * install using profile Xorg
-* run `install-packages.sh`
-* install yay
+* run `install-step-1.sh`
+* run `install-step-2.sh`
+* install `yay`
 ```
 git clone https://aur.archlinux.org/yay.git
 cd yay
@@ -10,10 +11,9 @@ makepkg -si
 yay --version
 ```
 * install brave browser: `yay -S brave-bin`
-* `git clone http://github.com/calint/osca` in `~/w/`
-* `cd ~/w/osca && ./make-all.sh && ./init-user-home.sh`
 * logout login
 * run: `start-frameless`
+* to configure touchpad see `config-touchpad.sh` or:
 * open terminal: `Super + c`
 * `xinput` to find touchpad, `xinput list-props x` to find properties:
   - "Tapping Enabled"
