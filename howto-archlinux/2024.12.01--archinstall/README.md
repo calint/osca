@@ -48,6 +48,7 @@ bluetoothctl
 
 ### install media on usb does not boot
 * disable secure boot in bios
+* legacy mode can be disabled
 
 ### at install in `iwctl` cannot find networks with  `scan`
 * power off and on the device
