@@ -1,5 +1,4 @@
 # notes
-* on HP Stream Notebook PC 11: disable secure boot in bios to boot the installation from usb
 * connect wifi using `https://wiki.archlinux.org/title/Iwd`
 * install using profile `Xorg` with `pipewire` sound
 * run `install-step-1.sh`
@@ -47,8 +46,11 @@ bluetoothctl
 
 ## HP Stream Notebook PC 11
 
+### install media on usb does not boot
+* disable secure boot in bios
+
 ### at install in `iwctl` cannot find networks with  `scan`
-* power off and on the device for scan to work
+* power off and on the device
 ```
 device wlan0 set-property Powered off
 device wlan0 set-property Powered on
