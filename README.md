@@ -1,6 +1,6 @@
 # osca
 
-experimental minimal X11 desktop environment
+minimal X11 desktop environment
 
 intention:
 * a lightweight desktop environment for X11
@@ -27,49 +27,50 @@ contains:
 ![screenshot 2](screenshots/frameless-ubuntu-1.png)
 
 
-![screenshot 2](screenshots/2024-12-07--09-02-22.png)
+![screenshot 3](screenshots/2024-12-07--09-02-22.png)
+
 
 ```
 
             lines   words   chars
    source:    875    2666   24686
-   zipped:     20     142    5945
+   zipped:     20     146    5945
 
--rwxrwxr-x 1 c 21960 Dec  5 15:45 frameless
+-rwxr-xr-x 1 c 17544 Dec  7 09:13 frameless
 
 
             lines   words   chars
-   source:   1263    4076   34152
-   zipped:     37     180    8403
+   source:   1260    4073   34137
+   zipped:     33     182    8401
 
--rwxrwxr-x 1 c 37440 Dec  5 15:45 clonky
+-rwxr-xr-x 1 c 37296 Dec  7 09:13 clonky
 
 
             lines   words   chars
    source:    210     754    6718
-   zipped:      3      52    2290
+   zipped:      3      54    2290
 
--rwxrwxr-x 1 c 16808 Dec  5 15:45 menuq
+-rwxr-xr-x 1 c 16464 Dec  7 09:13 menuq
 
 
             lines   words   chars
    source:     55     121    1856
    zipped:      1      15     802
 
--rwxrwxr-x 1 c 16936 Dec  5 15:45 stickyo
+-rwxr-xr-x 1 c 16576 Dec  7 09:13 stickyo
 
 
             lines   words   chars
    source:     21      60     589
    zipped:      2       9     329
 
--rwxrwxr-x 1 c 16136 Dec  5 15:45 snap
+-rwxr-xr-x 1 c 15656 Dec  7 09:13 snap
 
 
              lines  words   chars
    source:    118     344    3206
-   zipped:      6      24    1141
+   zipped:      6      27    1141
 
--rwxrwxr-x 1 c 16864 Dec  5 15:45 mounte
+-rwxr-xr-x 1 c 16488 Dec  7 09:13 mounte
 
 ```
