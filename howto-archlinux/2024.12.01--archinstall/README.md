@@ -57,8 +57,8 @@ device wlan0 set-property Powered off
 device wlan0 set-property Powered on
 ```
 ### wifi connectivity issues with disconnects
-* try `iwconfig wlan0 power off` to turn of power saving
 * try `/etc/modprobe.d/rtl8723be.conf`:
 ```
+# disables power saving functions
 options rtl8723be aspm=0 ips=0 fwlps=0
 ```
