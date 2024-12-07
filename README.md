@@ -15,9 +15,9 @@ intention:
 contains:
 * frameless: window manager, one source file
 * clonky: system overview
+* menuq: binary launcher
 * snap: screenshot
 * stickyo: sticky notes
-* menuq: binary launcher
 * mounte: automatic mounter of USB
 
 
@@ -26,6 +26,8 @@ contains:
 
 ![screenshot 2](screenshots/frameless-ubuntu-1.png)
 
+
+![screenshot 2](screenshots/2024-12-07--09-02-22.png)
 
 ```
 
