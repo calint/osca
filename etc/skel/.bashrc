@@ -34,4 +34,4 @@ alias pkf='pacman -Ql'
 # find which package a file is in
 alias pkfq='pacman -F'
 # updates the database of mapping file to package
-alias pkfu='sudo pacmam -Fy'
+alias pkfu='sudo pacman -Fy'
