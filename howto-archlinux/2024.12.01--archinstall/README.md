@@ -1,7 +1,6 @@
 # notes
 * on HP Stream Notebook PC 11: disable secure boot in bios to boot the installation from usb
 * connect wifi using `https://wiki.archlinux.org/title/Iwd`
-  - note: on HP Stream Notebook PC 11 at install at iwctl: power off and on the device for scan to work `device wlan0 set-property Powered off` and `device wlan0 set-property Powered on`
 * install using profile `Xorg` with `pipewire` sound
 * run `install-step-1.sh`
 * run `install-step-2.sh`
@@ -42,4 +41,21 @@ bluetoothctl
 [bluetooth]# trust <device id>
 [bluetooth]# scan off
 [bluetooth]# exit
+```
+
+# troubleshooting
+
+## HP Stream Notebook PC 11
+
+### at install in `iwctl` cannot find networks with  `scan`
+* power off and on the device for scan to work
+```
+device wlan0 set-property Powered off
+device wlan0 set-property Powered on
+```
+### wifi connectivity issues with disconnects
+* try `iwconfig wlan0 power off` to turn of power saving
+* try `/etc/modprobe.d/rtl8723be.conf`:
+```
+options rtl8723be aspm=0 ips=0 fwlps=0
 ```
