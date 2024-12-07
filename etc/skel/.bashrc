@@ -25,13 +25,13 @@ alias pki='sudo pacman -S'
 alias pkl='pacman -Q'
 # query packages
 alias pkq='pacman -Ss'
-# find which package a file is in
-alias pkfq='pkgfile'
-# updates the database of mapping file to package
-alias pkfu='sudo pkgfile -u'
 # remove package
 alias pkr='sudo pacman -Rsn'
 # update packages
 alias pku='sudo pacman -Syu'
 # list files in package
-alias pkf='pkgfile -l'
+alias pkf='pacman -Ql'
+# find which package a file is in
+alias pkfq='pacman -F'
+# updates the database of mapping file to package
+alias pkfu='sudo pacmam -Fy'
