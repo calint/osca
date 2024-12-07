@@ -827,7 +827,7 @@ int main(int argc, char *argv[]) {
     puts(*argv++);
   }
 
-  if (!(dc = dc_new())) {
+  if (!(dc = dc_new(FONT_SIZE, LINE_HEIGHT))) {
     exit(1);
   }
 

@@ -23,7 +23,7 @@ struct dc {
   XRenderColor rendcol;
 };
 
-/*give*/ struct dc *dc_new(void) {
+/*give*/ struct dc *dc_new(double font_size, int line_height) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
@@ -39,13 +39,13 @@ struct dc {
   self->ytop = 0;
   self->dotx = 0;
   self->doty = 0;
-  self->ddoty = 10;
+  self->ddoty = line_height;
   self->win = RootWindow(self->dpy, self->scr);
   self->gc = XCreateGC(self->dpy, self->win, 0, NULL);
   self->cmap = DefaultColormap(self->dpy, self->scr);
   self->font = XftFontOpen(self->dpy, self->scr, XFT_FAMILY, XftTypeString,
                            "dejavu sans", XFT_ENCODING, XftTypeString, "UTF-8",
-                           XFT_SIZE, XftTypeDouble, 7.0, NULL);
+                           XFT_SIZE, XftTypeDouble, font_size, NULL);
   self->draw = XftDrawCreate(self->dpy, self->win,
                              DefaultVisual(self->dpy, self->scr), self->cmap);
   XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};

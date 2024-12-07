@@ -13,6 +13,12 @@
 // width of clonky output
 #define WIDTH 150
 
+// font size as double
+#define FONT_SIZE 7.0
+
+// line height in pixels
+#define LINE_HEIGHT 10
+
 // align left (0) or right (1) of the screen
 #define ALIGN 0
 
