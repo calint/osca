@@ -50,7 +50,7 @@ bluetoothctl
 * disable secure boot in bios
 * legacy mode can be disabled
 
-### at install in `iwctl` cannot find networks with  `scan`
+### at install in `iwctl`: cannot find networks with  `scan`
 * power off and on the device
 ```
 device wlan0 set-property Powered off
