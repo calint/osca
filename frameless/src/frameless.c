@@ -365,7 +365,7 @@ static void focus_on_window(xwin *xw) {
 }
 
 // returns True if window got focus False otherwise
-static char focus_window_by_index_try(unsigned ix) {
+static Bool focus_window_by_index_try(unsigned ix) {
   xwin *xw = &wins[ix];
   if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
     xwin_raise(xw);
