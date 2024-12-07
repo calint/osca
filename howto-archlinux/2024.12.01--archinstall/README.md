@@ -1,6 +1,6 @@
 # notes
 * connect wifi using `https://wiki.archlinux.org/title/Iwd`
-* install using profile `Xorg` with `pipewire` sound
+* `archinstall` using profile `Xorg` with `pipewire` sound
 * run `install-step-1.sh`
 * run `install-step-2.sh`
 * install `yay`:
