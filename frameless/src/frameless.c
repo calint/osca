@@ -149,13 +149,13 @@ static unsigned key_pressed;
 static xwin *win_focused;
 
 // dragging state
-static char is_dragging;
+static Bool is_dragging;
 static int dragging_prev_x;
 static int dragging_prev_y;
 static unsigned dragging_button;
 
 // True while switching desktop, False after any key release
-static char is_switching_desktop;
+static Bool is_switching_desktop;
 
 #ifdef FRAMELESS_DEBUG
 static char *ix_event_names[LASTEvent] = {
