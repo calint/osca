@@ -135,9 +135,6 @@ static int dsk;
 // current focused window
 static xwin *win_focused;
 
-// log file
-static FILE *flog;
-
 // default screen info
 static struct screen {
   unsigned id;
@@ -146,6 +143,9 @@ static struct screen {
 } screen;
 
 #ifdef FRAMELESS_DEBUG
+// log file
+static FILE *flog;
+
 static char *ix_event_names[LASTEvent] = {
     "unknown",        "unknown",        "KeyPress",         "KeyRelease",
     "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
