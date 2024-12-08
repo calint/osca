@@ -120,8 +120,8 @@ typedef struct xwin {
 // mapped xwin to X11 Window
 static xwin wins[WIN_MAX_COUNT];
 
-// log file
-static FILE *flog;
+// number of windows mapped
+static unsigned xwin_count;
 
 // default display
 static Display *dpy;
@@ -132,8 +132,11 @@ static Window root;
 // current desk
 static int dsk;
 
-// number of windows mapped
-static unsigned xwin_count;
+// current focused window
+static xwin *win_focused;
+
+// log file
+static FILE *flog;
 
 // default screen info
 static struct screen {
@@ -141,21 +144,6 @@ static struct screen {
   unsigned wi;
   unsigned hi;
 } screen;
-
-// current key pressed
-static unsigned key_pressed;
-
-// current focused window
-static xwin *win_focused;
-
-// dragging state
-static Bool is_dragging;
-static int dragging_prev_x;
-static int dragging_prev_y;
-static unsigned dragging_button;
-
-// True while switching desktop, False after any key release
-static Bool is_switching_desktop;
 
 #ifdef FRAMELESS_DEBUG
 static char *ix_event_names[LASTEvent] = {
@@ -571,6 +559,18 @@ int main(int argc, char **args, char **env) {
 
   // previous desk
   int dsk_prv = 0;
+
+  // current key pressed
+  unsigned key_pressed = 0;
+
+  // dragging state
+  Bool is_dragging = 0;
+  int dragging_prev_x = 0;
+  int dragging_prev_y = 0;
+  unsigned dragging_button = 0;
+
+  // True while switching desktop, False after any key release
+  Bool is_switching_desktop = False;
 
   xwin *xw = NULL; // temporary used in event loop
   XEvent ev;       // temporary used in event loop
