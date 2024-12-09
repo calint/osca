@@ -5,10 +5,7 @@
 #ifdef FRAMELESS_DEBUG
 #include <stdio.h>
 
-// log file
-static FILE *flog;
-
-static char *ix_event_names[LASTEvent] = {
+const static char *ix_event_names[LASTEvent] = {
     "unknown",        "unknown",        "KeyPress",         "KeyRelease",
     "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
     "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
@@ -18,6 +15,8 @@ static char *ix_event_names[LASTEvent] = {
     "GravityNotify",  "ResizeRequest",  "CirculateNotify",  "CirculateRequest",
     "PropertyNotify", "SelectionClear", "SelectionRequest", "SelectionNotify",
     "ColormapNotify", "ClientMessage",  "MappingNotify",    "GenericEvent"};
++ // log file
+    static FILE *flog;
 #endif
 
 // debugging log written to file "~/frameless.log"
