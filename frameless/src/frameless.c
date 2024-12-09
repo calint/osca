@@ -175,7 +175,7 @@ static xwin *xwin_get_by_window(Window w) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "!!! no free windows\n");
 #endif
-    exit(-1);
+    exit(3);
   }
   xwin *xw = &wins[first_avail];
   xw->bits = XWIN_BIT_ALLOCATED;
