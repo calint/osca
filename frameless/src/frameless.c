@@ -2,7 +2,7 @@
 #include <X11/cursorfont.h>
 #include <stdlib.h>
 
-// debugging log written to file "~/frameless.log"
+// debugging log
 // #define FRAMELESS_DEBUG
 // #define FRAMELESS_DEBUG_FILE "frameless.log"
 
