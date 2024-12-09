@@ -1,8 +1,24 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+#ifdef FRAMELESS_DEBUG
+#include <stdio.h>
+
+// log file
+static FILE *flog;
+
+static char *ix_event_names[LASTEvent] = {
+    "unknown",        "unknown",        "KeyPress",         "KeyRelease",
+    "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
+    "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
+    "Expose",         "GraphicsExpose", "NoExpose",         "VisibilityNotify",
+    "CreateNotify",   "DestroyNotify",  "UnmapNotify",      "MapNotify",
+    "MapRequest",     "ReparentNotify", "ConfigureNotify",  "ConfigureRequest",
+    "GravityNotify",  "ResizeRequest",  "CirculateNotify",  "CirculateRequest",
+    "PropertyNotify", "SelectionClear", "SelectionRequest", "SelectionNotify",
+    "ColormapNotify", "ClientMessage",  "MappingNotify",    "GenericEvent"};
+#endif
 
 // debugging log written to file "~/frameless.log"
 // #define FRAMELESS_DEBUG
@@ -141,22 +157,6 @@ static struct screen {
   unsigned wi;
   unsigned hi;
 } screen;
-
-#ifdef FRAMELESS_DEBUG
-// log file
-static FILE *flog;
-
-static char *ix_event_names[LASTEvent] = {
-    "unknown",        "unknown",        "KeyPress",         "KeyRelease",
-    "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
-    "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
-    "Expose",         "GraphicsExpose", "NoExpose",         "VisibilityNotify",
-    "CreateNotify",   "DestroyNotify",  "UnmapNotify",      "MapNotify",
-    "MapRequest",     "ReparentNotify", "ConfigureNotify",  "ConfigureRequest",
-    "GravityNotify",  "ResizeRequest",  "CirculateNotify",  "CirculateRequest",
-    "PropertyNotify", "SelectionClear", "SelectionRequest", "SelectionNotify",
-    "ColormapNotify", "ClientMessage",  "MappingNotify",    "GenericEvent"};
-#endif
 
 static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
