@@ -2,10 +2,14 @@
 #include <X11/cursorfont.h>
 #include <stdlib.h>
 
+// debugging log written to file "~/frameless.log"
+// #define FRAMELESS_DEBUG
+// #define FRAMELESS_DEBUG_FILE "frameless.log"
+
 #ifdef FRAMELESS_DEBUG
 #include <stdio.h>
 
-const static char *ix_event_names[LASTEvent] = {
+static const char *ix_event_names[LASTEvent] = {
     "unknown",        "unknown",        "KeyPress",         "KeyRelease",
     "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
     "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
@@ -19,10 +23,6 @@ const static char *ix_event_names[LASTEvent] = {
 // log file
 static FILE *flog;
 #endif
-
-// debugging log written to file "~/frameless.log"
-// #define FRAMELESS_DEBUG
-// #define DEBUG_FILE "frameless.log"
 
 // maximum number of windows
 #define WIN_MAX_COUNT 128
@@ -522,7 +522,7 @@ static int error_handler(Display *d, XErrorEvent *e) {
 
 int main(int argc, char **args, char **env) {
 #ifdef FRAMELESS_DEBUG
-  flog = fopen(DEBUG_FILE, "a");
+  flog = fopen(FRAMELESS_DEBUG_FILE, "a");
   if (!flog) {
     exit(1);
   }
