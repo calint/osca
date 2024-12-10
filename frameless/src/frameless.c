@@ -145,8 +145,8 @@ static Display *dpy;
 // root window
 static Window root;
 
-// current desk
-static int dsk;
+// desk in focus
+static int current_desk;
 
 // current focused window
 static xwin *win_focused;
@@ -182,7 +182,7 @@ static xwin *xwin_get_by_window(Window w) {
   xwin_count++;
   // fprintf(flog, "windows allocated: %d\n", wincount);
   xw->win = w;
-  xw->desk = dsk;
+  xw->desk = current_desk;
   XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
   return xw;
 }
@@ -355,7 +355,7 @@ static void focus_on_window(xwin *xw) {
 // returns True if window got focus False otherwise
 static Bool focus_window_by_index_try(unsigned ix) {
   xwin *xw = &wins[ix];
-  if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+  if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
     xwin_raise(xw);
     focus_on_window(xw);
     return True;
@@ -386,7 +386,7 @@ static Bool focus_on_only_window_on_desk(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
       if (focus) {
         return False; // there are more than 1 window on this desk
       }
@@ -406,7 +406,7 @@ static void focus_window_after_desk_switch(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk)) {
+    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
       if (xw->bits & XWIN_BIT_FOCUSED) {
         // found focused window on this desk
         focus = xw;
@@ -747,41 +747,41 @@ int main(int argc, char **args, char **env) {
       case KEY_DESKTOP_UP:
       case KEY_DESKTOP_UP_ALT:
         is_switching_desktop = True;
-        dsk_prv = dsk;
-        dsk++;
+        dsk_prv = current_desk;
+        current_desk++;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
-            // 'win_focused' is the new focused window on desk 'dsk'
-            turn_off_window_focus_on_desk(dsk);
+            // 'win_focused' is the new focused window on desk 'current_desk'
+            turn_off_window_focus_on_desk(current_desk);
             // change desk on focused window
-            win_focused->desk = dsk;
+            win_focused->desk = current_desk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
             // place focused window on top
             xwin_raise(win_focused);
           }
         }
-        desk_show(dsk, dsk_prv);
+        desk_show(current_desk, dsk_prv);
         focus_window_after_desk_switch();
         break;
       case KEY_DESKTOP_DOWN:
       case KEY_DESKTOP_DOWN_ALT:
         is_switching_desktop = True;
-        dsk_prv = dsk;
-        dsk--;
+        dsk_prv = current_desk;
+        current_desk--;
         if (ev.xkey.state & ShiftMask) {
           if (win_focused) {
-            // 'win_focused' is the new focused window on desk 'dsk'
-            turn_off_window_focus_on_desk(dsk);
+            // 'win_focused' is the new focused window on desk 'current_desk'
+            turn_off_window_focus_on_desk(current_desk);
             // change desk on focused window
-            win_focused->desk = dsk;
+            win_focused->desk = current_desk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
             win_focused->desk_x = win_focused->x;
             // place focused window on top
             xwin_raise(win_focused);
           }
         }
-        desk_show(dsk, dsk_prv);
+        desk_show(current_desk, dsk_prv);
         focus_window_after_desk_switch();
         break;
       }
@@ -865,7 +865,7 @@ int main(int argc, char **args, char **env) {
       dragging_button = 0;
       xw = xwin_get_by_window(ev.xbutton.window);
       // in case a window was dragged from folded state (different desktop)
-      xw->desk = dsk;
+      xw->desk = current_desk;
       XUngrabPointer(dpy, CurrentTime);
       break;
     }
