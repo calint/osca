@@ -145,17 +145,15 @@ static Display *dpy;
 // root window
 static Window root;
 
-// desk in focus
 static int current_desk;
 
-// current focused window
-static xwin *win_focused;
+static xwin *focused_win;
 
 // default screen info
 static struct screen {
   unsigned id;
-  unsigned wi;
-  unsigned hi;
+  unsigned wi; // width
+  unsigned hi; // height
 } screen;
 
 static xwin *xwin_get_by_window(Window w) {
@@ -345,11 +343,11 @@ static int xwin_ix(xwin *this) {
 }
 
 static void focus_on_window(xwin *xw) {
-  if (win_focused) {
-    xwin_focus_off(win_focused);
+  if (focused_win) {
+    xwin_focus_off(focused_win);
   }
   xwin_focus_on(xw);
-  win_focused = xw;
+  focused_win = xw;
 }
 
 // returns True if window got focus False otherwise
@@ -416,7 +414,7 @@ static void focus_window_after_desk_switch(void) {
       focus = xw;
     }
   }
-  win_focused = NULL;
+  focused_win = NULL;
   if (!focus) {
     // didn't find any window to focus
     return;
@@ -432,15 +430,15 @@ static void turn_off_window_focus_on_desk(int dsk) {
     if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk) &&
         (xw->bits & XWIN_BIT_FOCUSED)) {
       xwin_focus_off(xw);
-      if (win_focused == xw) {
-        win_focused = NULL;
+      if (focused_win == xw) {
+        focused_win = NULL;
       }
     }
   }
 }
 
 static void focus_next_window(void) {
-  int i0 = xwin_ix(win_focused);
+  int i0 = xwin_ix(focused_win);
   // note. 'i0' might be -1 but incremented to 0
   int i = i0;
   while (++i < WIN_MAX_COUNT) {
@@ -460,7 +458,7 @@ static void focus_next_window(void) {
 }
 
 static void focus_previous_window(void) {
-  int i0 = xwin_ix(win_focused);
+  int i0 = xwin_ix(focused_win);
   int i = i0;
   while (--i >= 0) {
     if (focus_window_by_index_try((unsigned)i)) {
@@ -484,8 +482,8 @@ static void free_window_and_resolve_focus(Window w) {
   }
   win->bits = 0; // mark free
   xwin_count--;
-  if (win_focused == win) {
-    win_focused = NULL;
+  if (focused_win == win) {
+    focused_win = NULL;
   }
   // try to focus window under pointer
   Window root_return, child_return;
@@ -682,52 +680,52 @@ int main(int argc, char **args, char **env) {
         break;
       case KEY_WINDOW_CLOSE:
       case KEY_WINDOW_CLOSE_ALT:
-        if (win_focused) {
-          xwin_close(win_focused);
+        if (focused_win) {
+          xwin_close(focused_win);
         }
         break;
       case KEY_WINDOW_BUMP:
-        if (win_focused) {
-          xwin_bump(win_focused, WIN_BUMP_PX);
+        if (focused_win) {
+          xwin_bump(focused_win, WIN_BUMP_PX);
           //? turn of full width, height bits
         }
         break;
       case KEY_WINDOW_CENTER:
-        if (win_focused) {
-          xwin_center(win_focused);
+        if (focused_win) {
+          xwin_center(focused_win);
         }
         break;
       case KEY_WINDOW_WIDER:
-        if (win_focused) {
+        if (focused_win) {
           if (ev.xkey.state & ShiftMask) {
-            xwin_thinner(win_focused);
+            xwin_thinner(focused_win);
           } else {
-            xwin_wider(win_focused);
+            xwin_wider(focused_win);
           }
           // if window was full width then turn that bit off
-          if (win_focused->bits & XWIN_BIT_FULL_WIDTH) {
-            win_focused->bits &= ~XWIN_BIT_FULL_WIDTH;
+          if (focused_win->bits & XWIN_BIT_FULL_WIDTH) {
+            focused_win->bits &= ~XWIN_BIT_FULL_WIDTH;
           }
         }
         break;
       case KEY_WINDOW_FULLSCREEN:
-        if (win_focused) {
-          xwin_toggle_fullscreen(win_focused);
+        if (focused_win) {
+          xwin_toggle_fullscreen(focused_win);
         }
         break;
       case KEY_WINDOW_FULLHEIGHT:
-        if (win_focused) {
-          xwin_toggle_fullheight(win_focused);
+        if (focused_win) {
+          xwin_toggle_fullheight(focused_win);
         }
         break;
       case KEY_WINDOW_FULLWIDTH:
-        if (win_focused) {
-          xwin_toggle_fullwidth(win_focused);
+        if (focused_win) {
+          xwin_toggle_fullwidth(focused_win);
         }
         break;
       case KEY_WINDOW_SURPRISE:
-        if (win_focused) {
-          xwin_bump(win_focused, WIN_BUMP_PX);
+        if (focused_win) {
+          xwin_bump(focused_win, WIN_BUMP_PX);
         }
         break;
       case KEY_WINDOW_FOCUS_PREVIOUS:
@@ -750,15 +748,15 @@ int main(int argc, char **args, char **env) {
         dsk_prv = current_desk;
         current_desk++;
         if (ev.xkey.state & ShiftMask) {
-          if (win_focused) {
-            // 'win_focused' is the new focused window on desk 'current_desk'
+          if (focused_win) {
+            // 'focused_win' is the new focused window on desk 'current_desk'
             turn_off_window_focus_on_desk(current_desk);
             // change desk on focused window
-            win_focused->desk = current_desk;
+            focused_win->desk = current_desk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
-            win_focused->desk_x = win_focused->x;
+            focused_win->desk_x = focused_win->x;
             // place focused window on top
-            xwin_raise(win_focused);
+            xwin_raise(focused_win);
           }
         }
         desk_show(current_desk, dsk_prv);
@@ -770,15 +768,15 @@ int main(int argc, char **args, char **env) {
         dsk_prv = current_desk;
         current_desk--;
         if (ev.xkey.state & ShiftMask) {
-          if (win_focused) {
-            // 'win_focused' is the new focused window on desk 'current_desk'
+          if (focused_win) {
+            // 'focused_win' is the new focused window on desk 'current_desk'
             turn_off_window_focus_on_desk(current_desk);
             // change desk on focused window
-            win_focused->desk = current_desk;
+            focused_win->desk = current_desk;
             // set 'desk_x' because 'desk_show' will restore it to 'x'
-            win_focused->desk_x = win_focused->x;
+            focused_win->desk_x = focused_win->x;
             // place focused window on top
-            xwin_raise(win_focused);
+            xwin_raise(focused_win);
           }
         }
         desk_show(current_desk, dsk_prv);
