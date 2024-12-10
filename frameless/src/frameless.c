@@ -682,8 +682,9 @@ int main(int argc, char **args, char **env) {
         break;
       case KEY_WINDOW_BUMP:
         if (focused_win) {
+          // turn of full width and/or height bit
+          focused_win->bits &= ~(XWIN_BIT_FULL_WIDTH | XWIN_BIT_FULL_HEIGHT);
           xwin_bump(focused_win, WIN_BUMP_PX);
-          //? turn of full width, height bits
         }
         break;
       case KEY_WINDOW_CENTER:
@@ -699,9 +700,7 @@ int main(int argc, char **args, char **env) {
             xwin_wider(focused_win);
           }
           // if window was full width then turn that bit off
-          if (focused_win->bits & XWIN_BIT_FULL_WIDTH) {
-            focused_win->bits &= ~XWIN_BIT_FULL_WIDTH;
-          }
+          focused_win->bits &= ~XWIN_BIT_FULL_WIDTH;
         }
         break;
       case KEY_WINDOW_FULLSCREEN:
