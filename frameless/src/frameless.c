@@ -139,14 +139,9 @@ static xwin wins[WIN_MAX_COUNT];
 // number of windows mapped
 static unsigned xwin_count;
 
-// default display
-static Display *dpy;
-
-// root window
-static Window root;
-
+static Display *display;
+static Window root_window;
 static int current_desk;
-
 static xwin *focused_win;
 
 // default screen info
@@ -181,22 +176,22 @@ static xwin *xwin_get_by_window(Window w) {
   // fprintf(flog, "windows allocated: %d\n", wincount);
   xw->win = w;
   xw->desk = current_desk;
-  XSetWindowBorderWidth(dpy, w, WIN_BORDER_WIDTH);
+  XSetWindowBorderWidth(display, w, WIN_BORDER_WIDTH);
   return xw;
 }
 
 static void xwin_focus_on(xwin *this) {
-  XSetInputFocus(dpy, this->win, RevertToParent, CurrentTime);
-  XSetWindowBorder(dpy, this->win, WIN_BORDER_ACTIVE_COLOR);
+  XSetInputFocus(display, this->win, RevertToParent, CurrentTime);
+  XSetWindowBorder(display, this->win, WIN_BORDER_ACTIVE_COLOR);
   this->bits |= XWIN_BIT_FOCUSED;
 }
 
 static void xwin_focus_off(xwin *this) {
-  XSetWindowBorder(dpy, this->win, WIN_BORDER_INACTIVE_COLOR);
+  XSetWindowBorder(display, this->win, WIN_BORDER_INACTIVE_COLOR);
   this->bits &= ~XWIN_BIT_FOCUSED;
 }
 
-static void xwin_raise(xwin *this) { XRaiseWindow(dpy, this->win); }
+static void xwin_raise(xwin *this) { XRaiseWindow(display, this->win); }
 
 static xwin *winx_find_by_window(Window w) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
@@ -209,12 +204,12 @@ static xwin *winx_find_by_window(Window w) {
 static void xwin_read_geom(xwin *this) {
   Window wsink;
   unsigned dummy;
-  XGetGeometry(dpy, this->win, &wsink, &this->x, &this->y, &this->wi, &this->hi,
-               &dummy, &dummy);
+  XGetGeometry(display, this->win, &wsink, &this->x, &this->y, &this->wi,
+               &this->hi, &dummy, &dummy);
 }
 
 static void xwin_set_geom(xwin *this) {
-  XMoveResizeWindow(dpy, this->win, this->x, this->y, this->wi, this->hi);
+  XMoveResizeWindow(display, this->win, this->x, this->y, this->wi, this->hi);
 }
 
 static void xwin_center(xwin *this) {
@@ -247,11 +242,11 @@ static void xwin_close(xwin *this) {
   XEvent ke;
   ke.type = ClientMessage;
   ke.xclient.window = this->win;
-  ke.xclient.message_type = XInternAtom(dpy, "WM_PROTOCOLS", True);
+  ke.xclient.message_type = XInternAtom(display, "WM_PROTOCOLS", True);
   ke.xclient.format = 32;
-  ke.xclient.data.l[0] = (long)XInternAtom(dpy, "WM_DELETE_WINDOW", True);
+  ke.xclient.data.l[0] = (long)XInternAtom(display, "WM_DELETE_WINDOW", True);
   ke.xclient.data.l[1] = CurrentTime;
-  XSendEvent(dpy, this->win, False, NoEventMask, &ke);
+  XSendEvent(display, this->win, False, NoEventMask, &ke);
 }
 
 static void xwin_toggle_fullscreen(xwin *this) {
@@ -367,7 +362,7 @@ static void desk_show(int dsk, int dsk_prv) {
     if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
       continue;
     }
-    if (xw->win == 0 || xw->win == root) {
+    if (xw->win == 0 || xw->win == root_window) {
       continue;
     }
     if (xw->desk == dsk_prv) {
@@ -489,8 +484,8 @@ static void free_window_and_resolve_focus(Window w) {
   Window root_return, child_return;
   int root_x, root_y, win_x, win_y;
   unsigned mask_return;
-  if (XQueryPointer(dpy, root, &root_return, &child_return, &root_x, &root_y,
-                    &win_x, &win_y, &mask_return)) {
+  if (XQueryPointer(display, root_window, &root_return, &child_return, &root_x,
+                    &root_y, &win_x, &win_y, &mask_return)) {
     if (child_return != None) {
       xwin *xw = xwin_get_by_window(child_return);
       focus_on_window(xw);
@@ -538,22 +533,23 @@ int main(int argc, char **args, char **env) {
 
   XSetErrorHandler(error_handler);
 
-  dpy = XOpenDisplay(NULL);
-  if (!dpy) {
+  display = XOpenDisplay(NULL);
+  if (!display) {
     exit(2);
   }
 
-  screen.id = (unsigned)DefaultScreen(dpy);
-  screen.wi = (unsigned)DisplayWidth(dpy, screen.id);
-  screen.hi = (unsigned)DisplayHeight(dpy, screen.id);
+  screen.id = (unsigned)DefaultScreen(display);
+  screen.wi = (unsigned)DisplayWidth(display, screen.id);
+  screen.hi = (unsigned)DisplayHeight(display, screen.id);
 
-  root = DefaultRootWindow(dpy);
-  Cursor root_window_cursor = XCreateFontCursor(dpy, XC_arrow);
-  XDefineCursor(dpy, root, root_window_cursor);
-  XGrabKey(dpy, AnyKey, Mod4Mask, root, True, GrabModeAsync, GrabModeAsync);
-  XGrabKey(dpy, AnyKey, Mod4Mask + ShiftMask, root, True, GrabModeAsync,
+  root_window = DefaultRootWindow(display);
+  Cursor root_window_cursor = XCreateFontCursor(display, XC_arrow);
+  XDefineCursor(display, root_window, root_window_cursor);
+  XGrabKey(display, AnyKey, Mod4Mask, root_window, True, GrabModeAsync,
            GrabModeAsync);
-  XSelectInput(dpy, root, SubstructureNotifyMask);
+  XGrabKey(display, AnyKey, Mod4Mask + ShiftMask, root_window, True,
+           GrabModeAsync, GrabModeAsync);
+  XSelectInput(display, root_window, SubstructureNotifyMask);
 
   // previous desk
   int dsk_prv = 0;
@@ -572,7 +568,7 @@ int main(int argc, char **args, char **env) {
 
   xwin *xw = NULL; // temporary used in event loop
   XEvent ev;       // temporary used in event loop
-  while (!XNextEvent(dpy, &ev)) {
+  while (!XNextEvent(display, &ev)) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "%lu: event: %s   win=%p\n", ev.xany.serial,
             ix_event_names[ev.type], (void *)ev.xany.window);
@@ -586,7 +582,7 @@ int main(int argc, char **args, char **env) {
 #endif
       break;
     case MapNotify:
-      if (ev.xmap.window == root || ev.xmap.window == None ||
+      if (ev.xmap.window == root_window || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
@@ -597,12 +593,12 @@ int main(int argc, char **args, char **env) {
       xw = xwin_get_by_window(ev.xmap.window);
       xwin_center(xw);
       focus_on_window(xw);
-      XGrabButton(dpy, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
+      XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
                   GrabModeAsync, GrabModeAsync, None, None);
-      XSelectInput(dpy, xw->win, EnterWindowMask);
+      XSelectInput(display, xw->win, EnterWindowMask);
       break;
     case UnmapNotify:
-      if (ev.xmap.window == root || ev.xmap.window == None ||
+      if (ev.xmap.window == root_window || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
@@ -740,7 +736,7 @@ int main(int argc, char **args, char **env) {
           // log-out
           return 0;
         }
-        XKillClient(dpy, ev.xkey.subwindow);
+        XKillClient(display, ev.xkey.subwindow);
         break;
       case KEY_DESKTOP_UP:
       case KEY_DESKTOP_UP_ALT:
@@ -798,13 +794,14 @@ int main(int argc, char **args, char **env) {
       dragging_button = ev.xbutton.button;
       xw = xwin_get_by_window(ev.xbutton.window);
       focus_on_window(xw);
-      XGrabPointer(dpy, xw->win, True, PointerMotionMask | ButtonReleaseMask,
-                   GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+      XGrabPointer(display, xw->win, True,
+                   PointerMotionMask | ButtonReleaseMask, GrabModeAsync,
+                   GrabModeAsync, None, None, CurrentTime);
       xwin_raise(xw);
       xwin_read_geom(xw);
       break;
     case MotionNotify:
-      while (XCheckTypedEvent(dpy, MotionNotify, &ev))
+      while (XCheckTypedEvent(display, MotionNotify, &ev))
         ;
       int xdiff = ev.xbutton.x_root - dragging_prev_x;
       int ydiff = ev.xbutton.y_root - dragging_prev_y;
@@ -864,7 +861,7 @@ int main(int argc, char **args, char **env) {
       xw = xwin_get_by_window(ev.xbutton.window);
       // in case a window was dragged from folded state (different desktop)
       xw->desk = current_desk;
-      XUngrabPointer(dpy, CurrentTime);
+      XUngrabPointer(display, CurrentTime);
       break;
     }
   }
