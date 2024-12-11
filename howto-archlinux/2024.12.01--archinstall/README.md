@@ -1,4 +1,6 @@
 # notes
+
+## installation
 * connect wifi using `https://wiki.archlinux.org/title/Iwd`
 * `archinstall` using profile `Xorg` with `pipewire` sound
 * run `install-step-1.sh`
@@ -45,6 +47,14 @@ bluetoothctl
 [bluetooth]# trust <device id>
 [bluetooth]# scan off
 [bluetooth]# exit
+```
+
+## installation on laptop
+* suggestion to install power saving service
+```
+sudo pacman -S tlp
+sudo systemctl enable tlp
+sudo systemctl start tlp
 ```
 
 # troubleshooting
