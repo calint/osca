@@ -35,47 +35,48 @@ contains:
 
 ![screenshot 5](screenshots/2024-12-11--11-58-29.png)
 
+
 ```
 
             lines   words   chars
-   source:    875    2666   24686
-   zipped:     20     146    5945
+   source:    868    2655   25043
+   zipped:     28     121    5920
 
--rwxr-xr-x 1 c 17544 Dec  7 09:13 frameless
+-rwxr-xr-x 1 c 21424 Dec 11 12:09 frameless
 
 
             lines   words   chars
-   source:   1260    4073   34137
-   zipped:     33     182    8401
+   source:   1260    4077   34203
+   zipped:     36     193    8420
 
--rwxr-xr-x 1 c 37296 Dec  7 09:13 clonky
+-rwxr-xr-x 1 c 37296 Dec 11 12:09 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      54    2290
 
--rwxr-xr-x 1 c 16464 Dec  7 09:13 menuq
+-rwxr-xr-x 1 c 16464 Dec 11 12:09 menuq
 
 
             lines   words   chars
    source:     55     121    1856
    zipped:      1      15     802
 
--rwxr-xr-x 1 c 16576 Dec  7 09:13 stickyo
+-rwxr-xr-x 1 c 16576 Dec 11 12:09 stickyo
 
 
             lines   words   chars
    source:     21      60     589
    zipped:      2       9     329
 
--rwxr-xr-x 1 c 15656 Dec  7 09:13 snap
+-rwxr-xr-x 1 c 15656 Dec 11 12:09 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      27    1141
 
--rwxr-xr-x 1 c 16488 Dec  7 09:13 mounte
+-rwxr-xr-x 1 c 16488 Dec 11 12:09 mounte
 
 ```
