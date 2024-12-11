@@ -62,3 +62,7 @@ device wlan0 set-property Powered on
 # disables power saving functions
 options rtl8723be aspm=0 ips=0 fwlps=0
 ```
+
+## Acer Aspire Lite AL14-51M-56HU
+
+### no sound in the speakers
