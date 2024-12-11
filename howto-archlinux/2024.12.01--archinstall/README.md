@@ -28,6 +28,11 @@ xinput set-prop 9 314 1
 ```
 
 ## configure bluetooth speaker
+enable bluetooth daemon
+```
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+```
 from `https://wiki.archlinux.org/title/Bluetooth_headset`
 ```
 bluetoothctl
