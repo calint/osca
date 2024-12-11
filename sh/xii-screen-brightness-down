@@ -1,2 +1,2 @@
 #!/bin/sh
-xbacklight -dec 5
+brightnessctl set 10%-
