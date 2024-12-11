@@ -251,7 +251,7 @@ static void xwin_close(xwin *this) {
 
 static void xwin_toggle_fullscreen(xwin *this) {
   xwin_read_geom(this);
-  if ((this->bits & (XWIN_BITS_FULL_SCREEN)) == (XWIN_BITS_FULL_SCREEN)) {
+  if ((this->bits & XWIN_BITS_FULL_SCREEN) == XWIN_BITS_FULL_SCREEN) {
     // toggle from fullscreen
     this->x = this->x_pf;
     this->y = this->y_pf;
