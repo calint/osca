@@ -49,7 +49,7 @@ bluetoothctl
 [bluetooth]# exit
 ```
 
-## installation on laptop
+## on laptop
 * suggestion to install power saving service
 ```
 sudo pacman -S tlp
@@ -82,3 +82,7 @@ options rtl8723be aspm=0 ips=0 fwlps=0
 
 ### no sound from the speakers
 * `sudo pacman -S sof-firmware` and reboot
+
+### occasionally the touchpad configuration is reset by the system
+* example of occurrence is when installing `tlp`
+* resolution: re-run `config-touchpad.sh`
