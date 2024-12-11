@@ -27,35 +27,3 @@
  #    /\_-_/\
  #      | |
  # 
-
-
-# additional ubuntu packages for osca
-sudo apt-get install scrot mousepad alsamixergui dconf-cli thunar feh alsa-utils xbacklight vlc
-sudo snap install brave
-
-# enable alsamixer
-sudo addgroup `id -un` audio
-
-# x11 developers
-sudo apt-get install libx11-dev libxft-dev
-
-# gnome developers
-sudo apt-get install gnome-devel
-
-# opengl developers
-sudo apt-get install freeglut3 freeglut3-dev libxmu-dev libxi-dev
-
-# enable opengl
-sudo adduser `id -un` video
-
-# emulatation packages
-sudo apt-get install qemu wine
-
-# enable qemu kvm
-sudo adduser `id -un` libvirtd
-
-# notes
-# 1. to enable Frameless session at login to Xorg:
-#    copy 'usr/share/xsessions/frameless.desktop' to '/usr/share/xsessions/'
-# 2. wifi module rtl8723be needs configuration to resolve connectivity issues
-#    copy 'etc/modprobe.d/rtl8723be.conf' to '/etc/modprobe.d/'
