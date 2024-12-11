@@ -173,7 +173,6 @@ static xwin *xwin_get_by_window(Window w) {
   xwin *xw = &wins[first_avail];
   xw->bits = XWIN_BIT_ALLOCATED;
   xwin_count++;
-  // fprintf(flog, "windows allocated: %d\n", wincount);
   xw->win = w;
   xw->desk = current_desk;
   XSetWindowBorderWidth(display, w, WIN_BORDER_WIDTH);
@@ -348,7 +347,7 @@ static void focus_on_window(xwin *xw) {
 // returns True if window got focus False otherwise
 static Bool focus_window_by_index_try(unsigned ix) {
   xwin *xw = &wins[ix];
-  if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
+  if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
     xwin_raise(xw);
     focus_on_window(xw);
     return True;
@@ -379,7 +378,7 @@ static Bool focus_on_only_window_on_desk(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
+    if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
       if (focus) {
         return False; // there are more than 1 window on this desk
       }
@@ -399,7 +398,7 @@ static void focus_window_after_desk_switch(void) {
   xwin *focus = NULL;
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == current_desk)) {
+    if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
       if (xw->bits & XWIN_BIT_FOCUSED) {
         // found focused window on this desk
         focus = xw;
@@ -422,8 +421,8 @@ static void focus_window_after_desk_switch(void) {
 static void turn_off_window_focus_on_desk(int dsk) {
   for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
     xwin *xw = &wins[i];
-    if ((xw->bits & XWIN_BIT_ALLOCATED) && (xw->desk == dsk) &&
-        (xw->bits & XWIN_BIT_FOCUSED)) {
+    if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == dsk &&
+        xw->bits & XWIN_BIT_FOCUSED) {
       xwin_focus_off(xw);
       if (focused_window == xw) {
         focused_window = NULL;
@@ -864,6 +863,6 @@ int main(int argc, char **args, char **env) {
       break;
     }
   }
-  //? clean-up cursor
+  //? clean-up is done by OS
   return 0;
 }
