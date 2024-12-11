@@ -50,11 +50,15 @@ bluetoothctl
 ```
 
 ## on laptop
-* suggestion to install power saving service
+* install power saving service
 ```
 sudo pacman -S tlp
 sudo systemctl enable tlp
 sudo systemctl start tlp
+```
+* install `powertop` for overview of power consumption
+```
+sudo pacman -S powertop
 ```
 
 # troubleshooting
