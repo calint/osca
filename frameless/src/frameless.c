@@ -205,8 +205,14 @@ static void xwin_set_geom(xwin *this) {
 
 static void xwin_center(xwin *this) {
   xwin_read_geom(this);
-  this->x = (int)((screen.wi - this->wi) >> 1);
-  this->y = (int)((screen.hi - this->hi) >> 1);
+  if (!(this->bits & XWIN_BIT_FULL_WIDTH)) {
+    // only adjust x if window is not in full width
+    this->x = (int)((screen.wi - this->wi) >> 1);
+  }
+  if (!(this->bits & XWIN_BIT_FULL_HEIGHT)) {
+    // only adjust y if window is not in full height
+    this->y = (int)((screen.hi - this->hi) >> 1);
+  }
   xwin_set_geom(this);
 }
 
