@@ -1,3 +1,4 @@
+#include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <stdlib.h>
@@ -75,19 +76,10 @@ static FILE *flog;
 #define CMD_LAUNCH_SNAPSHOT "xii-screenshot"
 #define CMD_LAUNCH_SNAPSHOT_SHIFT "xii-screenshot-select"
 
-#define KEY_FN_SCREEN_BRIGHTNESS_DOWN 68 // F2
 #define CMD_FN_SCREEN_BRIGHTNESS_DOWN "xii-screen-brightness-down"
-
-#define KEY_FN_SCREEN_BRIGHTNESS_UP 69 // F3
 #define CMD_FN_SCREEN_BRIGHTNESS_UP "xii-screen-brightness-up"
-
-#define KEY_FN_VOLUME_TOGGLE 72 // F6
 #define CMD_FN_VOLUME_TOGGLE "xii-volume-toggle"
-
-#define KEY_FN_VOLUME_DOWN 73 // F7
 #define CMD_FN_VOLUME_DOWN "xii-volume-down"
-
-#define KEY_FN_VOLUME_UP 74 // F8
 #define CMD_FN_VOLUME_UP "xii-volume-up"
 
 #define KEY_WINDOW_CLOSE 9            // esc
@@ -565,6 +557,18 @@ int main(int argc, char **args, char **env) {
   // True while switching desktop, False after any key release
   Bool is_switching_desktop = False;
 
+  // key codes for media keys
+  const KeyCode key_code_audio_lower_volume =
+      XKeysymToKeycode(display, XF86XK_AudioLowerVolume);
+  const KeyCode key_code_audio_raise_volume =
+      XKeysymToKeycode(display, XF86XK_AudioRaiseVolume);
+  const KeyCode key_code_audio_mute =
+      XKeysymToKeycode(display, XF86XK_AudioMute);
+  const KeyCode key_code_mon_brightness_down =
+      XKeysymToKeycode(display, XF86XK_MonBrightnessDown);
+  const KeyCode key_code_mon_brightness_up =
+      XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
+
   xwin *xw = NULL; // temporary used in event loop
   XEvent ev;       // temporary used in event loop
   while (!XNextEvent(display, &ev)) {
@@ -657,21 +661,6 @@ int main(int argc, char **args, char **env) {
         } else {
           system(CMD_LAUNCH_SNAPSHOT);
         }
-        break;
-      case KEY_FN_SCREEN_BRIGHTNESS_DOWN:
-        system(CMD_FN_SCREEN_BRIGHTNESS_DOWN);
-        break;
-      case KEY_FN_SCREEN_BRIGHTNESS_UP:
-        system(CMD_FN_SCREEN_BRIGHTNESS_UP);
-        break;
-      case KEY_FN_VOLUME_TOGGLE:
-        system(CMD_FN_VOLUME_TOGGLE);
-        break;
-      case KEY_FN_VOLUME_DOWN:
-        system(CMD_FN_VOLUME_DOWN);
-        break;
-      case KEY_FN_VOLUME_UP:
-        system(CMD_FN_VOLUME_UP);
         break;
       case KEY_WINDOW_CLOSE:
       case KEY_WINDOW_CLOSE_ALT:
@@ -775,6 +764,20 @@ int main(int argc, char **args, char **env) {
         }
         desk_show(current_desk, dsk_prv);
         focus_window_after_desk_switch();
+        break;
+      default:
+        // handle media keys
+        if (key_pressed == key_code_mon_brightness_down) {
+          system(CMD_FN_SCREEN_BRIGHTNESS_DOWN);
+        } else if (key_pressed == key_code_mon_brightness_up) {
+          system(CMD_FN_SCREEN_BRIGHTNESS_UP);
+        } else if (key_pressed == key_code_audio_mute) {
+          system(CMD_FN_VOLUME_TOGGLE);
+        } else if (key_pressed == key_code_audio_lower_volume) {
+          system(CMD_FN_VOLUME_DOWN);
+        } else if (key_pressed == key_code_audio_raise_volume) {
+          system(CMD_FN_VOLUME_UP);
+        }
         break;
       }
       break;
