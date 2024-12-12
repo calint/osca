@@ -159,6 +159,7 @@ static xwin *xwin_get_by_window(Window w) {
   if (first_avail == -1) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "!!! no free windows\n");
+    fflush(flog);
 #endif
     exit(3);
   }
