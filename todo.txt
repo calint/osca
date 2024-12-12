@@ -20,7 +20,7 @@
             search for starts with in every path element
             display selectable options
             select using keyboard arrows
-[ ] clang-tidy: basic 
+[ ] clang-tidy: basic
 [x]     frameless
 [ ]     clonky
 [ ]     menuq
