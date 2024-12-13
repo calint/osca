@@ -1,0 +1,9 @@
+[Default Applications]
+image/png=feh.desktop
+image/jpeg=feh.desktop
+video/3gpp=mpv.desktop
+
+[Added Associations]
+image/png=feh.desktop;
+image/jpeg=org.gnome.eog.desktop;feh.desktop;
+video/3gpp=mpv.desktop;
