@@ -777,6 +777,22 @@ static void render_net_interfaces() {
   freeifaddrs(ifas);
 }
 
+static void render_top_10_processes(void) {
+  FILE *file = popen("ps -eo %mem,%cpu,comm --sort=-%mem | head -n 11", "r");
+  if (!file) {
+    return;
+  }
+  char buf[512];
+  unsigned counter = 11;
+  while (counter--) {
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+      break;
+    }
+    pl(buf);
+  }
+  pclose(file);
+}
+
 static void signal_exit(int i) {
   puts("\nexiting");
   dc_del(dc);
@@ -809,6 +825,8 @@ static void render(void) {
   render_cpu_throttles();
   render_battery();
   render_acpi();
+  //  render_hr();
+  //  render_top_10_processes();
   render_hr();
   render_syslog();
   render_hr();
