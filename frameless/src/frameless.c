@@ -577,7 +577,7 @@ int main(int argc, char **args, char **env) {
       XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
 
   xwin *xw = NULL; // temporary used in event loop
-  XEvent ev;       // temporary used in event loop
+  XEvent ev = {0}; // temporary used in event loop
   while (!XNextEvent(display, &ev)) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "%lu: event: %s   win=%p\n", ev.xany.serial,
