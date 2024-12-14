@@ -17,6 +17,7 @@ git
 glm
 gtk4
 gtkwave
+gvfs
 htop
 intel-media-driver
 intel-oneapi-tbb
