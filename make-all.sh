@@ -1,4 +1,6 @@
 #!/bin/sh
+# tools used:
+#   gcc      14.2.1
 set -e
 
 # change to directory of the script
