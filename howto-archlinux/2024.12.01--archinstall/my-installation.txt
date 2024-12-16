@@ -15,6 +15,7 @@ eog
 feh
 git
 glm
+gnu-netcat
 gtk4
 gtkwave
 gvfs
@@ -60,6 +61,7 @@ tlp
 ttf-dejavu
 tumbler
 unzip
+valgrind
 visual-studio-code-bin
 vulkan-intel
 wireplumber
