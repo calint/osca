@@ -5,13 +5,7 @@ set -e
 cd $(dirname "$0")
 
 CC="gcc"
-#CC="clang -Weverything \
-#    -Wno-declaration-after-statement \
-#    -Wno-padded \
-#    -Wno-missing-noreturn \
-#    -Wno-disabled-macro-expansion \
-#    -Wno-format-nonliteral \
-#"
+#CC="clang -Weverything -Wno-declaration-after-statement -Wno-padded -Wno-unsafe-buffer-usage -Wno-disabled-macro-expansion -Wno-missing-noreturn"
 BIN="clonky"
 SRC="src/*.c"
 OPTS="-Os -Werror -Wfatal-errors"

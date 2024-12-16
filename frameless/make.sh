@@ -5,15 +5,11 @@ set -e
 cd $(dirname "$0")
 
 CC="gcc"
-#CC="clang -Weverything \
-#    -Wno-declaration-after-statement \
-#    -Wno-padded \
-#"
+#CC="clang -Weverything -Wno-declaration-after-statement -Wno-padded -Wno-unsafe-buffer-usage"
 BIN=frameless
 SRC=src/frameless.c
-OPTS="-Os -pedantic-errors -Wfatal-errors -Werror"
-WARNINGS="-Wall -Wextra -Wconversion -Wsign-conversion -Wno-unused-result \
-        -Wno-unused-parameter -Wno-unused-variable"
+OPTS="-Os -Wfatal-errors -Werror"
+WARNINGS="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wno-unused-result -Wno-unused-parameter"
 LIBS="-lX11"
 
 echo

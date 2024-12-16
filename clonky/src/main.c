@@ -742,7 +742,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   pl(buf);
 }
 
-static void render_net_interfaces() {
+static void render_net_interfaces(void) {
   struct ifaddrs *ifas = NULL;
   if (getifaddrs(&ifas) == -1) {
     return;
