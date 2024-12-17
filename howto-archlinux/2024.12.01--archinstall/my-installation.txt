@@ -43,6 +43,7 @@ mpv
 nano
 nasm
 openfpgaloader
+p7zip
 pipewire
 pipewire-alsa
 pipewire-jack
@@ -60,7 +61,6 @@ thunar
 tlp
 ttf-dejavu
 tumbler
-unzip
 valgrind
 visual-studio-code-bin
 vulkan-intel
@@ -72,5 +72,4 @@ xorg-xinput
 xorg-xsetroot
 xterm
 yay
-zip
 zram-generator
