@@ -11,7 +11,9 @@ mkdir -p "$SKEL/.config"
 cd $HOME
 cp -av .bashrc "$SKEL"
 cp -av .xinitrc "$SKEL"
+cp -rav .config/mimeapps.list "$SKEL/.config"
 cp -rav .config/gtk-3.0 "$SKEL/.config"
+cp -rav .config/Thunar "$SKEL/.config"
 cp -rav .config/xfce4 "$SKEL/.config"
 cd "$SKEL"
 ln -s .bashrc .profile
