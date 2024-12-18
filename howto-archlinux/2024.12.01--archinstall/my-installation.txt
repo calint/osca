@@ -12,7 +12,9 @@ cmake
 dmidecode
 efibootmgr
 eog
+exfat-utils
 feh
+ffmpegthumbnailer
 git
 glm
 gnu-netcat
@@ -29,6 +31,9 @@ iwd
 jq
 lcov
 less
+libgepub
+libgsf
+libopenraw
 libva-intel-driver
 libva-utils
 libxft
@@ -44,13 +49,19 @@ nano
 nasm
 openfpgaloader
 p7zip
+pavucontrol
 pipewire
 pipewire-alsa
 pipewire-jack
+pipewire-pulse
 plocate
+poppler-glib
 powertop
+putty
 qemu-system-x86
 qemu-ui-gtk
+riscv64-elf-gcc
+rsync
 scrot
 sdl2
 sdl2_image
@@ -58,6 +69,7 @@ sdl2_ttf
 sof-firmware
 sysstat
 thunar
+tinyxxd
 tlp
 ttf-dejavu
 tumbler
