@@ -1,16 +1,18 @@
+[ ] frameless: encapsulate handling of 'bit' field in xin_.... functions
 [ ] frameless: consider hiding windows from other desktops instead of "folding"
     them to the right
-[ ] osca: xii volume and screen brightness controls
+[x] osca: xii volume and screen brightness controls
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
-[ ] frameless: capture XF86... keys
+[x] frameless: capture XF86... keys
 [ ] stickyo: use of resources is exorbitant (35 MB  res - shared)
     => additional stickies consume much less resources
 [ ] stickyo: save and remember state of stickies
 [ ] frameless: capture button 3 and swipe up / down motion to switch desktop
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] review menuq code
-[ ] review mounte code
+[x] review mounte code
+    => deprecated
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
