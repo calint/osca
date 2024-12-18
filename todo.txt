@@ -1,4 +1,4 @@
-[ ] frameless: encapsulate handling of 'bit' field in xin_.... functions
+[ ] frameless: encapsulate handling of field 'bits' in xin_.... functions
 [ ] frameless: consider hiding windows from other desktops instead of "folding"
     them to the right
 [x] osca: xii volume and screen brightness controls
