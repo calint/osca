@@ -1,6 +1,5 @@
 #include "graph.h"
 #include "dc.h"
-#include "main-cfg.h"
 #include <stdio.h>
 #include <stdlib.h>
 
