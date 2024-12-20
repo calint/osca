@@ -1,5 +1,6 @@
 #include "graph.h"
 #include "dc.h"
+#include "main-cfg.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,37 +39,7 @@ void graph_add_value(struct graph *self, const long long value) {
   }
 }
 
-void graph_draw(const struct graph *self, struct dc *dc,
-                const int y_value_shift_right) {
-  const int dc_x = dc_get_x(dc);
-  const int dc_y = dc_get_y(dc);
-  //? fix the magic number 100 which works because function is called in one
-  // location from main.c with shift value of 2 which happens to be main-cfg.h
-  // DEFAULT_GRAPH_HEIGHT
-  dc_draw_line(dc, dc_x, dc_y - (100 >> y_value_shift_right),
-               dc_x + (int)self->nvalues, dc_y - (100 >> y_value_shift_right));
-  int x = dc_x;
-  // circular buffer, draw from current index to end
-  for (unsigned i = self->ix; i < self->nvalues; i++) {
-    long long value = self->values[i] >> y_value_shift_right;
-    if (value == 0 && self->values[i] != 0) {
-      value = 1;
-    }
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
-    x++;
-  }
-  // draw from 0 to current index
-  for (unsigned i = 0; i < self->ix; i++) {
-    long long value = self->values[i] >> y_value_shift_right;
-    if (value == 0 && self->values[i] != 0) {
-      value = 1;
-    }
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
-    x++;
-  }
-}
-
-static long long graphd_cap_value(const long long value, const int height) {
+static long long graph_cap_value(const long long value, const int height) {
   if (value > height) {
     return height;
   }
@@ -78,8 +49,8 @@ static long long graphd_cap_value(const long long value, const int height) {
   return value;
 }
 
-void graph_draw2(const struct graph *self, struct dc *dc, const int height,
-                 const long long max_value) {
+void graph_draw(const struct graph *self, struct dc *dc, const int height,
+                const long long max_value) {
   if (max_value == 0) {
     return;
   }
@@ -95,7 +66,7 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
     if (value == 0 && self->values[i] != 0) {
       value = 1;
     }
-    value = graphd_cap_value(value, height);
+    value = graph_cap_value(value, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
@@ -105,7 +76,7 @@ void graph_draw2(const struct graph *self, struct dc *dc, const int height,
     if (value == 0 && self->values[i] != 0) {
       value = 1;
     }
-    value = graphd_cap_value(value, height);
+    value = graph_cap_value(value, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }

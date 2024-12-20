@@ -1,4 +1,5 @@
 #include "dc.h"
+#include "main-cfg.h"
 #include <X11/Xft/Xft.h>
 #include <locale.h>
 #include <stdio.h>
@@ -85,15 +86,17 @@ void dc_draw_str(struct dc *self, const char *str) {
 }
 
 void dc_draw_hr(struct dc *self) {
-  self->doty += 3; //? magic number from main-cfg.h DELTA_Y_HR
+  self->doty += DELTA_Y_HR;
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
             self->xlft + (int)self->width, self->doty);
+  // self->doty += DELTA_Y_HR;
 }
 
 void dc_draw_hr1(struct dc *self, const int width) {
-  self->doty += 3; //? magic number from main-cfg.h DELTA_Y_HR
+  self->doty += DELTA_Y_HR;
   XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
             self->xlft + width, self->doty);
+  // self->doty += DELTA_Y_HR;
 }
 
 void dc_inc_y(struct dc *self, const int dy) { self->doty += dy; }

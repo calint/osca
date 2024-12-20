@@ -220,7 +220,7 @@ static void render_cpu_load(void) {
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
-  graph_draw2(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
+  graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
 
 static void render_hello_clonky(void) {
@@ -256,11 +256,11 @@ static void render_mem_info(void) {
   fclose(file);
 
   sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
-  int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
+  const int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, DELTA_Y_HR);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
-  graph_draw(graph_mem, dc, 2);
+  graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
   if (mem_avail >> 10 != 0) {
     mem_avail >>= 10;
     mem_total >>= 10;

@@ -5,25 +5,25 @@
 #define NET_GRAPH_MAX 1024 * 1024
 
 // the size of a separator
-#define DELTA_Y_HR 3
+#define DELTA_Y_HR 7
 
 // start of clonky output
 #define TOP_Y 0
 
 // width of clonky output
-#define WIDTH 150
+#define WIDTH 200
 
 // font size as double
-#define FONT_SIZE 7.0
+#define FONT_SIZE 9.0
 
 // line height in pixels
-#define LINE_HEIGHT 10
+#define LINE_HEIGHT 15
 
 // align left (0) or right (1) of the screen
 #define ALIGN 0
 
 // pixels of default graphs
-#define DEFAULT_GRAPH_HEIGHT 25
+#define DEFAULT_GRAPH_HEIGHT 35
 
 // maximum number of network interfaces
 #define NETIFC_ARRAY_SIZE 4
