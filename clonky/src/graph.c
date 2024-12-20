@@ -50,9 +50,6 @@ static long long cap_value(const long long value, const int height) {
 
 void graph_draw(const struct graph *self, struct dc *dc, const int height,
                 const long long max_value) {
-  if (max_value == 0) {
-    return;
-  }
   const int dc_x = dc_get_x(dc);
   const int dc_y = dc_get_y(dc);
   // draw top line
