@@ -42,7 +42,7 @@ void graphd_add_value(struct graphd *self, const long long value) {
   }
 }
 
-static long long graphd_cap_value(long long v, const int height) {
+static long long cap_value(long long v, const int height) {
   if (v > height) {
     return height;
   }
@@ -62,21 +62,15 @@ void graphd_draw(const struct graphd *self, struct dc *dc, const int height,
   int x = dc_x;
   // circular buffer, draw from current index to end
   for (unsigned i = self->ix; i < self->nvalues; i++) {
-    long long value = self->values[i] * height / max_value;
-    value = graphd_cap_value(value, height);
-    if (value == 0 && self->values[i] != 0) {
-      value = 1;
-    }
+    const long long value =
+        cap_value(self->values[i] * height / max_value, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
   // draw from 0 to current index
   for (unsigned i = 0; i < self->ix; i++) {
-    long long value = self->values[i] * height / max_value;
-    value = graphd_cap_value(value, height);
-    if (value == 0 && self->values[i] != 0) {
-      value = 1;
-    }
+    const long long value =
+        cap_value(self->values[i] * height / max_value, height);
     dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
     x++;
   }
