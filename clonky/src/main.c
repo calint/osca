@@ -837,7 +837,7 @@ int main(int argc, char *argv[]) {
 
   puts("clonky system overview");
 
-  dc = /*takes*/ dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH,
+  dc = /*takes*/ dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, MARGIN_TOP, WIDTH,
                         HR_PIXELS_BEFORE, HR_PIXELS_AFTER, ALIGN);
   graph_cpu = /*takes*/ graph_new(WIDTH);
   graph_mem = /*takes*/ graph_new(WIDTH);

@@ -5,7 +5,7 @@
 #define ALIGN 0
 
 // start of clonky output
-#define TOP_Y 0
+#define MARGIN_TOP 0
 
 // width of clonky output
 #define WIDTH 200
