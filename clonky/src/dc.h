@@ -29,6 +29,7 @@ void dc_newline(struct dc *self);
 // moves the cursor down by 'dy' pixels
 void dc_inc_y(struct dc *self, int dy);
 
+// flushes the display
 void dc_flush(const struct dc *self);
 
 int dc_get_x(const struct dc *self);
