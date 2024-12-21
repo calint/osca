@@ -1,7 +1,7 @@
 #ifndef CLONKY_CFG_H
 #define CLONKY_CFG_H
 
-// align left (0) or right (1) on the screen
+// align left (0) or right (1) on screen
 #define ALIGN 0
 
 // start of clonky output
