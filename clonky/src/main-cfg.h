@@ -17,14 +17,14 @@
 // line height in pixels
 #define LINE_HEIGHT 15
 
+// the size of a separator
+#define DELTA_Y_HR 7
+
 // pixels of default graphs
 #define DEFAULT_GRAPH_HEIGHT 35
 
 // the y-values of the graph 1 MB
 #define NET_GRAPH_MAX 1024 * 1024
-
-// the size of a separator
-#define DELTA_Y_HR 7
 
 // maximum number of network interfaces
 #define NETIFC_ARRAY_SIZE 4
