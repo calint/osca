@@ -34,7 +34,7 @@ struct dc {
   self->dpy = XOpenDisplay(NULL);
   if (!self->dpy) {
     printf("!!! could not open display\n");
-    return NULL;
+    exit(1);
   }
   self->scr = DefaultScreen(self->dpy);
   self->display_width = (unsigned)DisplayWidth(self->dpy, self->scr);

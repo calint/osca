@@ -844,11 +844,6 @@ int main(int argc, char *argv[]) {
 
   dc = /*takes*/ dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH,
                         HR_PIXELS_BEFORE, HR_PIXELS_AFTER, ALIGN);
-  if (!dc) {
-    printf("!!! cannot create drawer\n");
-    exit(1);
-  }
-
   graph_cpu = /*takes*/ graph_new(WIDTH);
   graph_mem = /*takes*/ graph_new(WIDTH);
   graph_net = /*takes*/ graphd_new(WIDTH);
