@@ -17,11 +17,11 @@
 // line height in pixels
 #define LINE_HEIGHT 15
 
-// the size of a separator
+// pre hr pixels
 #define HR_SIZE 7
 
 // pixels of default graphs
-#define DEFAULT_GRAPH_HEIGHT 35
+#define DEFAULT_GRAPH_HEIGHT 40
 
 // the y-values of the graph 1 MB
 #define NET_GRAPH_MAX 1024 * 1024

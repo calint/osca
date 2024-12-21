@@ -5,7 +5,7 @@ struct dc;
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
                             int line_height, int top_y, unsigned width,
-                            int hr_size);
+                            int hr_size, int align);
 
 void dc_del(/*takes*/ struct dc *self);
 
@@ -27,8 +27,6 @@ void dc_flush(const struct dc *self);
 
 int dc_get_x(const struct dc *self);
 
-void dc_set_x(struct dc *self, int x);
-
 int dc_get_y(const struct dc *self);
 
 void dc_set_y(struct dc *self, int y);
@@ -36,7 +34,5 @@ void dc_set_y(struct dc *self, int y);
 unsigned dc_get_width(const struct dc *self);
 
 unsigned dc_get_screen_width(const struct dc *self);
-
-void dc_set_margin_left(struct dc *self, int x);
 
 #endif

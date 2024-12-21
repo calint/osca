@@ -844,15 +844,10 @@ int main(int argc, char *argv[]) {
     puts(*argv++);
   }
 
-  if (!(dc =
-            dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH, HR_SIZE))) {
+  if (!(dc = dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH, HR_SIZE,
+                    ALIGN))) {
     printf("!!! cannot create drawer\n");
     exit(1);
-  }
-
-  if (ALIGN == 1) {
-    // align right
-    dc_set_margin_left(dc, (int)dc_get_screen_width(dc) - WIDTH);
   }
 
   graph_cpu = graph_new(WIDTH);

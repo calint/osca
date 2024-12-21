@@ -26,7 +26,7 @@ struct dc {
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
                             int line_height, int top_y, unsigned width,
-                            int hr_size) {
+                            int hr_size, int align) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
@@ -38,12 +38,12 @@ struct dc {
   self->display_width = (unsigned)DisplayWidth(self->dpy, self->scr);
   self->display_height = (unsigned)DisplayHeight(self->dpy, self->scr);
   self->width = width;
+  self->margin_left = align == 0 ? 0 : (int)(self->display_width - width);
   self->top_y = top_y;
   self->hr_size = hr_size;
-  self->margin_left = 0;
-  self->current_x = 0;
-  self->current_y = 0;
   self->line_height = line_height;
+  self->current_x = self->margin_left;
+  self->current_y = 0;
   self->win = RootWindow(self->dpy, self->scr);
   self->gc = XCreateGC(self->dpy, self->win, 0, NULL);
   self->color_map = DefaultColormap(self->dpy, self->scr);
@@ -80,16 +80,17 @@ void dc_clear(struct dc *self) {
 
 void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
                   const int y1) {
-  XDrawLine(self->dpy, self->win, self->gc, self->margin_left + x0, y0,
-            self->margin_left + x1, y1);
+  XDrawLine(self->dpy, self->win, self->gc, x0, y0, x1, y1);
 }
 
-void dc_newline(struct dc *self) { self->current_y += self->line_height; }
+void dc_newline(struct dc *self) {
+  self->current_y += self->line_height;
+  self->current_x = self->margin_left;
+}
 
 void dc_draw_str(struct dc *self, const char *str) {
-  XftDrawStringUtf8(self->draw, &self->color, self->font,
-                    self->margin_left + self->current_x, self->current_y,
-                    (const FcChar8 *)str, (int)strlen(str));
+  XftDrawStringUtf8(self->draw, &self->color, self->font, self->current_x,
+                    self->current_y, (const FcChar8 *)str, (int)strlen(str));
 }
 
 void dc_draw_hr(struct dc *self) {
@@ -111,10 +112,6 @@ void dc_inc_y(struct dc *self, const int dy) { self->current_y += dy; }
 void dc_flush(const struct dc *self) { XFlush(self->dpy); }
 
 int dc_get_x(const struct dc *self) { return self->current_x; }
-
-void dc_set_x(struct dc *self, const int x) { self->current_x = x; }
-
-void dc_set_margin_left(struct dc *self, const int x) { self->margin_left = x; }
 
 int dc_get_y(const struct dc *self) { return self->current_y; }
 

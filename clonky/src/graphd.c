@@ -57,8 +57,8 @@ void graphd_draw(const struct graphd *self, struct dc *dc, const int height,
   const int dc_x = dc_get_x(dc);
   const int dc_y = dc_get_y(dc);
   // draw top line
-  dc_draw_line(dc, dc_x, dc_y - height, dc_x + (int)self->nvalues,
-               dc_y - height);
+  const int top_y = dc_y - height;
+  dc_draw_line(dc, dc_x, top_y, dc_x + (int)self->nvalues, top_y);
   int x = dc_x;
   // circular buffer, draw from current index to end
   for (unsigned i = self->ix; i < self->nvalues; i++) {
