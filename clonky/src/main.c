@@ -848,9 +848,9 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  graph_cpu = graph_new(WIDTH);
-  graph_mem = graph_new(WIDTH);
-  graph_net = graphd_new(WIDTH);
+  graph_cpu = /*takes*/ graph_new(WIDTH);
+  graph_mem = /*takes*/ graph_new(WIDTH);
+  graph_net = /*takes*/ graphd_new(WIDTH);
 
   auto_config();
 
