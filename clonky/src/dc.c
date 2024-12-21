@@ -115,8 +115,6 @@ int dc_get_x(const struct dc *self) { return self->current_x; }
 
 int dc_get_y(const struct dc *self) { return self->current_y; }
 
-void dc_set_y(struct dc *self, const int y) { self->current_y = y; }
-
 unsigned dc_get_width(const struct dc *self) { return self->width; }
 
 unsigned dc_get_screen_width(const struct dc *self) {
