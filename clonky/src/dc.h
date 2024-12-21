@@ -29,8 +29,4 @@ int dc_get_x(const struct dc *self);
 
 int dc_get_y(const struct dc *self);
 
-unsigned dc_get_width(const struct dc *self);
-
-unsigned dc_get_screen_width(const struct dc *self);
-
 #endif

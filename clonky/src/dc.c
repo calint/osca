@@ -114,9 +114,3 @@ void dc_flush(const struct dc *self) { XFlush(self->dpy); }
 int dc_get_x(const struct dc *self) { return self->current_x; }
 
 int dc_get_y(const struct dc *self) { return self->current_y; }
-
-unsigned dc_get_width(const struct dc *self) { return self->width; }
-
-unsigned dc_get_screen_width(const struct dc *self) {
-  return self->display_width;
-}
