@@ -11,7 +11,7 @@ struct graphd {
   long long _value_prev;
 };
 
-struct /*give*/ graphd *graphd_new(const unsigned nvalues) {
+struct /*gives*/ graphd *graphd_new(const unsigned nvalues) {
   struct graphd *self = calloc(1, sizeof(struct graphd));
   if (!self) {
     printf("!!! graphd_new cannot alloc\n");
@@ -27,7 +27,7 @@ struct /*give*/ graphd *graphd_new(const unsigned nvalues) {
   return self;
 }
 
-void graphd_del(/*take*/ struct graphd *self) {
+void graphd_del(/*takes*/ struct graphd *self) {
   free(self->values);
   free(self);
 }

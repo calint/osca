@@ -23,8 +23,8 @@ struct dc {
   XRenderColor rendcol;
 };
 
-/*give*/ struct dc *dc_new(const char *font_name, double font_size,
-                           int line_height) {
+/*gives*/ struct dc *dc_new(const char *font_name, double font_size,
+                            int line_height) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
@@ -55,7 +55,7 @@ struct dc {
   return self;
 }
 
-void dc_del(/*take*/ struct dc *self) {
+void dc_del(/*takes*/ struct dc *self) {
   puts("· deleting dc");
   XftDrawDestroy(self->draw);
   XftFontClose(self->dpy, self->font);

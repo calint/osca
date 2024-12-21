@@ -4,9 +4,9 @@
 struct dc;
 struct graph;
 
-struct /*give*/ graph *graph_new(unsigned nvalues);
+struct /*gives*/ graph *graph_new(unsigned nvalues);
 
-void graph_del(/*take*/ struct graph *self);
+void graph_del(/*takes*/ struct graph *self);
 
 void graph_draw(const struct graph *self, struct dc *dc, int height,
                 long long max_value);
