@@ -461,7 +461,7 @@ static void render_date_time(void) {
   dc_draw_str(dc, sb.chars);
 }
 
-static void render_cpu_throttles(void) {
+static void render_cores_throttle(void) {
   FILE *file = fopen("/sys/devices/system/cpu/present", "r");
   if (!file) {
     return;
@@ -478,7 +478,7 @@ static void render_cpu_throttles(void) {
   }
   const unsigned ncpus = max - min + 1;
   strb_p_int(&sb, (int)ncpus);
-  strb_p(&sb, " cpu");
+  strb_p(&sb, " core");
   if (ncpus != 1) {
     strb_p_char(&sb, 's');
   }
@@ -821,7 +821,7 @@ static void render(void) {
   render_io_stat();
   render_df();
   render_hr();
-  render_cpu_throttles();
+  render_cores_throttle();
   render_battery();
   render_acpi();
   //  render_hr();
