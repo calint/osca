@@ -18,7 +18,7 @@
 #define LINE_HEIGHT 15
 
 // pre hr pixels
-#define HR_SIZE 7
+#define HR_SIZE 5
 
 // pixels of default graphs
 #define DEFAULT_GRAPH_HEIGHT 35
