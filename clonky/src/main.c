@@ -34,7 +34,7 @@ static struct graph *graph_mem;
 static struct graphd *graph_net;
 
 // prefix to battery status directory
-static const char power_supply_path_prefix[] = "/sys/class/power_supply/";
+static const char *power_supply_path_prefix = "/sys/class/power_supply/";
 
 // quirk for different names for battery charge indicator
 static const char *battery_energy_or_charge_prefix = "";
