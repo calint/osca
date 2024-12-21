@@ -4,9 +4,9 @@
 struct dc;
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
-                            unsigned line_height, int top_y, unsigned width,
-                            unsigned hr_pixels_before, unsigned hr_pixels_after,
-                            unsigned align);
+                            unsigned line_height, int margin_top,
+                            unsigned width, unsigned pixels_before_hr,
+                            unsigned pixels_after_hr, unsigned align);
 
 void dc_del(/*takes*/ struct dc *self);
 
