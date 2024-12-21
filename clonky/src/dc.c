@@ -30,7 +30,10 @@ struct dc {
                             unsigned width, unsigned pixels_before_hr,
                             unsigned pixels_after_hr, unsigned align) {
   struct dc *self = calloc(1, sizeof(struct dc));
-  setlocale(LC_ALL, "");
+  if (!self) {
+    printf("!!! could not allocate dc\n");
+    exit(1);
+  }
   self->display = XOpenDisplay(NULL);
   if (!self->display) {
     printf("!!! could not open display\n");
@@ -57,7 +60,7 @@ struct dc {
   self->draw = XftDrawCreate(self->display, self->window,
                              DefaultVisual(self->display, self->screen),
                              self->color_map);
-  XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};
+  const XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};
   self->render_color = xrendcolwhite;
   XftColorAllocValue(self->display, DefaultVisual(self->display, self->screen),
                      self->color_map, &self->render_color, &self->color);
