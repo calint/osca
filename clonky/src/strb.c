@@ -6,6 +6,8 @@ inline void strb_init(strb *self) {
   self->chars[0] = '\0';
 }
 
+void strb_clear(strb *self) { strb_init(self); }
+
 inline size_t strb_rem(strb *self) {
   const size_t rem = sizeof(self->chars) - self->index;
   return rem;
@@ -52,7 +54,7 @@ inline int strb_p_int_with_width(strb *self, const int num, const int width) {
   return strb_p(self, buf);
 }
 
-int strb_p_nbytes(strb *self, long long nbytes) {
+int strb_p_nbytes(strb *self, const long long nbytes) {
   const long long kb = nbytes >> 10;
   if (kb == 0) {
     if (strb_p_long(self, nbytes)) {
@@ -87,9 +89,4 @@ void strb_back(strb *self) {
     self->index--;
     self->chars[self->index] = '\0';
   }
-}
-
-void strb_clear(strb *self) { //? same as strb_init
-  self->index = 0;
-  self->chars[0] = '\0';
 }
