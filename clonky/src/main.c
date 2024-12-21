@@ -793,15 +793,15 @@ static void render_top_10_processes(void) {
 
 static void signal_exit(int i) {
   puts("\nexiting");
-  dc_del(dc);
+  dc_del(/*gives*/ dc);
   if (graph_cpu) {
-    graph_del(graph_cpu);
+    graph_del(/*gives*/ graph_cpu);
   }
   if (graph_mem) {
-    graph_del(graph_mem);
+    graph_del(/*gives*/ graph_mem);
   }
   if (graph_net) {
-    graphd_del(graph_net);
+    graphd_del(/*gives*/ graph_net);
   }
   exit(i);
 }
@@ -842,8 +842,9 @@ int main(int argc, char *argv[]) {
     puts(*argv++);
   }
 
-  if (!(dc = dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH,
-                    HR_PIXELS_BEFORE, HR_PIXELS_AFTER, ALIGN))) {
+  dc = /*takes*/ dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH,
+                        HR_PIXELS_BEFORE, HR_PIXELS_AFTER, ALIGN);
+  if (!dc) {
     printf("!!! cannot create drawer\n");
     exit(1);
   }
