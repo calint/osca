@@ -4,7 +4,7 @@
 struct dc;
 struct graphd;
 
-struct /*gives*/ graphd *graphd_new(unsigned nvalues);
+/*gives*/ struct graphd *graphd_new(unsigned nvalues);
 
 void graphd_del(/*takes*/ struct graphd *self);
 

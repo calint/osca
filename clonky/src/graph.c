@@ -9,7 +9,7 @@ struct graph {
   unsigned ix;
 };
 
-struct /*gives*/ graph *graph_new(unsigned nvalues) {
+/*gives*/ struct graph *graph_new(unsigned nvalues) {
   struct graph *self = calloc(1, sizeof(struct graph));
   if (!self) {
     printf("!!! graph_new cannot alloc\n");
