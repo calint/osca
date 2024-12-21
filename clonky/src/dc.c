@@ -16,17 +16,19 @@ struct dc {
   unsigned display_height;
   unsigned width;
   int top_y;
-  int hr_size;
+  unsigned hr_pixels_before;
+  unsigned hr_pixels_after;
   int margin_left;
-  int line_height;
+  unsigned line_height;
   int current_y;
   int current_x;
   XRenderColor render_color;
 };
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
-                            int line_height, int top_y, unsigned width,
-                            int hr_size, int align) {
+                            unsigned line_height, int top_y, unsigned width,
+                            unsigned hr_pixels_before, unsigned hr_pixels_after,
+                            unsigned align) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
@@ -40,7 +42,8 @@ struct dc {
   self->width = width;
   self->margin_left = align == 0 ? 0 : (int)(self->display_width - width);
   self->top_y = top_y;
-  self->hr_size = hr_size;
+  self->hr_pixels_before = hr_pixels_before;
+  self->hr_pixels_after = hr_pixels_after;
   self->line_height = line_height;
   self->current_x = self->margin_left;
   self->current_y = 0;
@@ -84,7 +87,7 @@ void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
 }
 
 void dc_newline(struct dc *self) {
-  self->current_y += self->line_height;
+  self->current_y += (int)self->line_height;
   self->current_x = self->margin_left;
 }
 
@@ -94,17 +97,17 @@ void dc_draw_str(struct dc *self, const char *str) {
 }
 
 void dc_draw_hr(struct dc *self) {
-  self->current_y += self->hr_size;
+  self->current_y += (int)self->hr_pixels_before;
   XDrawLine(self->dpy, self->win, self->gc, self->margin_left, self->current_y,
             self->margin_left + (int)self->width, self->current_y);
-  // self->current_y += self->hr_size;
+  self->current_y += (int)self->hr_pixels_after;
 }
 
 void dc_draw_hr1(struct dc *self, const int width) {
-  self->current_y += self->hr_size;
+  self->current_y += (int)self->hr_pixels_before;
   XDrawLine(self->dpy, self->win, self->gc, self->margin_left, self->current_y,
             self->margin_left + width, self->current_y);
-  // self->current_y += self->hr_size;
+  self->current_y += (int)self->hr_pixels_after;
 }
 
 void dc_inc_y(struct dc *self, const int dy) { self->current_y += dy; }
