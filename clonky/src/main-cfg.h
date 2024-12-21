@@ -18,7 +18,7 @@
 #define LINE_HEIGHT 15
 
 // the size of a separator
-#define DELTA_Y_HR 7
+#define HR_SIZE 7
 
 // pixels of default graphs
 #define DEFAULT_GRAPH_HEIGHT 35

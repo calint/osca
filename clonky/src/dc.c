@@ -1,5 +1,4 @@
 #include "dc.h"
-#include "main-cfg.h"
 #include <X11/Xft/Xft.h>
 #include <locale.h>
 #include <stdio.h>
@@ -9,22 +8,25 @@ struct dc {
   Display *dpy;
   Window win;
   GC gc;
-  Colormap cmap;
+  Colormap color_map;
   XftFont *font;
   XftDraw *draw;
   XftColor color;
-  unsigned dpy_width;
-  unsigned dpy_height;
+  unsigned display_width;
+  unsigned display_height;
   unsigned width;
-  int xlft;
-  int ddoty;
-  int doty;
-  int dotx;
-  XRenderColor rendcol;
+  int top_y;
+  int hr_size;
+  int margin_left;
+  int line_height;
+  int current_y;
+  int current_x;
+  XRenderColor render_color;
 };
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
-                            int line_height) {
+                            int line_height, int top_y, unsigned width,
+                            int hr_size) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
@@ -33,25 +35,28 @@ struct dc {
     return NULL;
   }
   self->scr = DefaultScreen(self->dpy);
-  self->dpy_width = (unsigned)DisplayWidth(self->dpy, self->scr);
-  self->dpy_height = (unsigned)DisplayHeight(self->dpy, self->scr);
-  self->width = self->dpy_width;
-  self->xlft = 0;
-  self->dotx = 0;
-  self->doty = 0;
-  self->ddoty = line_height;
+  self->display_width = (unsigned)DisplayWidth(self->dpy, self->scr);
+  self->display_height = (unsigned)DisplayHeight(self->dpy, self->scr);
+  self->width = width;
+  self->top_y = top_y;
+  self->hr_size = hr_size;
+  self->margin_left = 0;
+  self->current_x = 0;
+  self->current_y = 0;
+  self->line_height = line_height;
   self->win = RootWindow(self->dpy, self->scr);
   self->gc = XCreateGC(self->dpy, self->win, 0, NULL);
-  self->cmap = DefaultColormap(self->dpy, self->scr);
+  self->color_map = DefaultColormap(self->dpy, self->scr);
   self->font = XftFontOpen(self->dpy, self->scr, XFT_FAMILY, XftTypeString,
                            font_name, XFT_ENCODING, XftTypeString, "UTF-8",
                            XFT_SIZE, XftTypeDouble, font_size, NULL);
-  self->draw = XftDrawCreate(self->dpy, self->win,
-                             DefaultVisual(self->dpy, self->scr), self->cmap);
+  self->draw =
+      XftDrawCreate(self->dpy, self->win, DefaultVisual(self->dpy, self->scr),
+                    self->color_map);
   XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};
-  self->rendcol = xrendcolwhite;
-  XftColorAllocValue(self->dpy, DefaultVisual(self->dpy, self->scr), self->cmap,
-                     &self->rendcol, &self->color);
+  self->render_color = xrendcolwhite;
+  XftColorAllocValue(self->dpy, DefaultVisual(self->dpy, self->scr),
+                     self->color_map, &self->render_color, &self->color);
   return self;
 }
 
@@ -65,57 +70,58 @@ void dc_del(/*takes*/ struct dc *self) {
 
 void dc_clear(struct dc *self) {
   XSetForeground(self->dpy, self->gc, BlackPixel(self->dpy, self->scr));
-  XFillRectangle(self->dpy, self->win, self->gc, self->xlft, TOP_Y, self->width,
-                 self->dpy_height);
+  XFillRectangle(self->dpy, self->win, self->gc, self->margin_left, self->top_y,
+                 self->width,
+                 (unsigned)((int)self->display_height - self->top_y));
   XSetForeground(self->dpy, self->gc, WhitePixel(self->dpy, self->scr));
+  self->current_y = self->top_y;
+  self->current_x = self->margin_left;
 }
 
 void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
                   const int y1) {
-  XDrawLine(self->dpy, self->win, self->gc, self->xlft + x0, y0,
-            self->xlft + x1, y1);
+  XDrawLine(self->dpy, self->win, self->gc, self->margin_left + x0, y0,
+            self->margin_left + x1, y1);
 }
 
-void dc_newline(struct dc *self) { self->doty += self->ddoty; }
+void dc_newline(struct dc *self) { self->current_y += self->line_height; }
 
 void dc_draw_str(struct dc *self, const char *str) {
   XftDrawStringUtf8(self->draw, &self->color, self->font,
-                    self->xlft + self->dotx, self->doty, (const FcChar8 *)str,
-                    (int)strlen(str));
+                    self->margin_left + self->current_x, self->current_y,
+                    (const FcChar8 *)str, (int)strlen(str));
 }
 
 void dc_draw_hr(struct dc *self) {
-  self->doty += DELTA_Y_HR;
-  XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
-            self->xlft + (int)self->width, self->doty);
-  // self->doty += DELTA_Y_HR;
+  self->current_y += self->hr_size;
+  XDrawLine(self->dpy, self->win, self->gc, self->margin_left, self->current_y,
+            self->margin_left + (int)self->width, self->current_y);
+  // self->current_y += self->hr_size;
 }
 
 void dc_draw_hr1(struct dc *self, const int width) {
-  self->doty += DELTA_Y_HR;
-  XDrawLine(self->dpy, self->win, self->gc, self->xlft, self->doty,
-            self->xlft + width, self->doty);
-  // self->doty += DELTA_Y_HR;
+  self->current_y += self->hr_size;
+  XDrawLine(self->dpy, self->win, self->gc, self->margin_left, self->current_y,
+            self->margin_left + width, self->current_y);
+  // self->current_y += self->hr_size;
 }
 
-void dc_inc_y(struct dc *self, const int dy) { self->doty += dy; }
+void dc_inc_y(struct dc *self, const int dy) { self->current_y += dy; }
 
 void dc_flush(const struct dc *self) { XFlush(self->dpy); }
 
-int dc_get_x(const struct dc *self) { return self->dotx; }
+int dc_get_x(const struct dc *self) { return self->current_x; }
 
-void dc_set_x(struct dc *self, const int x) { self->dotx = x; }
+void dc_set_x(struct dc *self, const int x) { self->current_x = x; }
 
-void dc_set_left_x(struct dc *self, const int x) { self->xlft = x; }
+void dc_set_margin_left(struct dc *self, const int x) { self->margin_left = x; }
 
-int dc_get_y(const struct dc *self) { return self->doty; }
+int dc_get_y(const struct dc *self) { return self->current_y; }
 
-void dc_set_y(struct dc *self, const int y) { self->doty = y; }
+void dc_set_y(struct dc *self, const int y) { self->current_y = y; }
 
 unsigned dc_get_width(const struct dc *self) { return self->width; }
 
-void dc_set_width(struct dc *self, const unsigned width) {
-  self->width = width;
+unsigned dc_get_screen_width(const struct dc *self) {
+  return self->display_width;
 }
-
-unsigned dc_get_screen_width(const struct dc *self) { return self->dpy_width; }

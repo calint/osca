@@ -218,7 +218,7 @@ static void render_cpu_load(void) {
   cpu_usage_prv = usage;
   const long long usage_percent = dusage * 100 / dtotal;
   graph_add_value(graph_cpu, usage_percent);
-  dc_inc_y(dc, DELTA_Y_HR);
+  dc_inc_y(dc, HR_SIZE);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
@@ -258,7 +258,7 @@ static void render_mem_info(void) {
   sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
   const int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
   graph_add_value(graph_mem, proc);
-  dc_inc_y(dc, DELTA_Y_HR);
+  dc_inc_y(dc, HR_SIZE);
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
   if (mem_avail >> 10 != 0) {
@@ -277,7 +277,7 @@ static void render_net_graph(void) {
     // if no network device to graph
     return;
   }
-  dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + DELTA_Y_HR);
+  dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + HR_SIZE);
   char path[128] = "";
   snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/tx_bytes",
            net_device);
@@ -809,7 +809,6 @@ static void signal_exit(int i) {
 }
 
 static void render(void) {
-  dc_set_y(dc, TOP_Y);
   dc_clear(dc);
   render_date_time();
   render_cpu_load();
@@ -845,16 +844,15 @@ int main(int argc, char *argv[]) {
     puts(*argv++);
   }
 
-  if (!(dc = dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT))) {
+  if (!(dc =
+            dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH, HR_SIZE))) {
     printf("!!! cannot create drawer\n");
     exit(1);
   }
 
-  dc_set_width(dc, WIDTH);
-
   if (ALIGN == 1) {
     // align right
-    dc_set_left_x(dc, (int)dc_get_screen_width(dc) - WIDTH);
+    dc_set_margin_left(dc, (int)dc_get_screen_width(dc) - WIDTH);
   }
 
   graph_cpu = graph_new(WIDTH);
