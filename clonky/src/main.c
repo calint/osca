@@ -1,5 +1,3 @@
-#define _GNU_SOURCE // To get defines of NI_MAXSERV and NI_MAXHOST
-
 #include "dc.h"
 #include "graph.h"
 #include "graphd.h"
