@@ -1,6 +1,5 @@
 #include "dc.h"
 #include <X11/Xft/Xft.h>
-#include <locale.h>
 #include <stdio.h>
 
 struct dc {

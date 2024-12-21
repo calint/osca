@@ -2,7 +2,6 @@
 #include "dc.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 struct graphd {
   unsigned nvalues;
