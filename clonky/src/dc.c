@@ -81,8 +81,8 @@ void dc_clear(struct dc *self) {
   self->current_x = self->margin_left;
 }
 
-void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
-                  const int y1) {
+void dc_draw_line(const struct dc *self, const int x0, const int y0,
+                  const int x1, const int y1) {
   XDrawLine(self->dpy, self->win, self->gc, x0, y0, x1, y1);
 }
 
@@ -91,7 +91,7 @@ void dc_newline(struct dc *self) {
   self->current_x = self->margin_left;
 }
 
-void dc_draw_str(struct dc *self, const char *str) {
+void dc_draw_str(const struct dc *self, const char *str) {
   XftDrawStringUtf8(self->draw, &self->color, self->font, self->current_x,
                     self->current_y, (const FcChar8 *)str, (int)strlen(str));
 }
