@@ -3,6 +3,7 @@ alsa-utils
 base
 base-devel
 bash-completion
+blender
 bluez
 bluez-utils
 brave-bin
@@ -15,6 +16,7 @@ eog
 exfat-utils
 feh
 ffmpegthumbnailer
+gimp
 git
 glm
 gnu-netcat
@@ -36,6 +38,7 @@ libgsf
 libopenraw
 libva-intel-driver
 libva-utils
+libxcrypt-compat
 libxft
 linux
 linux-firmware
@@ -47,6 +50,7 @@ mousepad
 mpv
 nano
 nasm
+ncurses5-compat-libs
 openfpgaloader
 p7zip
 pavucontrol
@@ -69,6 +73,7 @@ sdl2_ttf
 sof-firmware
 sysstat
 thunar
+tiled
 tinyxxd
 tlp
 ttf-dejavu
