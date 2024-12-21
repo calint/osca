@@ -838,9 +838,6 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, signal_exit);
 
   puts("clonky system overview");
-  while (argc--) {
-    puts(*argv++);
-  }
 
   dc = /*takes*/ dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT, TOP_Y, WIDTH,
                         HR_PIXELS_BEFORE, HR_PIXELS_AFTER, ALIGN);
