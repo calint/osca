@@ -845,7 +845,8 @@ int main(int argc, char *argv[]) {
     puts(*argv++);
   }
 
-  if (!(dc = dc_new(FONT_SIZE, LINE_HEIGHT))) {
+  if (!(dc = dc_new(FONT_NAME, FONT_SIZE, LINE_HEIGHT))) {
+    printf("!!! cannot create drawer\n");
     exit(1);
   }
 

@@ -3,7 +3,8 @@
 
 struct dc;
 
-/*give*/ struct dc *dc_new(double font_size, int line_height);
+/*give*/ struct dc *dc_new(const char *font_name, double font_size,
+                           int line_height);
 
 void dc_del(/*take*/ struct dc *self);
 

@@ -24,12 +24,13 @@ struct dc {
   XRenderColor rendcol;
 };
 
-/*give*/ struct dc *dc_new(double font_size, int line_height) {
+/*give*/ struct dc *dc_new(const char *font_name, double font_size,
+                           int line_height) {
   struct dc *self = calloc(1, sizeof(struct dc));
   setlocale(LC_ALL, "");
   self->dpy = XOpenDisplay(NULL);
   if (!self->dpy) {
-    fprintf(stderr, "!!! could not open display\n");
+    printf("!!! could not open display\n");
     return NULL;
   }
   self->scr = DefaultScreen(self->dpy);
@@ -45,7 +46,7 @@ struct dc {
   self->gc = XCreateGC(self->dpy, self->win, 0, NULL);
   self->cmap = DefaultColormap(self->dpy, self->scr);
   self->font = XftFontOpen(self->dpy, self->scr, XFT_FAMILY, XftTypeString,
-                           "dejavu sans", XFT_ENCODING, XftTypeString, "UTF-8",
+                           font_name, XFT_ENCODING, XftTypeString, "UTF-8",
                            XFT_SIZE, XftTypeDouble, font_size, NULL);
   self->draw = XftDrawCreate(self->dpy, self->win,
                              DefaultVisual(self->dpy, self->scr), self->cmap);

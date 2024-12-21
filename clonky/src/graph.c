@@ -12,13 +12,13 @@ struct graph {
 struct /*give*/ graph *graph_new(unsigned nvalues) {
   struct graph *self = calloc(1, sizeof(struct graph));
   if (!self) {
-    printf("graph_new can not alloc\n");
+    printf("!!! graph_new cannot alloc\n");
     exit(1);
   }
   self->nvalues = nvalues;
   self->values = (long long *)calloc(nvalues, sizeof(long long));
   if (!self->values) {
-    puts("graph_new can not alloc array of size %d\n");
+    printf("!!! graph_new cannot alloc array of size %d\n", nvalues);
     exit(1);
   }
   self->ix = 0;

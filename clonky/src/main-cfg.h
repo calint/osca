@@ -13,7 +13,8 @@
 // width of clonky output
 #define WIDTH 200
 
-// font size as double
+// font name and size
+#define FONT_NAME "dejavu sans"
 #define FONT_SIZE 9.0
 
 // line height in pixels
