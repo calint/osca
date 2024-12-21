@@ -64,14 +64,14 @@ void graphd_draw(const struct graphd *self, struct dc *dc, const int height,
   for (unsigned i = self->ix; i < self->nvalues; i++) {
     const long long value =
         cap_value(self->values[i] * height / max_value, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
+    dc_draw_line(dc, x, dc_y - (int)value, x, dc_y);
     x++;
   }
   // draw from 0 to current index
   for (unsigned i = 0; i < self->ix; i++) {
     const long long value =
         cap_value(self->values[i] * height / max_value, height);
-    dc_draw_line(dc, x, dc_y, x, dc_y - (int)value);
+    dc_draw_line(dc, x, dc_y - (int)value, x, dc_y);
     x++;
   }
 }

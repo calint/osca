@@ -17,7 +17,6 @@ struct dc {
   unsigned dpy_height;
   unsigned width;
   int xlft;
-  int ytop;
   int ddoty;
   int doty;
   int dotx;
@@ -38,7 +37,6 @@ struct dc {
   self->dpy_height = (unsigned)DisplayHeight(self->dpy, self->scr);
   self->width = self->dpy_width;
   self->xlft = 0;
-  self->ytop = 0;
   self->dotx = 0;
   self->doty = 0;
   self->ddoty = line_height;
@@ -67,23 +65,23 @@ void dc_del(/*take*/ struct dc *self) {
 
 void dc_clear(struct dc *self) {
   XSetForeground(self->dpy, self->gc, BlackPixel(self->dpy, self->scr));
-  XFillRectangle(self->dpy, self->win, self->gc, self->xlft, self->ytop,
-                 self->width, self->dpy_height);
+  XFillRectangle(self->dpy, self->win, self->gc, self->xlft, TOP_Y, self->width,
+                 self->dpy_height);
   XSetForeground(self->dpy, self->gc, WhitePixel(self->dpy, self->scr));
 }
 
 void dc_draw_line(struct dc *self, const int x0, const int y0, const int x1,
                   const int y1) {
-  XDrawLine(self->dpy, self->win, self->gc, self->xlft + x0, self->ytop + y0,
-            self->xlft + x1, self->ytop + y1);
+  XDrawLine(self->dpy, self->win, self->gc, self->xlft + x0, y0,
+            self->xlft + x1, y1);
 }
 
 void dc_newline(struct dc *self) { self->doty += self->ddoty; }
 
 void dc_draw_str(struct dc *self, const char *str) {
   XftDrawStringUtf8(self->draw, &self->color, self->font,
-                    self->xlft + self->dotx, self->ytop + self->doty,
-                    (const FcChar8 *)str, (int)strlen(str));
+                    self->xlft + self->dotx, self->doty, (const FcChar8 *)str,
+                    (int)strlen(str));
 }
 
 void dc_draw_hr(struct dc *self) {
