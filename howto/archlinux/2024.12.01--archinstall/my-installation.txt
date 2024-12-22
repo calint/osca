@@ -55,6 +55,7 @@ openfpgaloader
 p7zip
 pacman-contrib
 pavucontrol
+perf
 pipewire
 pipewire-alsa
 pipewire-jack
