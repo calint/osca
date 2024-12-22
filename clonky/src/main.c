@@ -3,23 +3,17 @@
 #include "graphd.h"
 #include "main-cfg.h"
 #include "strb.h"
-#include <arpa/inet.h>
 #include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <ifaddrs.h>
-#include <linux/if_link.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
 
 // device context (renderer)
 static struct dc *dc;
