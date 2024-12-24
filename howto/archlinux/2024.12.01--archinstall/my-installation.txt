@@ -1,3 +1,4 @@
+7zip
 acpi
 alsa-utils
 base
@@ -52,7 +53,6 @@ nano
 nasm
 ncurses5-compat-libs
 openfpgaloader
-p7zip
 pacman-contrib
 pavucontrol
 perf
