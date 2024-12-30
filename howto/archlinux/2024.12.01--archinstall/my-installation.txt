@@ -9,8 +9,10 @@ bluez
 bluez-utils
 brave-bin
 brightnessctl
+ca-certificates-mozilla
 clang
 cmake
+cutecom
 dmidecode
 efibootmgr
 eog
@@ -82,11 +84,13 @@ tinyxxd
 tk
 tlp
 ttf-dejavu
+ttf-jetbrains-mono
 tumbler
 valgrind
 visual-studio-code-bin
 vulkan-intel
 wireplumber
+xclip
 xorg-server
 xorg-xev
 xorg-xinit
