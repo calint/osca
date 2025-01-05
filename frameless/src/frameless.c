@@ -103,7 +103,9 @@ static FILE *flog;
 #define KEY_DESKTOP_DOWN 116    // down
 #define KEY_DESKTOP_DOWN_ALT 38 // a
 
-#define IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS 500
+#define IGNORED_ENTER_AFTER_MAP_TIME_MS 500
+// time to ignore enter notifies after a map notify
+// note: solves the problem with newly launched applications losing focus
 
 typedef struct xwin {
   Window win;     // x11 window handle
@@ -632,14 +634,14 @@ int main(int argc, char **args, char **env) {
     case EnterNotify:
       if (is_dragging || is_switching_desktop ||
           current_time_ms() - time_of_last_map_notify_ms <
-              IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS) {
+              IGNORED_ENTER_AFTER_MAP_TIME_MS) {
         // * if dragging then it is resizing, don't change focus
         // * if switching desktop, don't focus on the window that is under the
         //   pointer. focus on previously focused window on that desktop.
         // * when launching a new window and pointer is outside that window an
         //   EnterNotify for the window under the pointer is triggered. ignore
         //   that event for the time specified by
-        //   IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS to avoid losing focus from
+        //   IGNORED_ENTER_AFTER_MAP_TIME_MS to avoid losing focus from
         //   the newly launched application
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
