@@ -54,6 +54,7 @@ mpv
 nano
 nasm
 ncurses5-compat-libs
+neofetch
 openfpgaloader
 pacman-contrib
 pavucontrol
@@ -87,6 +88,7 @@ ttf-dejavu
 ttf-jetbrains-mono
 tumbler
 valgrind
+verible-bin
 visual-studio-code-bin
 vulkan-intel
 wireplumber

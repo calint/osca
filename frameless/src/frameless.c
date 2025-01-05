@@ -2,6 +2,7 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 // debugging log
 // #define FRAMELESS_DEBUG
@@ -102,6 +103,8 @@ static FILE *flog;
 #define KEY_DESKTOP_DOWN 116    // down
 #define KEY_DESKTOP_DOWN_ALT 38 // a
 
+#define IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS 500
+
 typedef struct xwin {
   Window win;     // x11 window handle
   int x;          // position x
@@ -135,6 +138,7 @@ static Display *display;
 static Window root_window;
 static int current_desk;
 static xwin *focused_window;
+static long long time_of_last_map_notify_ms;
 
 // default screen info
 static struct screen {
@@ -142,6 +146,12 @@ static struct screen {
   unsigned wi; // width
   unsigned hi; // height
 } screen;
+
+static long long current_time_ms() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
 
 static xwin *xwin_get_by_window(Window w) {
   int first_avail = -1;
@@ -606,6 +616,7 @@ int main(int argc, char **args, char **env) {
       XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
                   GrabModeAsync, GrabModeAsync, None, None);
       XSelectInput(display, xw->win, EnterWindowMask);
+      time_of_last_map_notify_ms = current_time_ms();
       break;
     case UnmapNotify:
       if (ev.xmap.window == root_window || ev.xmap.window == None ||
@@ -619,13 +630,17 @@ int main(int argc, char **args, char **env) {
       free_window_and_resolve_focus(ev.xmap.window);
       break;
     case EnterNotify:
-      if (is_dragging || is_switching_desktop || key_pressed) {
+      if (is_dragging || is_switching_desktop ||
+          current_time_ms() - time_of_last_map_notify_ms <
+              IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS) {
         // * if dragging then it is resizing, don't change focus
         // * if switching desktop, don't focus on the window that is under the
         //   pointer. focus on previously focused window on that desktop.
         // * when launching a new window and pointer is outside that window an
         //   EnterNotify for the window under the pointer is triggered. ignore
-        //   that event if key is pressed (assuming it was a launch, fix).
+        //   that event for the time specified by
+        //   IGNORED_FOCUS_AFTER_MAP_NOTIFY_TIME_MS to avoid losing focus from
+        //   the newly launched application
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
         fflush(flog);
