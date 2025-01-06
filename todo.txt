@@ -1,3 +1,7 @@
+[ ] frameless: study the possibility to capture a window creation
+    event before it is mapped
+[x] frameless: fix the focus when opening an application
+    => it focuses on MapNotify and then ignores focus events for 500 ms
 [ ] frameless: encapsulate handling of field 'bits' in xin_.... functions
 [ ] frameless: consider hiding windows from other desktops instead of "folding"
     them to the right
