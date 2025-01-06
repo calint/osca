@@ -597,12 +597,18 @@ int main(int argc, char **args, char **env) {
     fflush(flog);
 #endif
     switch (ev.type) {
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     default:
 #ifdef FRAMELESS_DEBUG
       fprintf(flog, "  unhandled\n");
       fflush(flog);
 #endif
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case MapNotify:
       if (ev.xmap.window == root_window || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
@@ -620,6 +626,9 @@ int main(int argc, char **args, char **env) {
       XSelectInput(display, xw->win, EnterWindowMask);
       time_of_last_map_notify_ms = current_time_ms();
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case UnmapNotify:
       if (ev.xmap.window == root_window || ev.xmap.window == None ||
           ev.xmap.override_redirect) {
@@ -631,6 +640,9 @@ int main(int argc, char **args, char **env) {
       }
       free_window_and_resolve_focus(ev.xmap.window);
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case EnterNotify:
       if (is_dragging || is_switching_desktop ||
           current_time_ms() - time_of_last_map_notify_ms <
@@ -652,6 +664,9 @@ int main(int argc, char **args, char **env) {
       xw = xwin_get_by_window(ev.xcrossing.window);
       focus_on_window(xw);
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case KeyPress:
       key_pressed = ev.xkey.keycode;
       switch (key_pressed) {
@@ -805,6 +820,9 @@ int main(int argc, char **args, char **env) {
         break;
       }
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case KeyRelease:
       if (key_pressed == ev.xkey.keycode) {
         key_pressed = 0;
@@ -812,6 +830,9 @@ int main(int argc, char **args, char **env) {
       //? should check that the key was switch desktop
       is_switching_desktop = False;
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case ButtonPress:
       is_dragging = True;
       dragging_prev_x = ev.xbutton.x_root;
@@ -825,6 +846,9 @@ int main(int argc, char **args, char **env) {
       xwin_raise(xw);
       xwin_read_geom(xw);
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case MotionNotify:
       while (XCheckTypedEvent(display, MotionNotify, &ev))
         ;
@@ -880,6 +904,9 @@ int main(int argc, char **args, char **env) {
         break;
       }
       break;
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
     case ButtonRelease:
       is_dragging = False;
       dragging_button = 0;
