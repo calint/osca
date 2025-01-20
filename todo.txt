@@ -1,3 +1,5 @@
+[ ] frameless: if switching to a desktop without windows unfocus current window
+    in previous desktop
 [ ] frameless: study the possibility to capture a window creation
     event before it is mapped
 [x] frameless: fix the focus when opening an application
