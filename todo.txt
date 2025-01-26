@@ -36,6 +36,19 @@
 [ ]     stickyo
 [ ] clang-tidy: maxed
 [ ] frameless: different shades on desktop depending on id
+[ ] clonky: display connection quality and network name for wireless devices
+    :: iw dev wlan0 link
+    Connected to 38:d5:47:40:99:d0 (on wlan0)
+            SSID: AC51
+            freq: 2467.0
+            RX: 311025979 bytes (260365 packets)
+            TX: 16520134 bytes (97826 packets)
+            signal: -66 dBm
+            rx bitrate: 117.0 MBit/s MCS 14
+            tx bitrate: 144.4 MBit/s MCS 15 short GI
+            bss flags: short-slot-time
+            dtim period: 1
+            beacon int: 100
 --------------------------------------------------------------
 [x] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
