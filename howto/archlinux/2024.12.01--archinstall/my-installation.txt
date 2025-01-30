@@ -13,7 +13,7 @@ ca-certificates-mozilla
 clang
 cmake
 cutecom
-dmidecode
+dosfstools
 efibootmgr
 eog
 exfat-utils
@@ -31,6 +31,7 @@ htop
 intel-media-driver
 intel-oneapi-tbb
 intel-ucode
+inxi
 iverilog
 iwd
 jq
@@ -45,16 +46,17 @@ libxcrypt-compat
 libxft
 linux
 linux-firmware
+linux-lts
 llvm
 man-db
 mariadb
+memtest86+-efi
 mesa-utils
 mousepad
 mpv
 nano
 nasm
 ncurses5-compat-libs
-neofetch
 openfpgaloader
 pacman-contrib
 pavucontrol
@@ -71,9 +73,8 @@ qemu-system-x86
 qemu-ui-gtk
 riscv64-elf-gcc
 rsync
-scid
 scrot
-sdl2
+sdl2-compat
 sdl2_image
 sdl2_ttf
 sof-firmware
