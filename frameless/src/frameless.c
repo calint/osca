@@ -649,13 +649,15 @@ int main(int argc, char **args, char **env) {
           current_time_ms() - time_of_last_map_notify_ms <
               IGNORED_ENTER_AFTER_MAP_TIME_MS) {
         // * if dragging then it is resizing, don't change focus
-        // * if switching desktop, don't focus on the window that is under the
-        //   pointer. focus on previously focused window on that desktop.
-        // * when launching a new window and pointer is outside that window an
-        //   EnterNotify for the window under the pointer is triggered. ignore
-        //   that event for the time specified by
-        //   IGNORED_ENTER_AFTER_MAP_TIME_MS to avoid losing focus from
+        // * if switching desktop, don't focus on the window that is under
+        //   the pointer. focus on previously focused window on that desktop.
+        // * when launching a new window ignore the event for
+        //   IGNORED_ENTER_AFTER_MAP_TIME_MS since it might lose focus from
         //   the newly launched application
+        //   detail: a newly mapped window is at 0,0 and moved to center of
+        //   screen and focused. if the move leaves the pointer on some other
+        //   window then that window receives focus. this somewhat hacky way
+        //   of avoiding that is good enough compared to the complications.
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
         fflush(flog);
