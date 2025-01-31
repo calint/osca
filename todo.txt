@@ -1,27 +1,29 @@
-[x] frameless: if switching to a desktop without windows unfocus current window
-    in previous desktop
-    => setting input focus to root window
-[ ] frameless: study the possibility to capture a window creation
-    event before it is mapped
-[x] frameless: fix the focus when opening an application
-    => it focuses on MapNotify and then ignores focus events for 500 ms
-[ ] frameless: encapsulate handling of field 'bits' in xin_.... functions
+[ ] clonky: display connection quality and network name for wireless devices
+    :: iw wlan0 link
+    Connected to 38:d5:47:40:99:d0 (on wlan0)
+            SSID: AC51
+            freq: 2467.0
+            RX: 311025979 bytes (260365 packets)
+            TX: 16520134 bytes (97826 packets)
+            signal: -66 dBm
+            rx bitrate: 117.0 MBit/s MCS 14
+            tx bitrate: 144.4 MBit/s MCS 15 short GI
+            bss flags: short-slot-time
+            dtim period: 1
+            beacon int: 100
 [ ] frameless: consider hiding windows from other desktops instead of "folding"
     them to the right
-[x] osca: xii volume and screen brightness controls
+[ ] frameless: encapsulate handling of field 'bits' in xin_.... functions
+[ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
+[ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
-[x] frameless: capture XF86... keys
 [ ] stickyo: use of resources is exorbitant (35 MB  res - shared)
     => additional stickies consume much less resources
 [ ] stickyo: save and remember state of stickies
 [ ] frameless: capture button 3 and swipe up / down motion to switch desktop
 [ ] frameless: capture button 3 and swipe left / right motion to switch focus
 [ ] review menuq code
-[x] review mounte code
-    => deprecated
-[ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
-[ ] clonky: unit/s to use specified dt instead of assuming 1s
 [ ] gtk.css: export GTK_DEBUG=interactive
 [ ] clonky: valgrind
 [ ] menuq: valgrind
@@ -37,20 +39,20 @@
 [ ]     stickyo
 [ ] clang-tidy: maxed
 [ ] frameless: different shades on desktop depending on id
-[ ] clonky: display connection quality and network name for wireless devices
-    :: iw dev wlan0 link
-    Connected to 38:d5:47:40:99:d0 (on wlan0)
-            SSID: AC51
-            freq: 2467.0
-            RX: 311025979 bytes (260365 packets)
-            TX: 16520134 bytes (97826 packets)
-            signal: -66 dBm
-            rx bitrate: 117.0 MBit/s MCS 14
-            tx bitrate: 144.4 MBit/s MCS 15 short GI
-            bss flags: short-slot-time
-            dtim period: 1
-            beacon int: 100
 --------------------------------------------------------------
+[x] osca: xii volume and screen brightness controls
+[x] frameless: capture XF86... keys
+[x] review mounte code
+    => deprecated
+[x] frameless: if switching to a desktop without windows unfocus current window
+    in previous desktop
+    => setting input focus to root window
+[-] frameless: study the possibility to capture a window creation
+    event before it is mapped
+    => the complications are too great. the hacky way of handling focus after
+       mapping is satisfactory
+[x] frameless: fix the focus when opening an application
+    => it focuses on MapNotify and then ignores focus events for 500 ms
 [x] frameless: when closing window and no focused windows on desk then focus
     on window under pointer
 [x] review stickyo code
