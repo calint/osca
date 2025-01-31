@@ -421,7 +421,8 @@ static void focus_window_after_desk_switch(void) {
   }
   focused_window = NULL;
   if (!focus) {
-    // didn't find any window to focus
+    // didn't find any window to focus; focus on root window
+    XSetInputFocus(display, PointerRoot, RevertToParent, CurrentTime);
     return;
   }
   focus_on_window(focus);

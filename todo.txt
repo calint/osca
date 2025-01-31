@@ -1,5 +1,6 @@
-[ ] frameless: if switching to a desktop without windows unfocus current window
+[x] frameless: if switching to a desktop without windows unfocus current window
     in previous desktop
+    => setting input focus to root window
 [ ] frameless: study the possibility to capture a window creation
     event before it is mapped
 [x] frameless: fix the focus when opening an application
