@@ -1,5 +1,5 @@
 [ ] clonky: display connection quality and network name for wireless devices
-    :: iw wlan0 link
+    :: iw dev wlan0 link
     Connected to 38:d5:47:40:99:d0 (on wlan0)
             SSID: AC51
             freq: 2467.0
