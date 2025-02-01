@@ -562,11 +562,9 @@ int main(int argc, char **args, char **env) {
            GrabModeAsync, GrabModeAsync);
   XSelectInput(display, root_window, SubstructureNotifyMask);
 
-  // previous desk
-  int dsk_prv = 0;
+  int dsk_prv = 0; // previous desk
 
-  // current key pressed
-  unsigned key_pressed = 0;
+  unsigned key_pressed = 0; // current key pressed
 
   // dragging state
   Bool is_dragging = False;
@@ -574,8 +572,8 @@ int main(int argc, char **args, char **env) {
   int dragging_prev_y = 0;
   unsigned dragging_button = 0;
 
-  // True while switching desktop, False after any key release
   Bool is_switching_desktop = False;
+  // True while switching desktop, False after any key release
 
   // key codes for media keys
   const KeyCode key_code_audio_lower_volume =
@@ -590,6 +588,7 @@ int main(int argc, char **args, char **env) {
       XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
 
   xwin *move_or_resize_window = NULL;
+  // window that is being moved or resized
 
   XEvent ev = {0};
   while (!XNextEvent(display, &ev)) {
