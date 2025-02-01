@@ -1,5 +1,14 @@
+# osca home
 export OSCA="$HOME/w/osca"
-export PATH="$HOME/bin:$OSCA/sh:$PATH"
+
+# add to path if not already there
+if [[ ":$PATH:" != *":$OSCA/sh:"* ]]; then
+    export PATH="$OSCA/sh:$PATH"
+fi
+
+if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+    export PATH="$HOME/bin:$PATH"
+fi
 
 export PS1=" :: "
 

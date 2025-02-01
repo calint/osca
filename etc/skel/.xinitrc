@@ -1,8 +1,14 @@
-# path to osca
+# osca home
 export OSCA="$HOME/w/osca"
 
-# executables path
-export PATH="$HOME/bin:$OSCA/sh:$PATH"
+# add to path if not already there
+if [[ ":$PATH:" != *":$OSCA/sh:"* ]]; then
+    export PATH="$OSCA/sh:$PATH"
+fi
+
+if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+    export PATH="$HOME/bin:$PATH"
+fi
 
 # no session manager
 export SESSION_MANAGER=
