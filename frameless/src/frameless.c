@@ -612,15 +612,14 @@ int main(int argc, char **args, char **env) {
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     case MapNotify: {
-      const Window win = ev.xmap.window;
-      if (win == root_window || win == None || ev.xmap.override_redirect) {
+      if (ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
         fflush(flog);
 #endif
         break;
       }
-      xw = xwin_get_by_window(win);
+      xw = xwin_get_by_window(ev.xmap.window);
       xwin_center(xw);
       focus_on_window(xw);
       XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
@@ -633,15 +632,7 @@ int main(int argc, char **args, char **env) {
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     case UnmapNotify: {
-      const Window win = ev.xmap.window;
-      if (win == root_window || win == None || ev.xmap.override_redirect) {
-#ifdef FRAMELESS_DEBUG
-        fprintf(flog, "  ignored\n");
-        fflush(flog);
-#endif
-        break;
-      }
-      free_window_and_resolve_focus(win);
+      free_window_and_resolve_focus(ev.xunmap.window);
       break;
     }
     //----------------------------------------------------------------------
