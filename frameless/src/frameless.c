@@ -589,8 +589,9 @@ int main(int argc, char **args, char **env) {
   const KeyCode key_code_mon_brightness_up =
       XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
 
-  xwin *xw = NULL; // temporary used in event loop, resizing and moving
-  XEvent ev = {0}; // temporary used in event loop
+  xwin *move_or_resize_window = NULL;
+
+  XEvent ev = {0};
   while (!XNextEvent(display, &ev)) {
 #ifdef FRAMELESS_DEBUG
     fprintf(flog, "%lu: event: %s   win=%p\n", ev.xany.serial,
@@ -619,7 +620,7 @@ int main(int argc, char **args, char **env) {
 #endif
         break;
       }
-      xw = xwin_get_by_window(ev.xmap.window);
+      xwin *xw = xwin_get_by_window(ev.xmap.window);
       xwin_center(xw);
       focus_on_window(xw);
       XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
@@ -658,7 +659,7 @@ int main(int argc, char **args, char **env) {
 #endif
         break;
       }
-      xw = xwin_get_by_window(ev.xcrossing.window);
+      xwin *xw = xwin_get_by_window(ev.xcrossing.window);
       focus_on_window(xw);
       break;
     }
@@ -838,13 +839,13 @@ int main(int argc, char **args, char **env) {
       dragging_prev_x = ev.xbutton.x_root;
       dragging_prev_y = ev.xbutton.y_root;
       dragging_button = ev.xbutton.button;
-      xw = xwin_get_by_window(ev.xbutton.window);
-      focus_on_window(xw);
-      XGrabPointer(display, xw->win, True,
+      move_or_resize_window = xwin_get_by_window(ev.xbutton.window);
+      focus_on_window(move_or_resize_window);
+      XGrabPointer(display, move_or_resize_window->win, True,
                    PointerMotionMask | ButtonReleaseMask, GrabModeAsync,
                    GrabModeAsync, None, None, CurrentTime);
-      xwin_raise(xw);
-      xwin_read_geom(xw);
+      xwin_raise(move_or_resize_window);
+      xwin_read_geom(move_or_resize_window);
       break;
     }
     //----------------------------------------------------------------------
@@ -857,19 +858,15 @@ int main(int argc, char **args, char **env) {
       int ydiff = ev.xbutton.y_root - dragging_prev_y;
       dragging_prev_x = ev.xbutton.x_root;
       dragging_prev_y = ev.xbutton.y_root;
-      if (!xw) {
-        // case should not happen because 'xw' is set when dragging starts
-        break;
-      }
-      int new_x = xw->x + xdiff;
-      int new_wi = (int)xw->wi + xdiff;
-      int new_y = xw->y + ydiff;
-      int new_hi = (int)xw->hi + ydiff;
-      if (xw->bits & XWIN_BIT_FULL_WIDTH) {
+      int new_x = move_or_resize_window->x + xdiff;
+      int new_wi = (int)move_or_resize_window->wi + xdiff;
+      int new_y = move_or_resize_window->y + ydiff;
+      int new_hi = (int)move_or_resize_window->hi + ydiff;
+      if (move_or_resize_window->bits & XWIN_BIT_FULL_WIDTH) {
         new_x = -WIN_BORDER_WIDTH;
         new_wi = (int)screen.wi;
       }
-      if (xw->bits & XWIN_BIT_FULL_HEIGHT) {
+      if (move_or_resize_window->bits & XWIN_BIT_FULL_HEIGHT) {
         new_y = -WIN_BORDER_WIDTH;
         new_hi = (int)screen.hi;
       }
@@ -881,16 +878,16 @@ int main(int argc, char **args, char **env) {
         if (new_hi < WIN_MIN_WIDTH_HEIGHT) {
           new_hi = WIN_MIN_WIDTH_HEIGHT;
         }
-        xw->wi = (unsigned)new_wi;
-        xw->hi = (unsigned)new_hi;
-        xwin_set_geom(xw);
+        move_or_resize_window->wi = (unsigned)new_wi;
+        move_or_resize_window->hi = (unsigned)new_hi;
+        xwin_set_geom(move_or_resize_window);
         break;
       }
       switch (key_pressed) {
       default: // moving window
-        xw->x = new_x;
-        xw->y = new_y;
-        xwin_set_geom(xw);
+        move_or_resize_window->x = new_x;
+        move_or_resize_window->y = new_y;
+        xwin_set_geom(move_or_resize_window);
         break;
       case KEY_WINDOW_RESIZE:
         if (new_wi < WIN_MIN_WIDTH_HEIGHT) {
@@ -899,9 +896,9 @@ int main(int argc, char **args, char **env) {
         if (new_hi < WIN_MIN_WIDTH_HEIGHT) {
           new_hi = WIN_MIN_WIDTH_HEIGHT;
         }
-        xw->wi = (unsigned)new_wi;
-        xw->hi = (unsigned)new_hi;
-        xwin_set_geom(xw);
+        move_or_resize_window->wi = (unsigned)new_wi;
+        move_or_resize_window->hi = (unsigned)new_hi;
+        xwin_set_geom(move_or_resize_window);
         break;
       }
       break;
@@ -912,10 +909,11 @@ int main(int argc, char **args, char **env) {
     case ButtonRelease: {
       is_dragging = False;
       dragging_button = 0;
-      xw = xwin_get_by_window(ev.xbutton.window);
+      move_or_resize_window = xwin_get_by_window(ev.xbutton.window);
       // in case a window was dragged from folded state (different desktop)
-      xw->desk = current_desk;
+      move_or_resize_window->desk = current_desk;
       XUngrabPointer(display, CurrentTime);
+      move_or_resize_window = NULL;
       break;
     }
     }
