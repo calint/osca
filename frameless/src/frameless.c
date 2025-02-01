@@ -601,25 +601,26 @@ int main(int argc, char **args, char **env) {
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    default:
+    default: {
 #ifdef FRAMELESS_DEBUG
       fprintf(flog, "  unhandled\n");
       fflush(flog);
 #endif
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case MapNotify:
-      if (ev.xmap.window == root_window || ev.xmap.window == None ||
-          ev.xmap.override_redirect) {
+    case MapNotify: {
+      const Window win = ev.xmap.window;
+      if (win == root_window || win == None || ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
         fflush(flog);
 #endif
         break;
       }
-      xw = xwin_get_by_window(ev.xmap.window);
+      xw = xwin_get_by_window(win);
       xwin_center(xw);
       focus_on_window(xw);
       XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
@@ -627,30 +628,32 @@ int main(int argc, char **args, char **env) {
       XSelectInput(display, xw->win, EnterWindowMask);
       time_of_last_map_notify_ms = current_time_ms();
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case UnmapNotify:
-      if (ev.xmap.window == root_window || ev.xmap.window == None ||
-          ev.xmap.override_redirect) {
+    case UnmapNotify: {
+      const Window win = ev.xmap.window;
+      if (win == root_window || win == None || ev.xmap.override_redirect) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "  ignored\n");
         fflush(flog);
 #endif
         break;
       }
-      free_window_and_resolve_focus(ev.xmap.window);
+      free_window_and_resolve_focus(win);
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case EnterNotify:
+    case EnterNotify: {
       if (is_dragging || is_switching_desktop ||
           current_time_ms() - time_of_last_map_notify_ms <
               IGNORED_ENTER_AFTER_MAP_TIME_MS) {
         // * if dragging then it is resizing, don't change focus
         // * if switching desktop, don't focus on the window that is under
-        //   the pointer. focus on previously focused window on that desktop.
+        //   the pointer; focus on previously focused window on that desktop
         // * when launching a new window ignore the event for
         //   IGNORED_ENTER_AFTER_MAP_TIME_MS since it might lose focus from
         //   the newly launched application
@@ -667,10 +670,11 @@ int main(int argc, char **args, char **env) {
       xw = xwin_get_by_window(ev.xcrossing.window);
       focus_on_window(xw);
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case KeyPress:
+    case KeyPress: {
       key_pressed = ev.xkey.keycode;
       switch (key_pressed) {
       case KEY_LAUNCH_CONSOLE:
@@ -823,20 +827,22 @@ int main(int argc, char **args, char **env) {
         break;
       }
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case KeyRelease:
+    case KeyRelease: {
       if (key_pressed == ev.xkey.keycode) {
         key_pressed = 0;
       }
       //? should check that the key was switch desktop
       is_switching_desktop = False;
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case ButtonPress:
+    case ButtonPress: {
       is_dragging = True;
       dragging_prev_x = ev.xbutton.x_root;
       dragging_prev_y = ev.xbutton.y_root;
@@ -849,10 +855,11 @@ int main(int argc, char **args, char **env) {
       xwin_raise(xw);
       xwin_read_geom(xw);
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case MotionNotify:
+    case MotionNotify: {
       while (XCheckTypedEvent(display, MotionNotify, &ev))
         ;
       int xdiff = ev.xbutton.x_root - dragging_prev_x;
@@ -907,10 +914,11 @@ int main(int argc, char **args, char **env) {
         break;
       }
       break;
+    }
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
     //----------------------------------------------------------------------
-    case ButtonRelease:
+    case ButtonRelease: {
       is_dragging = False;
       dragging_button = 0;
       xw = xwin_get_by_window(ev.xbutton.window);
@@ -918,6 +926,7 @@ int main(int argc, char **args, char **env) {
       xw->desk = current_desk;
       XUngrabPointer(display, CurrentTime);
       break;
+    }
     }
   }
   //? clean-up is done by OS
