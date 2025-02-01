@@ -29,11 +29,11 @@ static FILE *flog;
 // maximum number of windows
 #define WIN_MAX_COUNT 128
 
-// pixels to show of a window folded to the right
-#define WIN_SLIP_DX 21
+// pixels to show of a window folded to the right; example 21
+#define WIN_SLIP_DX 0
 
-// random pixels relative to WIN_SLIP_DX
-#define WIN_SLIP 7
+// random pixels relative to WIN_SLIP_DX; example 7
+#define WIN_SLIP 0
 
 // window border width
 #define WIN_BORDER_WIDTH 1
@@ -317,7 +317,7 @@ static void xwin_toggle_fullwidth(xwin *this) {
 static void xwin_hide(xwin *this) {
   xwin_read_geom(this);
   this->desk_x = this->x;
-  unsigned slip = (unsigned)(rand() % WIN_SLIP);
+  unsigned slip = WIN_SLIP == 0 ? 0 : (unsigned)(rand() % WIN_SLIP);
   this->x = (int)(screen.wi - WIN_SLIP_DX + slip);
   xwin_set_geom(this);
 }
