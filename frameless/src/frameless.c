@@ -589,7 +589,7 @@ int main(int argc, char **args, char **env) {
   const KeyCode key_code_mon_brightness_up =
       XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
 
-  xwin *xw = NULL; // temporary used in event loop
+  xwin *xw = NULL; // temporary used in event loop, resizing and moving
   XEvent ev = {0}; // temporary used in event loop
   while (!XNextEvent(display, &ev)) {
 #ifdef FRAMELESS_DEBUG
