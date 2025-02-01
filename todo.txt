@@ -11,8 +11,6 @@
             bss flags: short-slot-time
             dtim period: 1
             beacon int: 100
-[ ] frameless: consider hiding windows from other desktops instead of "folding"
-    them to the right
 [ ] frameless: encapsulate handling of field 'bits' in xin_.... functions
 [ ] clonky: e.g. 1.3 MB instead of truncated to 1 MB
 [ ] clonky: unit/s to use specified dt instead of assuming 1s
@@ -40,6 +38,9 @@
 [ ] clang-tidy: maxed
 [ ] frameless: different shades on desktop depending on id
 --------------------------------------------------------------
+[x] frameless: consider hiding windows from other desktops instead of "folding"
+    them to the right
+    => WIN_SLIP_DX and WIN_SLIP set to 0
 [x] osca: xii volume and screen brightness controls
 [x] frameless: capture XF86... keys
 [x] review mounte code
