@@ -569,7 +569,7 @@ int main(int argc, char **args, char **env) {
   unsigned key_pressed = 0;
 
   // dragging state
-  Bool is_dragging = 0;
+  Bool is_dragging = False;
   int dragging_prev_x = 0;
   int dragging_prev_y = 0;
   unsigned dragging_button = 0;
