@@ -716,7 +716,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
       fgets(cmd, sizeof(cmd), file);
       // read SSID
       char ssid[128] = "";
-      fscanf(file, "%127[^\n]%*c", ssid);
+      fscanf(file, "\tSSID: %[^\n]%*c", ssid);
       // discard next three lines
       fgets(cmd, sizeof(cmd), file);
       fgets(cmd, sizeof(cmd), file);
@@ -729,7 +729,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
       pclose(file);
       // re-use 'cmd' buffer to print the result
       str_compact_spaces(ssid);
-      snprintf(cmd, sizeof(cmd), "%s %s %s", ssid, number, unit);
+      snprintf(cmd, sizeof(cmd), " %s   %s %s", ssid, number, unit);
       pl(cmd);
     }
   }

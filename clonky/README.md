@@ -5,6 +5,7 @@ uses shell commands:
 * `journalctl`
 * `df`
 * `iostat`
+* `iw`
 
 uses information from:
 * `/proc/meminfo`
