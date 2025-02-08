@@ -663,6 +663,48 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
   return ni;
 }
 
+static void render_wifi_info_for_interface(const char *interface_name) {
+  // :: iw wlan0 link
+  // Connected to 38:d5:47:40:99:d4 (on wlan0)
+  //         SSID: AC51_5G
+  //         freq: 5180.0
+  //         RX: 712799364 bytes (565282 packets)
+  //         TX: 26835925 bytes (182863 packets)
+  //         signal: -75 dBm
+  //         rx bitrate: 234.0 MBit/s VHT-MCS 5 80MHz VHT-NSS 1
+  //         tx bitrate: 150.0 MBit/s VHT-MCS 7 40MHz short GI VHT-NSS 1
+  //         bss flags: short-slot-time
+  //         dtim period: 1
+  //         beacon int: 100
+  // ::
+  char cmd[256] = "";
+  snprintf(cmd, sizeof(cmd), "iw %s link", interface_name);
+  FILE *file = popen(cmd, "r");
+  if (!file) {
+    return;
+  }
+  // discard first line
+  fgets(cmd, sizeof(cmd), file);
+  // read SSID
+  char ssid[128] = "";
+  fscanf(file, "\tSSID: %127[^\n]%*c", ssid);
+  str_compact_spaces(ssid);
+  if (ssid[0] == '\0') {
+    return;
+  }
+  // discard next three lines
+  fgets(cmd, sizeof(cmd), file);
+  fgets(cmd, sizeof(cmd), file);
+  fgets(cmd, sizeof(cmd), file);
+  // read signal strength
+  char signal[64] = "";
+  fscanf(file, "\tsignal: %63[^\n]%*c", signal);
+  pclose(file);
+  // re-use 'cmd' buffer to print the result
+  snprintf(cmd, sizeof(cmd), " %s   %s", ssid, signal);
+  pl(cmd);
+}
+
 static void render_net_interface(struct ifaddrs *ifa) {
   if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
                                 ifa->ifa_addr->sa_family != AF_INET6)) {
@@ -695,43 +737,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   if (net_device_is_wlan &&
       !strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
     // yes. print network name and signal strength using command:
-    // :: iw wlan0 link
-    // Connected to 38:d5:47:40:99:d4 (on wlan0)
-    //         SSID: AC51_5G
-    //         freq: 5180.0
-    //         RX: 712799364 bytes (565282 packets)
-    //         TX: 26835925 bytes (182863 packets)
-    //         signal: -75 dBm
-    //         rx bitrate: 234.0 MBit/s VHT-MCS 5 80MHz VHT-NSS 1
-    //         tx bitrate: 150.0 MBit/s VHT-MCS 7 40MHz short GI VHT-NSS 1
-    //         bss flags: short-slot-time
-    //         dtim period: 1
-    //         beacon int: 100
-    // ::
-    char cmd[256] = "";
-    snprintf(cmd, sizeof(cmd), "iw %s link", ifa->ifa_name);
-    FILE *file = popen(cmd, "r");
-    if (file) {
-      // discard first line
-      fgets(cmd, sizeof(cmd), file);
-      // read SSID
-      char ssid[128] = "";
-      fscanf(file, "\tSSID: %[^\n]%*c", ssid);
-      // discard next three lines
-      fgets(cmd, sizeof(cmd), file);
-      fgets(cmd, sizeof(cmd), file);
-      fgets(cmd, sizeof(cmd), file);
-      // read signal strength
-      char label[64] = "";
-      char number[64] = "";
-      char unit[64] = "";
-      fscanf(file, "%63s %63s %63s", label, number, unit);
-      pclose(file);
-      // re-use 'cmd' buffer to print the result
-      str_compact_spaces(ssid);
-      snprintf(cmd, sizeof(cmd), " %s   %s %s", ssid, number, unit);
-      pl(cmd);
-    }
+    render_wifi_info_for_interface(ifa->ifa_name);
   }
 
   // get stats from /sys
