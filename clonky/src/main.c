@@ -687,8 +687,9 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read SSID
   char ssid[128] = "";
-  fscanf(file, "\tSSID: %127[^\n]%*c", ssid);
-  str_compact_spaces(ssid);
+  if (!fscanf(file, "\tSSID: %127[^\n]%*c", ssid)) {
+    return;
+  }
   if (ssid[0] == '\0') {
     return;
   }
@@ -698,7 +699,9 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read signal strength
   char signal[64] = "";
-  fscanf(file, "\tsignal: %63[^\n]%*c", signal);
+  if (!fscanf(file, "\tsignal: %63[^\n]%*c", signal)) {
+    return;
+  }
   pclose(file);
   // re-use 'cmd' buffer to print the result
   snprintf(cmd, sizeof(cmd), " %s   %s", ssid, signal);
