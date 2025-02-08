@@ -63,8 +63,10 @@ static void str_to_lower(char *str) {
 
 // returns string value from /sys/ file system without new line or "" if
 // anything goes wrong
-// path is full path of file value is destination returns
-// value without '\n' or "" if anything goes wrong
+// path: full path of file
+// value: destination is written to pointer
+// value_buf_size: size of value buffer
+// if value is without '\n' at the end then write "" to value
 static void sys_value_str_line(const char *path, char *value,
                                const unsigned value_buf_size) {
   int fd = open(path, O_RDONLY);
@@ -73,17 +75,17 @@ static void sys_value_str_line(const char *path, char *value,
     return;
   }
   ssize_t nbytes = read(fd, value, value_buf_size);
-  if (nbytes == -1) {
+  if (nbytes <= 0) {
     value[0] = '\0';
     close(fd);
     return;
   }
+  close(fd);
   if (value[nbytes - 1] == '\n') {
     value[nbytes - 1] = '\0';
-  } else {
-    value[0] = '\0';
+    return;
   }
-  close(fd);
+  value[0] = '\0';
 }
 
 static int sys_value_int(const char *path) {
@@ -155,8 +157,10 @@ static void render_battery(void) {
   // construct paths to '..._full' and '..._now'
   char *path_prefix_end = path + nchars;
   strncpy(path_prefix_end, "full", maxlen);
+  path[sizeof(path) - 1] = '\0'; // ensure null-termination
   const long long charge_full = sys_value_long(path);
   strncpy(path_prefix_end, "now", maxlen);
+  path[sizeof(path) - 1] = '\0'; // ensure null-termination
   const long long charge_now = sys_value_long(path);
   snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
            battery_name);
