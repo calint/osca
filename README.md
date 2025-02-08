@@ -39,44 +39,44 @@ contains:
 ```
 
             lines   words   chars
-   source:    878    2730   25768
-   zipped:     24     132    6099
+   source:    922    2841   28902
+   zipped:     32     169    6492
 
--rwxr-xr-x 1 c 21472 Dec 21 11:41 frameless
+-rwxr-xr-x 1 c 21600 Feb  8 17:31 frameless
 
 
             lines   words   chars
-   source:   1236    3891   33150
-   zipped:     31     190    8277
+   source:   1266    4033   35067
+   zipped:     44     199    8728
 
--rwxr-xr-x 1 c 37264 Dec 21 11:41 clonky
+-rwxr-xr-x 1 c 36888 Feb  8 17:31 clonky
 
 
             lines   words   chars
    source:    210     754    6718
    zipped:      3      54    2290
 
--rwxr-xr-x 1 c 16464 Dec 21 11:41 menuq
+-rwxr-xr-x 1 c 16440 Feb  8 17:31 menuq
 
 
             lines   words   chars
    source:     55     121    1856
    zipped:      1      15     802
 
--rwxr-xr-x 1 c 16576 Dec 21 11:41 stickyo
+-rwxr-xr-x 1 c 16552 Feb  8 17:31 stickyo
 
 
             lines   words   chars
    source:     21      60     589
    zipped:      2       9     329
 
--rwxr-xr-x 1 c 15656 Dec 21 11:41 snap
+-rwxr-xr-x 1 c 15632 Feb  8 17:31 snap
 
 
              lines  words   chars
    source:    118     344    3206
    zipped:      6      27    1141
 
--rwxr-xr-x 1 c 16488 Dec 21 11:41 mounte
+-rwxr-xr-x 1 c 16464 Feb  8 17:31 mounte
 
 ```
