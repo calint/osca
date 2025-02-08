@@ -26,6 +26,7 @@ libtbb-dev
 llvm
 curl
 python3-venv
+apt-file
 gimp
 blender
 tiled
