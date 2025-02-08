@@ -39,6 +39,7 @@ static char battery_name[32] = "";
 // auto_config_network_traffic() copies the device name found in
 // '/sys/class/net/' preferring wlan otherwise fallback to non loop-back device
 static char net_device[32] = "";
+static char net_device_is_wlan = 0;
 
 // network interfaces
 static struct netifc {
@@ -114,7 +115,7 @@ static int sys_value_exists(const char *path) { return !access(path, F_OK); }
 static void str_compact_spaces(char *str) {
   // "   a  b c  "
   char *dst = str;
-  while (*str == ' ') {
+  while (*str == ' ' || *str == '\t') {
     str++;
   }
   // "a  b c  "
@@ -126,7 +127,7 @@ static void str_compact_spaces(char *str) {
     }
     str++;
     int is_spc = 0;
-    while (*str == ' ') {
+    while (*str == ' ' || *str == '\t') {
       str++;
       is_spc++;
     }
@@ -625,6 +626,7 @@ static void auto_config_network_traffic(void) {
     if (is_wlan_device(entry->d_name)) {
       // found wlan device (preferred)
       strncpy(net_device, entry->d_name, sizeof(net_device));
+      net_device_is_wlan = 1;
       break;
     }
     // network device (not preferred)
@@ -688,6 +690,49 @@ static void render_net_interface(struct ifaddrs *ifa) {
   snprintf(buf, sizeof(buf), "%.*s: %.*s %.*s", 32, ifa->ifa_name, 64, ip_addr,
            (int)sizeof(operstate), operstate);
   pl(buf);
+
+  // is it the wifi device?
+  if (net_device_is_wlan &&
+      !strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
+    // yes. print network name and signal strength using command:
+    // :: iw wlan0 link
+    // Connected to 38:d5:47:40:99:d4 (on wlan0)
+    //         SSID: AC51_5G
+    //         freq: 5180.0
+    //         RX: 712799364 bytes (565282 packets)
+    //         TX: 26835925 bytes (182863 packets)
+    //         signal: -75 dBm
+    //         rx bitrate: 234.0 MBit/s VHT-MCS 5 80MHz VHT-NSS 1
+    //         tx bitrate: 150.0 MBit/s VHT-MCS 7 40MHz short GI VHT-NSS 1
+    //         bss flags: short-slot-time
+    //         dtim period: 1
+    //         beacon int: 100
+    // ::
+    char cmd[256] = "";
+    snprintf(cmd, sizeof(cmd), "iw %s link", ifa->ifa_name);
+    FILE *file = popen(cmd, "r");
+    if (file) {
+      // discard first line
+      fgets(cmd, sizeof(cmd), file);
+      // read SSID
+      char ssid[128] = "";
+      fscanf(file, "%127[^\n]%*c", ssid);
+      // discard next three lines
+      fgets(cmd, sizeof(cmd), file);
+      fgets(cmd, sizeof(cmd), file);
+      fgets(cmd, sizeof(cmd), file);
+      // read signal strength
+      char label[64] = "";
+      char number[64] = "";
+      char unit[64] = "";
+      fscanf(file, "%63s %63s %63s", label, number, unit);
+      pclose(file);
+      // re-use 'cmd' buffer to print the result
+      str_compact_spaces(ssid);
+      snprintf(cmd, sizeof(cmd), "%s %s %s", ssid, number, unit);
+      pl(cmd);
+    }
+  }
 
   // get stats from /sys
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
