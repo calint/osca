@@ -668,7 +668,7 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
 }
 
 static void render_wifi_info_for_interface(const char *interface_name) {
-  // :: iw wlan0 link
+  // :: iw dev wlan0 link
   // Connected to 38:d5:47:40:99:d4 (on wlan0)
   //         SSID: AC51_5G
   //         freq: 5180.0
@@ -682,7 +682,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   //         beacon int: 100
   // ::
   char cmd[256] = "";
-  snprintf(cmd, sizeof(cmd), "iw %s link", interface_name);
+  snprintf(cmd, sizeof(cmd), "iw dev %s link", interface_name);
   FILE *file = popen(cmd, "r");
   if (!file) {
     return;
