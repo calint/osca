@@ -333,7 +333,7 @@ static void render_cheetsheet(void) {
 }
 
 static void render_df(void) {
-  FILE *file = popen("df -h 2> /dev/null", "r");
+  FILE *file = popen("df -h", "r");
   if (!file) {
     return;
   }
