@@ -37,12 +37,12 @@ static const char *power_supply_path_prefix = "/sys/class/power_supply/";
 static const char *battery_energy_or_charge_prefix = "";
 
 // 'auto_config_battery' copies the battery entry in '/sys/class/power_supply/'
-static char battery_name[32] = "";
+static char battery_name[32];
 
 // 'auto_config_network_traffic' copies the device name found in
 // '/sys/class/net/' preferring wifi otherwise fallback to non loop-back device
-static char net_device[32] = "";
-static char net_device_is_wifi = 0;
+static char net_device[32];
+static char net_device_is_wifi;
 
 // network interfaces
 static struct netifc {
@@ -55,7 +55,7 @@ static struct netifc {
 } netifcs[NETIFC_ARRAY_SIZE];
 
 // used network interfaces
-static unsigned netifcs_len = 0;
+static unsigned netifcs_len;
 
 static void str_to_lower(char *str) {
   while (*str) {
