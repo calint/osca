@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-22
+//
 #include "dc.h"
 #include "graph.h"
 #include "graphd.h"
@@ -33,13 +36,13 @@ static const char *power_supply_path_prefix = "/sys/class/power_supply/";
 // quirk for different names for battery charge indicator
 static const char *battery_energy_or_charge_prefix = "";
 
-// auto_config_battery() copies the battery entry in '/sys/class/power_supply/'
+// 'auto_config_battery' copies the battery entry in '/sys/class/power_supply/'
 static char battery_name[32] = "";
 
-// auto_config_network_traffic() copies the device name found in
-// '/sys/class/net/' preferring wlan otherwise fallback to non loop-back device
+// 'auto_config_network_traffic' copies the device name found in
+// '/sys/class/net/' preferring wifi otherwise fallback to non loop-back device
 static char net_device[32] = "";
-static char net_device_is_wlan = 0;
+static char net_device_is_wifi = 0;
 
 // network interfaces
 static struct netifc {
@@ -52,7 +55,7 @@ static struct netifc {
 } netifcs[NETIFC_ARRAY_SIZE];
 
 // used network interfaces
-static unsigned netifcs_len;
+static unsigned netifcs_len = 0;
 
 static void str_to_lower(char *str) {
   while (*str) {
@@ -61,7 +64,7 @@ static void str_to_lower(char *str) {
   }
 }
 
-// returns string value from /sys/ file system without new line or "" if
+// returns string value from '/sys/' file system without new line or "" if
 // anything goes wrong
 // path: full path of file
 // value: destination is written to pointer
@@ -74,18 +77,17 @@ static void sys_value_str_line(const char *path, char *value,
     value[0] = '\0';
     return;
   }
-  ssize_t nbytes = read(fd, value, value_buf_size);
+  const ssize_t nbytes = read(fd, value, value_buf_size);
+  close(fd);
   if (nbytes <= 0) {
     value[0] = '\0';
-    close(fd);
     return;
   }
-  close(fd);
-  if (value[nbytes - 1] == '\n') {
-    value[nbytes - 1] = '\0';
+  if (value[nbytes - 1] != '\n') {
+    value[0] = '\0';
     return;
   }
-  value[0] = '\0';
+  value[nbytes - 1] = '\0';
 }
 
 static int sys_value_int(const char *path) {
@@ -123,7 +125,7 @@ static void str_compact_spaces(char *str) {
   // "a  b c  "
   while (1) {
     *dst++ = *str;
-    if (!*str) {
+    if (*str == '\0') {
       // "a b c "
       return;
     }
@@ -164,7 +166,7 @@ static void auto_config_battery(void) {
     // found 'battery'
     strncpy(battery_name, entry->d_name, sizeof(battery_name));
 
-    //? quirk if it energy_full_design  charge_full_design
+    //? quirk if it is 'energy_full_design' or 'charge_full_design'
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
              battery_name);
     if (sys_value_exists(buf)) {
@@ -182,7 +184,7 @@ static void auto_config_battery(void) {
   }
   closedir(dir);
   if (battery_name[0] == '\0') {
-    puts("[!] no battery found in /sys/class/power_supply");
+    puts("[!] no battery found in /sys/class/power_supply/");
   }
   printf("· battery: ");
   puts(battery_name);
@@ -191,19 +193,10 @@ static void auto_config_battery(void) {
 
 static int is_wlan_device(const char *sys_cls_net_wlan) {
   // build string to file '/sys/class/net/XXX/wireless
-  strb sb;
-  strb_init(&sb);
-  if (strb_p(&sb, "/sys/class/net/")) {
-    return 0;
-  }
-  if (strb_p(&sb, sys_cls_net_wlan)) {
-    return 0;
-  }
-  if (strb_p(&sb, "/wireless")) {
-    return 0;
-  }
-  struct stat st; //? initial value
-  return !stat(sb.chars, &st);
+  char buf[128] = "";
+  snprintf(buf, sizeof(buf), "/sys/class/net/%s/wireless", sys_cls_net_wlan);
+  struct stat st = {0};
+  return !stat(buf, &st);
 }
 
 static void auto_config_network_traffic(void) {
@@ -226,15 +219,15 @@ static void auto_config_network_traffic(void) {
     if (is_wlan_device(entry->d_name)) {
       // found wlan device (preferred)
       strncpy(net_device, entry->d_name, sizeof(net_device));
-      net_device_is_wlan = 1;
+      net_device_is_wifi = 1;
       break;
     }
     // network device (not preferred)
     strncpy(net_device, entry->d_name, sizeof(net_device));
   }
   closedir(dir);
-  if (!net_device[0]) { //? map 'lo'?
-    puts("[!] no network device found in /sys/class/net");
+  if (net_device[0] == '\0') { //? map 'lo'?
+    puts("[!] no network device found in /sys/class/net/");
   }
   printf("· graph network interface: ");
   puts(net_device);
@@ -295,8 +288,9 @@ static void render_cpu_load(void) {
   static long long cpu_usage_prv = 0;
 
   FILE *file = fopen("/proc/stat", "r");
-  if (!file)
+  if (!file) {
     return;
+  }
   // /proc/stat first line gives:
   //  cpu  20254782 11358 9292446 480440419 187402 0 2833065 0 0 0
   //   user: normal processes executing in user mode
@@ -313,9 +307,8 @@ static void render_cpu_load(void) {
   long long iowait = 0;
   long long irq = 0;
   long long softirq = 0;
-  char buf[32] = "";
   // read first line
-  fscanf(file, "%31s %lld %lld %lld %lld %lld %lld %lld\n", buf, &user, &nice,
+  fscanf(file, "cpu %lld %lld %lld %lld %lld %lld %lld\n", &user, &nice,
          &system, &idle, &iowait, &irq, &softirq);
   fclose(file);
   const long long total = user + nice + system + idle + iowait + irq + softirq;
@@ -334,8 +327,8 @@ static void render_hello_clonky(void) {
   static long long unsigned counter = 0;
   counter++;
   char buf[128];
-  snprintf(buf, sizeof(buf), "%llu hello%sclonky", counter,
-           counter != 1 ? "s " : " ");
+  snprintf(buf, sizeof(buf), "%llu hello%s clonky", counter,
+           counter != 1 ? "s" : "");
   pl(buf);
 }
 
@@ -369,7 +362,7 @@ static void render_mem_info(void) {
   if (mem_avail >> 10 != 0) {
     mem_avail >>= 10;
     mem_total >>= 10;
-    strcpy(unit, "MB"); //? kB to MB not same as KB to MBs
+    strncpy(unit, "MB", sizeof(unit)); //? kB to MB not same as KB to MBs
   }
   snprintf(buf, sizeof(buf), "freemem %llu of %llu %s", mem_avail, mem_total,
            unit);
@@ -514,9 +507,9 @@ static void render_syslog(void) {
   if (!file) {
     return;
   }
-  char buf[512];
   unsigned counter = RENDER_SYSLOG_MAX_LINE_COUNT;
   while (counter--) {
+    char buf[512] = "";
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -530,12 +523,9 @@ static void render_acpi(void) {
   if (!file) {
     return;
   }
-  // no-infinite loop, arbitrary limit
   unsigned counter = RENDER_ACPI_MAX_LINE_COUNT;
   while (counter--) {
     char buf[512] = "";
-    // read at most 511 characters before a newline and read the newline
-    // characters
     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
       break;
     }
@@ -574,7 +564,7 @@ static void render_cores_throttle(void) {
     return;
   }
   const unsigned ncpus = max - min + 1;
-  strb_p_int(&sb, (int)ncpus);
+  strb_p_uint(&sb, ncpus);
   strb_p(&sb, " core");
   if (ncpus != 1) {
     strb_p_char(&sb, 's');
@@ -582,7 +572,6 @@ static void render_cores_throttle(void) {
   if (ncpus > 2) {
     // if more than 2 cpus display throttles on new line
     pl(sb.chars);
-    // puts(sb.chars);
     strb_clear(&sb);
   }
   const unsigned ncols = 5;
@@ -592,11 +581,11 @@ static void render_cores_throttle(void) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
       char path[128] = "";
       snprintf(path, sizeof(path),
-               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
+               "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq",
                cpu_ix);
       const long long max_freq = sys_value_long(path);
       snprintf(path, sizeof(path),
-               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
+               "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_cur_freq",
                cpu_ix);
       const long long cur_freq = sys_value_long(path);
       strb_p_char(&sb, ' ');
@@ -613,7 +602,6 @@ static void render_cores_throttle(void) {
       cpu_ix++;
     }
     pl(sb.chars);
-    // puts(sb.chars);
     strb_clear(&sb);
   }
   if (ncpus != 0 && total_proc != 0) {
@@ -735,6 +723,8 @@ static void render_net_interface(struct ifaddrs *ifa) {
   char path[128] = "";
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/operstate", 32,
            ifa->ifa_name);
+  // note: 32 is arbitrary max length of interface name
+
   char operstate[32] = "";
   sys_value_str_line(path, operstate, sizeof(operstate));
   str_to_lower(operstate);
@@ -748,7 +738,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   pl(buf);
 
   // is it the wifi device?
-  if (net_device_is_wlan &&
+  if (net_device_is_wifi &&
       !strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
     // yes. print network name and signal strength using command:
     render_wifi_info_for_interface(ifa->ifa_name);
@@ -900,8 +890,6 @@ static void render(void) {
   render_cores_throttle();
   render_battery();
   render_acpi();
-  //  render_hr();
-  //  render_top_10_processes();
   render_bluetooth_connected_devices();
   render_hr();
   render_syslog();
