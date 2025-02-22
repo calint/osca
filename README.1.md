@@ -20,17 +20,20 @@ contains:
 * stickyo: sticky notes
 
 
-![screenshot 1](screenshots/frameless-archlinux-1.png)
+![screenshot 1](screenshots/2025-02-22--11-22-42.png)
 
 
-![screenshot 2](screenshots/frameless-ubuntu-1.png)
+![screenshot 2](screenshots/frameless-archlinux-1.png)
 
 
-![screenshot 3](screenshots/2024-12-07--09-02-22.png)
+![screenshot 3](screenshots/frameless-ubuntu-1.png)
 
 
-![screenshot 4](screenshots/2024-12-11--11-58-03.png)
+![screenshot 4](screenshots/2024-12-07--09-02-22.png)
 
 
-![screenshot 5](screenshots/2024-12-21--11-38-39.png)
+![screenshot 5](screenshots/2024-12-11--11-58-03.png)
+
+
+![screenshot 6](screenshots/2024-12-21--11-38-39.png)
 
