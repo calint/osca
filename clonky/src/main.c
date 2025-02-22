@@ -191,7 +191,7 @@ static void auto_config_battery(void) {
   return;
 }
 
-static int is_wlan_device(const char *sys_cls_net_wlan) {
+static int is_wifi_device(const char *sys_cls_net_wlan) {
   // build string to file '/sys/class/net/XXX/wireless
   char buf[128] = "";
   snprintf(buf, sizeof(buf), "/sys/class/net/%s/wireless", sys_cls_net_wlan);
@@ -216,8 +216,8 @@ static void auto_config_network_traffic(void) {
       // skip loopback
       continue;
     }
-    if (is_wlan_device(entry->d_name)) {
-      // found wlan device (preferred)
+    if (is_wifi_device(entry->d_name)) {
+      // found wifi device (preferred)
       strncpy(net_device, entry->d_name, sizeof(net_device));
       net_device_is_wifi = 1;
       break;
