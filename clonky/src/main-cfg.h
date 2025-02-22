@@ -27,7 +27,7 @@
 // the y-values of the graph 1 MB
 #define NET_GRAPH_MAX 1024 * 1024
 
-// maximum number of network interfaces
+// max number of network interfaces
 #define NETIFC_ARRAY_SIZE 4
 
 // size of network interface name
