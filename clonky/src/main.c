@@ -696,9 +696,11 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   // read SSID
   char ssid[128] = "";
   if (!fscanf(file, "\tSSID: %127[^\n]%*c", ssid)) {
+    pclose(file);
     return;
   }
   if (ssid[0] == '\0') {
+    pclose(file);
     return;
   }
   // discard next three lines
@@ -708,6 +710,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   // read signal strength
   char signal[64] = "";
   if (!fscanf(file, "\tsignal: %63[^\n]%*c", signal)) {
+    pclose(file);
     return;
   }
   pclose(file);
