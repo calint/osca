@@ -25,6 +25,10 @@ int strb_p_char(strb *self, char ch);
 // returns 0 if ok
 int strb_p_int(strb *self, const int num);
 
+// formats and appends 'num'
+// returns 0 if ok
+int strb_p_uint(strb *self, const unsigned num);
+
 // appends 'num' with specified field 'width' aligned right
 // returns 0 if ok
 int strb_p_int_with_width(strb *self, int num, int width);

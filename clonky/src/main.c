@@ -587,6 +587,7 @@ static void render_cores_throttle(void) {
   }
   const unsigned ncols = 5;
   unsigned cpu_ix = min;
+  unsigned total_proc = 0;
   while (cpu_ix <= max) {
     for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
       char path[128] = "";
@@ -602,6 +603,7 @@ static void render_cores_throttle(void) {
       if (max_freq) {
         // if available render percent of max frequency
         const unsigned proc = (unsigned)(cur_freq * 100 / max_freq);
+        total_proc += proc;
         strb_p_int_with_width(&sb, (int)proc, 3);
         strb_p_char(&sb, '%');
       } else {
@@ -613,6 +615,13 @@ static void render_cores_throttle(void) {
     pl(sb.chars);
     // puts(sb.chars);
     strb_clear(&sb);
+  }
+  if (ncpus != 0 && total_proc != 0) {
+    strb_p(&sb, "average: ");
+    strb_p_uint(&sb, (total_proc + (ncpus / 2)) / ncpus);
+    // note: ncpus / 2 for rounding to nearest integer
+    strb_p_char(&sb, '%');
+    pl(sb.chars);
   }
 }
 

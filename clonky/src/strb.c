@@ -48,6 +48,12 @@ inline int strb_p_int(strb *self, const int num) {
   return strb_p(self, buf);
 }
 
+inline int strb_p_uint(strb *self, const unsigned num) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%u", num);
+  return strb_p(self, buf);
+}
+
 inline int strb_p_int_with_width(strb *self, const int num, const int width) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%*d", width, num);
