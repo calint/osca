@@ -6,6 +6,7 @@ uses shell commands:
 * `df`
 * `iostat`
 * `iw`
+* `bluetoothctl`
 
 uses information from:
 * `/proc/meminfo`

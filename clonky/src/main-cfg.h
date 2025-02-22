@@ -33,4 +33,16 @@
 // size of network interface name
 #define NETIFC_NAME_SIZE 16
 
+// max number of connected bluetooth devices shown
+#define RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT 8
+
+// max number of lines read in 'render_syslog'
+#define RENDER_SYSLOG_MAX_LINE_COUNT 15
+
+// max number of lines read in 'render_df'
+#define RENDER_DF_MAX_LINE_COUNT 64
+
+// max number of lines read in 'render_acpi'
+#define RENDER_ACPI_MAX_LINE_COUNT 64
+
 #endif

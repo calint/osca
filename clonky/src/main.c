@@ -139,410 +139,6 @@ static void str_compact_spaces(char *str) {
   }
 }
 
-static void render_hr(void) { dc_draw_hr(dc); }
-
-static void render_battery(void) {
-  if (battery_name[0] == '\0') {
-    // if no battery on the system
-    return;
-  }
-  char path[128] = "";
-  const int nchars =
-      snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
-               battery_name, battery_energy_or_charge_prefix);
-  if (nchars < 0 || (size_t)nchars >= sizeof(path)) {
-    return; // truncated
-  }
-  const size_t maxlen = sizeof(path) - (size_t)nchars;
-  // construct paths to '..._full' and '..._now'
-  char *path_prefix_end = path + nchars;
-  strncpy(path_prefix_end, "full", maxlen);
-  path[sizeof(path) - 1] = '\0'; // ensure null-termination
-  const long long charge_full = sys_value_long(path);
-  strncpy(path_prefix_end, "now", maxlen);
-  path[sizeof(path) - 1] = '\0'; // ensure null-termination
-  const long long charge_now = sys_value_long(path);
-  snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
-           battery_name);
-  // read battery status
-  char status[64];
-  sys_value_str_line(path, status, sizeof(status));
-  str_to_lower(status);
-  // format output
-  char output[128];
-  snprintf(output, sizeof(output), "battery %u%%  %s",
-           (unsigned)(charge_now * 100 / charge_full), status);
-  // draw a separator for visual que of current battery charge
-  dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
-  dc_newline(dc);
-  dc_draw_str(dc, output);
-}
-
-static void render_cpu_load(void) {
-  // previous reading
-  static long long cpu_total_prv = 0;
-  static long long cpu_usage_prv = 0;
-
-  FILE *file = fopen("/proc/stat", "r");
-  if (!file)
-    return;
-  // /proc/stat first line gives:
-  //  cpu  20254782 11358 9292446 480440419 187402 0 2833065 0 0 0
-  //   user: normal processes executing in user mode
-  //   nice: niced processes executing in user mode
-  //   system: processes executing in kernel mode
-  //   idle: twiddling thumbs
-  //   iowait: waiting for I/O to complete
-  //   irq: servicing interrupts
-  //   softirq: servicing softirqs
-  long long user = 0;
-  long long nice = 0;
-  long long system = 0;
-  long long idle = 0;
-  long long iowait = 0;
-  long long irq = 0;
-  long long softirq = 0;
-  char buf[32] = "";
-  // read first line
-  fscanf(file, "%31s %lld %lld %lld %lld %lld %lld %lld\n", buf, &user, &nice,
-         &system, &idle, &iowait, &irq, &softirq);
-  fclose(file);
-  const long long total = user + nice + system + idle + iowait + irq + softirq;
-  const long long usage = total - idle;
-  const long long dtotal = total - cpu_total_prv;
-  cpu_total_prv = total;
-  const long long dusage = usage - cpu_usage_prv;
-  cpu_usage_prv = usage;
-  const long long usage_percent = dusage * 100 / dtotal;
-  graph_add_value(graph_cpu, usage_percent);
-  dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
-  graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
-}
-
-static void render_hello_clonky(void) {
-  static long long unsigned counter = 0;
-  counter++;
-  char buf[128];
-  snprintf(buf, sizeof(buf), "%llu hello%sclonky", counter,
-           counter != 1 ? "s " : " ");
-  dc_newline(dc);
-  dc_draw_str(dc, buf);
-}
-
-static void render_mem_info(void) {
-  FILE *file = fopen("/proc/meminfo", "r");
-  if (!file) {
-    return;
-  }
-  // /proc/meminfo gives:
-  //  MemTotal:       15766756 kB
-  //  MemFree:         4058344 kB
-  //  MemAvailable:   10814308 kB
-  //  Buffers:          944396 kB
-  //  Cached:          5425168 kB
-  char name[32] = "";
-  char unit[16] = "";
-  long long mem_total = 0;
-  long long mem_avail = 0;
-  char buf[256] = "";
-  fgets(buf, sizeof(buf), file); //	MemTotal:        1937372 kB
-  sscanf(buf, "%31s %lld %15s", name, &mem_total, unit);
-  fgets(buf, sizeof(buf), file); //	MemFree:           99120 kB
-  fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
-  fclose(file);
-
-  sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
-  const int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
-  graph_add_value(graph_mem, proc);
-  dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
-  graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
-  if (mem_avail >> 10 != 0) {
-    mem_avail >>= 10;
-    mem_total >>= 10;
-    strcpy(unit, "MB"); //? kB to MB not same as KB to MBs
-  }
-  snprintf(buf, sizeof(buf), "freemem %llu of %llu %s", mem_avail, mem_total,
-           unit);
-  dc_newline(dc);
-  dc_draw_str(dc, buf);
-}
-
-static void render_net_graph(void) {
-  if (net_device[0] == '\0') {
-    // if no network device to graph
-    return;
-  }
-  dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + HR_PIXELS_BEFORE);
-  char path[128] = "";
-  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/tx_bytes",
-           net_device);
-  long long tx_bytes = sys_value_long(path);
-  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/rx_bytes",
-           net_device);
-  long long rx_bytes = sys_value_long(path);
-  graphd_add_value(graph_net, tx_bytes + rx_bytes);
-  graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
-}
-
-static void pl(const char *str) {
-  dc_newline(dc);
-  dc_draw_str(dc, str);
-}
-
-static void render_cheetsheet(void) {
-  static char *keysheet[] = {"ĸey",
-                             "+c               console",
-                             "+f                 files",
-                             "+e                editor",
-                             "+m                 media",
-                             "+v                 mixer",
-                             "+i              internet",
-                             "+x                sticky",
-                             "+o              binaries",
-                             "+p              snapshot",
-                             "+shift+p          ↳ area",
-                             "",
-                             "đesktop",
-                             "+up                   up",
-                             "+down               down",
-                             "",
-                             "window",
-                             "+esc               close",
-                             "+b                  bump",
-                             "+s                center",
-                             "+w                 wider",
-                             "+W               thinner",
-                             "+r                resize",
-                             "+1           full-screen",
-                             "+2           full-height",
-                             "+3            full-width",
-                             "+right        focus-next",
-                             "+left         focus-prev",
-                             "+shift+up        move-up",
-                             "+shift+down    move-down",
-                             "+0   i-am-bored-surprise",
-                             " ...                ... ",
-                             NULL};
-
-  char **str_ptr = keysheet;
-  while (*str_ptr) {
-    dc_newline(dc);
-    dc_draw_str(dc, *str_ptr);
-    str_ptr++;
-  }
-}
-
-static void render_df(void) {
-  FILE *file = popen("df -h", "r");
-  if (!file) {
-    return;
-  }
-  // df -h gives:
-  //  Filesystem      Size  Used Avail Use% Mounted on
-  //  tmpfs           1,6G  2,3M  1,6G   1% /run
-  //  /dev/nvme0n1p6  235G  166G   57G  75% /
-
-  char buf[256] = "";
-  unsigned lines = 64; // arbitrary limit
-  while (lines--) {
-    if (fscanf(file, "%255[^\n]%*c", buf) == EOF) {
-      break;
-    }
-    str_compact_spaces(buf);
-    if (buf[0] != '/') {
-      continue;
-    }
-    pl(buf);
-  }
-  pclose(file);
-}
-
-static void render_io_stat(void) {
-  static long long prv_kb_read_total = 0;
-  static long long prv_kb_written_total = 0;
-
-  FILE *file = popen("iostat -d", "r");
-  if (!file) {
-    return;
-  }
-  // Linux 6.2.0-34-generic (c) 	2023-10-20 	_x86_64_	(12 CPU)
-  // Device  tps  kB_read/s  kB_wrtn/s  kB_dscd/s  kB_read  kB_wrtn  kB_dscd
-  //
-  // loop0   0,00 0,00       0,00       0,00       21       0        0
-
-  char buf[256] = "";
-  // read the header
-  fgets(buf, sizeof(buf), file);
-  fgets(buf, sizeof(buf), file);
-  fgets(buf, sizeof(buf), file);
-  // sum values
-  long long kb_read = 0;
-  long long kb_read_total = 0;
-  long long kb_written = 0;
-  long long kb_written_total = 0;
-  while (fgets(buf, sizeof(buf), file)) {
-    if (buf[0] == '\0') {
-      // break on empty line
-      break;
-    }
-    char dev[64] = "";
-    sscanf(buf, "%63s %*s %*s %*s %*s %lld %lld", dev, &kb_read, &kb_written);
-    kb_read_total += kb_read;
-    kb_written_total += kb_written;
-  }
-  pclose(file);
-
-  const char *unit = "kB/s";
-  snprintf(buf, sizeof(buf), "read %lld %s wrote %lld %s",
-           kb_read_total -
-               (prv_kb_read_total ? prv_kb_read_total : kb_read_total),
-           unit,
-           kb_written_total -
-               (prv_kb_written_total ? prv_kb_written_total : kb_written_total),
-           unit);
-  pl(buf);
-
-  prv_kb_read_total = kb_read_total;
-  prv_kb_written_total = kb_written_total;
-}
-
-static void render_syslog(void) {
-  FILE *file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
-  if (!file) {
-    return;
-  }
-  char buf[512];
-  unsigned counter = 15; // maximum 15 line
-  while (counter--) {
-    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-      break;
-    }
-    pl(buf);
-  }
-  pclose(file);
-}
-
-static void render_acpi(void) {
-  FILE *file = popen("acpi -at", "r");
-  if (!file) {
-    return;
-  }
-  // no-infinite loop, arbitrary limit
-  unsigned counter = 64;
-  while (counter--) {
-    char buf[512] = "";
-    // read at most 511 characters before a newline and read the newline
-    // characters
-    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-      break;
-    }
-    str_to_lower(buf);
-    pl(buf);
-  }
-  pclose(file);
-}
-
-static void render_date_time(void) {
-  const time_t t = time(NULL);
-  const struct tm *lt = localtime(&t);
-  strb sb;
-  strb_init(&sb);
-  if (strb_p(&sb, asctime(lt))) {
-    return;
-  }
-  // delete the '\n' that asctime writes at the end of the string
-  strb_back(&sb);
-  dc_newline(dc);
-  dc_draw_str(dc, sb.chars);
-}
-
-static void render_cores_throttle(void) {
-  FILE *file = fopen("/sys/devices/system/cpu/present", "r");
-  if (!file) {
-    return;
-  }
-  unsigned min = 0;
-  unsigned max = 0;
-  fscanf(file, "%u-%u", &min, &max);
-  fclose(file);
-
-  strb sb;
-  strb_init(&sb);
-  if (strb_p(&sb, "throttle ")) {
-    return;
-  }
-  const unsigned ncpus = max - min + 1;
-  strb_p_int(&sb, (int)ncpus);
-  strb_p(&sb, " core");
-  if (ncpus != 1) {
-    strb_p_char(&sb, 's');
-  }
-  if (ncpus > 2) {
-    // if more than 2 cpus display throttles on new line
-    pl(sb.chars);
-    // puts(sb.chars);
-    strb_clear(&sb);
-  }
-  const unsigned ncols = 5;
-  unsigned cpu_ix = min;
-  while (cpu_ix <= max) {
-    for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
-      char path[128] = "";
-      snprintf(path, sizeof(path),
-               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
-               cpu_ix);
-      const long long max_freq = sys_value_long(path);
-      snprintf(path, sizeof(path),
-               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
-               cpu_ix);
-      const long long cur_freq = sys_value_long(path);
-      strb_p_char(&sb, ' ');
-      if (max_freq) {
-        // if available render percent of max frequency
-        const unsigned proc = (unsigned)(cur_freq * 100 / max_freq);
-        strb_p_int_with_width(&sb, (int)proc, 3);
-        strb_p_char(&sb, '%');
-      } else {
-        // max frequency not available
-        strb_p(&sb, "----");
-      }
-      cpu_ix++;
-    }
-    pl(sb.chars);
-    // puts(sb.chars);
-    strb_clear(&sb);
-  }
-}
-
-static void render_swaps(void) {
-  FILE *file = fopen("/proc/swaps", "r");
-  if (!file) {
-    return;
-  }
-  // Filename         Type       Size     Used   Priority
-  // /dev/mmcblk0p3   partition  2096124  16568  s-1
-  char buf[256] = "";
-  // read column headers
-  fgets(buf, sizeof(buf), file);
-  long long size_kb = 0;
-  long long used_kb = 0;
-  if (!fscanf(file, "%*s %*s %lld %lld", &size_kb, &used_kb)) {
-    fclose(file);
-    return;
-  }
-  fclose(file);
-
-  strb sb;
-  strb_init(&sb);
-  if (strb_p(&sb, "swapped ")) {
-    return;
-  }
-  if (strb_p_nbytes(&sb, used_kb << 10)) {
-    return;
-  }
-  pl(sb.chars);
-}
-
 static void auto_config_battery(void) {
   DIR *dir = opendir("/sys/class/power_supply");
   if (!dir) {
@@ -648,6 +244,405 @@ static void auto_config_network_traffic(void) {
 static void auto_config(void) {
   auto_config_battery();
   auto_config_network_traffic();
+}
+
+static void pl(const char *str) {
+  dc_newline(dc);
+  dc_draw_str(dc, str);
+}
+
+static void render_hr(void) { dc_draw_hr(dc); }
+
+static void render_battery(void) {
+  if (battery_name[0] == '\0') {
+    // if no battery on the system
+    return;
+  }
+  char path[128] = "";
+  const int nchars =
+      snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
+               battery_name, battery_energy_or_charge_prefix);
+  if (nchars < 0 || (size_t)nchars >= sizeof(path)) {
+    return; // truncated
+  }
+  const size_t maxlen = sizeof(path) - (size_t)nchars;
+  // construct paths to '..._full' and '..._now'
+  char *path_prefix_end = path + nchars;
+  strncpy(path_prefix_end, "full", maxlen);
+  path[sizeof(path) - 1] = '\0'; // ensure null-termination
+  const long long charge_full = sys_value_long(path);
+  strncpy(path_prefix_end, "now", maxlen);
+  path[sizeof(path) - 1] = '\0'; // ensure null-termination
+  const long long charge_now = sys_value_long(path);
+  snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
+           battery_name);
+  // read battery status
+  char status[64];
+  sys_value_str_line(path, status, sizeof(status));
+  str_to_lower(status);
+  // format output
+  char output[128];
+  snprintf(output, sizeof(output), "battery %u%%  %s",
+           (unsigned)(charge_now * 100 / charge_full), status);
+  // draw a separator for visual que of current battery charge
+  dc_draw_hr1(dc, (int)(WIDTH * charge_now / charge_full));
+  pl(output);
+}
+
+static void render_cpu_load(void) {
+  // previous reading
+  static long long cpu_total_prv = 0;
+  static long long cpu_usage_prv = 0;
+
+  FILE *file = fopen("/proc/stat", "r");
+  if (!file)
+    return;
+  // /proc/stat first line gives:
+  //  cpu  20254782 11358 9292446 480440419 187402 0 2833065 0 0 0
+  //   user: normal processes executing in user mode
+  //   nice: niced processes executing in user mode
+  //   system: processes executing in kernel mode
+  //   idle: twiddling thumbs
+  //   iowait: waiting for I/O to complete
+  //   irq: servicing interrupts
+  //   softirq: servicing softirqs
+  long long user = 0;
+  long long nice = 0;
+  long long system = 0;
+  long long idle = 0;
+  long long iowait = 0;
+  long long irq = 0;
+  long long softirq = 0;
+  char buf[32] = "";
+  // read first line
+  fscanf(file, "%31s %lld %lld %lld %lld %lld %lld %lld\n", buf, &user, &nice,
+         &system, &idle, &iowait, &irq, &softirq);
+  fclose(file);
+  const long long total = user + nice + system + idle + iowait + irq + softirq;
+  const long long usage = total - idle;
+  const long long dtotal = total - cpu_total_prv;
+  cpu_total_prv = total;
+  const long long dusage = usage - cpu_usage_prv;
+  cpu_usage_prv = usage;
+  const long long usage_percent = dusage * 100 / dtotal;
+  graph_add_value(graph_cpu, usage_percent);
+  dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
+  graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
+}
+
+static void render_hello_clonky(void) {
+  static long long unsigned counter = 0;
+  counter++;
+  char buf[128];
+  snprintf(buf, sizeof(buf), "%llu hello%sclonky", counter,
+           counter != 1 ? "s " : " ");
+  pl(buf);
+}
+
+static void render_mem_info(void) {
+  FILE *file = fopen("/proc/meminfo", "r");
+  if (!file) {
+    return;
+  }
+  // /proc/meminfo gives:
+  //  MemTotal:       15766756 kB
+  //  MemFree:         4058344 kB
+  //  MemAvailable:   10814308 kB
+  //  Buffers:          944396 kB
+  //  Cached:          5425168 kB
+  char name[32] = "";
+  char unit[16] = "";
+  long long mem_total = 0;
+  long long mem_avail = 0;
+  char buf[256] = "";
+  fgets(buf, sizeof(buf), file); //	MemTotal:        1937372 kB
+  sscanf(buf, "%31s %lld %15s", name, &mem_total, unit);
+  fgets(buf, sizeof(buf), file); //	MemFree:           99120 kB
+  fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
+  fclose(file);
+
+  sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
+  const int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
+  graph_add_value(graph_mem, proc);
+  dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
+  graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
+  if (mem_avail >> 10 != 0) {
+    mem_avail >>= 10;
+    mem_total >>= 10;
+    strcpy(unit, "MB"); //? kB to MB not same as KB to MBs
+  }
+  snprintf(buf, sizeof(buf), "freemem %llu of %llu %s", mem_avail, mem_total,
+           unit);
+  pl(buf);
+}
+
+static void render_net_graph(void) {
+  if (net_device[0] == '\0') {
+    // if no network device to graph
+    return;
+  }
+  dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + HR_PIXELS_BEFORE);
+  char path[128] = "";
+  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/tx_bytes",
+           net_device);
+  long long tx_bytes = sys_value_long(path);
+  snprintf(path, sizeof(path), "/sys/class/net/%s/statistics/rx_bytes",
+           net_device);
+  long long rx_bytes = sys_value_long(path);
+  graphd_add_value(graph_net, tx_bytes + rx_bytes);
+  graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
+}
+
+static void render_cheetsheet(void) {
+  static char *keysheet[] = {"ĸey",
+                             "+c               console",
+                             "+f                 files",
+                             "+e                editor",
+                             "+m                 media",
+                             "+v                 mixer",
+                             "+i              internet",
+                             "+x                sticky",
+                             "+o              binaries",
+                             "+p              snapshot",
+                             "+shift+p          ↳ area",
+                             "",
+                             "đesktop",
+                             "+up                   up",
+                             "+down               down",
+                             "",
+                             "window",
+                             "+esc               close",
+                             "+b                  bump",
+                             "+s                center",
+                             "+w                 wider",
+                             "+W               thinner",
+                             "+r                resize",
+                             "+1           full-screen",
+                             "+2           full-height",
+                             "+3            full-width",
+                             "+right        focus-next",
+                             "+left         focus-prev",
+                             "+shift+up        move-up",
+                             "+shift+down    move-down",
+                             "+0   i-am-bored-surprise",
+                             " ...                ... ",
+                             NULL};
+
+  char **str_ptr = keysheet;
+  while (*str_ptr) {
+    pl(*str_ptr);
+    str_ptr++;
+  }
+}
+
+static void render_df(void) {
+  FILE *file = popen("df -h", "r");
+  if (!file) {
+    return;
+  }
+  // df -h gives:
+  //  Filesystem      Size  Used Avail Use% Mounted on
+  //  tmpfs           1,6G  2,3M  1,6G   1% /run
+  //  /dev/nvme0n1p6  235G  166G   57G  75% /
+
+  char buf[256] = "";
+  unsigned counter = RENDER_DF_MAX_LINE_COUNT;
+  while (counter--) {
+    if (fscanf(file, "%255[^\n]%*c", buf) == EOF) {
+      break;
+    }
+    str_compact_spaces(buf);
+    if (buf[0] != '/') {
+      continue;
+    }
+    pl(buf);
+  }
+  pclose(file);
+}
+
+static void render_io_stat(void) {
+  static long long prv_kb_read_total = 0;
+  static long long prv_kb_written_total = 0;
+
+  FILE *file = popen("iostat -d", "r");
+  if (!file) {
+    return;
+  }
+  // Linux 6.2.0-34-generic (c) 	2023-10-20 	_x86_64_	(12 CPU)
+  // Device  tps  kB_read/s  kB_wrtn/s  kB_dscd/s  kB_read  kB_wrtn  kB_dscd
+  //
+  // loop0   0,00 0,00       0,00       0,00       21       0        0
+
+  char buf[256] = "";
+  // read the header
+  fgets(buf, sizeof(buf), file);
+  fgets(buf, sizeof(buf), file);
+  fgets(buf, sizeof(buf), file);
+  // sum values
+  long long kb_read = 0;
+  long long kb_read_total = 0;
+  long long kb_written = 0;
+  long long kb_written_total = 0;
+  while (fgets(buf, sizeof(buf), file)) {
+    if (buf[0] == '\0') {
+      // break on empty line
+      break;
+    }
+    char dev[64] = "";
+    sscanf(buf, "%63s %*s %*s %*s %*s %lld %lld", dev, &kb_read, &kb_written);
+    kb_read_total += kb_read;
+    kb_written_total += kb_written;
+  }
+  pclose(file);
+
+  const char *unit = "kB/s";
+  snprintf(buf, sizeof(buf), "read %lld %s wrote %lld %s",
+           kb_read_total -
+               (prv_kb_read_total ? prv_kb_read_total : kb_read_total),
+           unit,
+           kb_written_total -
+               (prv_kb_written_total ? prv_kb_written_total : kb_written_total),
+           unit);
+  pl(buf);
+
+  prv_kb_read_total = kb_read_total;
+  prv_kb_written_total = kb_written_total;
+}
+
+static void render_syslog(void) {
+  FILE *file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
+  if (!file) {
+    return;
+  }
+  char buf[512];
+  unsigned counter = RENDER_SYSLOG_MAX_LINE_COUNT;
+  while (counter--) {
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+      break;
+    }
+    pl(buf);
+  }
+  pclose(file);
+}
+
+static void render_acpi(void) {
+  FILE *file = popen("acpi -at", "r");
+  if (!file) {
+    return;
+  }
+  // no-infinite loop, arbitrary limit
+  unsigned counter = RENDER_ACPI_MAX_LINE_COUNT;
+  while (counter--) {
+    char buf[512] = "";
+    // read at most 511 characters before a newline and read the newline
+    // characters
+    if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+      break;
+    }
+    str_to_lower(buf);
+    pl(buf);
+  }
+  pclose(file);
+}
+
+static void render_date_time(void) {
+  const time_t t = time(NULL);
+  const struct tm *lt = localtime(&t);
+  strb sb;
+  strb_init(&sb);
+  if (strb_p(&sb, asctime(lt))) {
+    return;
+  }
+  // delete the '\n' that asctime writes at the end of the string
+  strb_back(&sb);
+  pl(sb.chars);
+}
+
+static void render_cores_throttle(void) {
+  FILE *file = fopen("/sys/devices/system/cpu/present", "r");
+  if (!file) {
+    return;
+  }
+  unsigned min = 0;
+  unsigned max = 0;
+  fscanf(file, "%u-%u", &min, &max);
+  fclose(file);
+
+  strb sb;
+  strb_init(&sb);
+  if (strb_p(&sb, "throttle ")) {
+    return;
+  }
+  const unsigned ncpus = max - min + 1;
+  strb_p_int(&sb, (int)ncpus);
+  strb_p(&sb, " core");
+  if (ncpus != 1) {
+    strb_p_char(&sb, 's');
+  }
+  if (ncpus > 2) {
+    // if more than 2 cpus display throttles on new line
+    pl(sb.chars);
+    // puts(sb.chars);
+    strb_clear(&sb);
+  }
+  const unsigned ncols = 5;
+  unsigned cpu_ix = min;
+  while (cpu_ix <= max) {
+    for (unsigned col = 0; col < ncols && cpu_ix <= max; col++) {
+      char path[128] = "";
+      snprintf(path, sizeof(path),
+               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
+               cpu_ix);
+      const long long max_freq = sys_value_long(path);
+      snprintf(path, sizeof(path),
+               "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
+               cpu_ix);
+      const long long cur_freq = sys_value_long(path);
+      strb_p_char(&sb, ' ');
+      if (max_freq) {
+        // if available render percent of max frequency
+        const unsigned proc = (unsigned)(cur_freq * 100 / max_freq);
+        strb_p_int_with_width(&sb, (int)proc, 3);
+        strb_p_char(&sb, '%');
+      } else {
+        // max frequency not available
+        strb_p(&sb, "----");
+      }
+      cpu_ix++;
+    }
+    pl(sb.chars);
+    // puts(sb.chars);
+    strb_clear(&sb);
+  }
+}
+
+static void render_swaps(void) {
+  FILE *file = fopen("/proc/swaps", "r");
+  if (!file) {
+    return;
+  }
+  // Filename         Type       Size     Used   Priority
+  // /dev/mmcblk0p3   partition  2096124  16568  s-1
+  char buf[256] = "";
+  // read column headers
+  fgets(buf, sizeof(buf), file);
+  long long size_kb = 0;
+  long long used_kb = 0;
+  if (!fscanf(file, "%*s %*s %lld %lld", &size_kb, &used_kb)) {
+    fclose(file);
+    return;
+  }
+  fclose(file);
+
+  strb sb;
+  strb_init(&sb);
+  if (strb_p(&sb, "swapped ")) {
+    return;
+  }
+  if (strb_p_nbytes(&sb, used_kb << 10)) {
+    return;
+  }
+  pl(sb.chars);
 }
 
 static struct netifc *netifcs_get_by_name_or_create(const char *name) {
@@ -841,6 +836,26 @@ static void render_top_10_processes(void) {
   pclose(file);
 }
 
+static void render_bluetooth_connected_devices(void) {
+  FILE *file = popen("bluetoothctl devices Connected", "r");
+  if (!file) {
+    return;
+  }
+  unsigned counter = RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT;
+  while (counter--) {
+    char device_name[128];
+    if (fscanf(file, "Device %*s %127[^\n]%*c", device_name) == EOF) {
+      break;
+    }
+    if (counter == RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT - 1) {
+      render_hr();
+      pl("bluetooth devices connected:");
+    }
+    pl(device_name);
+  }
+  pclose(file);
+}
+
 static void signal_exit(int i) {
   puts("\nexiting");
   dc_del(/*gives*/ dc);
@@ -874,6 +889,7 @@ static void render(void) {
   render_acpi();
   //  render_hr();
   //  render_top_10_processes();
+  render_bluetooth_connected_devices();
   render_hr();
   render_syslog();
   render_hr();
