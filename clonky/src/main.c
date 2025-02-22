@@ -34,7 +34,7 @@ static struct graphd *graph_net;
 static const char *power_supply_path_prefix = "/sys/class/power_supply/";
 
 // quirk for different names for battery charge indicator
-static const char *battery_energy_or_charge_prefix = "";
+static const char *battery_energy_or_charge_prefix;
 
 // 'auto_config_battery' copies the battery entry in '/sys/class/power_supply/'
 static char battery_name[32];
