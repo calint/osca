@@ -841,10 +841,11 @@ static void render_bluetooth_connected_devices(void) {
   if (!file) {
     return;
   }
+  char device_name[128] = "  ";
   unsigned counter = RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT;
   while (counter--) {
-    char device_name[128];
-    if (fscanf(file, "Device %*s %127[^\n]%*c", device_name) == EOF) {
+    if (fscanf(file, "Device %*s %125[^\n]%*c", device_name + 2) == EOF) {
+      // note: 125 and +2 because of the "  " prefix
       break;
     }
     if (counter == RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT - 1) {
