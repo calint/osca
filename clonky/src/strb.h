@@ -7,6 +7,7 @@ typedef struct strb {
   // index in chars. points at string terminator '\0'
   size_t index;
 } strb;
+// note: declared in header because it is used on the stack
 
 void strb_init(strb *self);
 

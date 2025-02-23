@@ -1,7 +1,8 @@
 #ifndef GRAPHD_H
 #define GRAPHD_H
 
-struct dc;
+#include "dc.h"
+
 struct graphd;
 
 /*gives*/ struct graphd *graphd_new(unsigned nvalues);
