@@ -37,7 +37,7 @@ int strb_p_int_with_width(strb *self, int num, int width);
 // returns 0 if ok
 int strb_p_long(strb *self, long long num);
 
-// formats number of bytes using suffixes (B, KB, MB, GB, TB)
+// formats number of bytes using suffixes (B, KB, MB, GB)
 // returns 0 if ok
 int strb_p_nbytes(strb *self, long long nbytes);
 

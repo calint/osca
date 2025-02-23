@@ -82,12 +82,25 @@ int strb_p_nbytes(strb *self, const long long nbytes) {
     }
     return 0;
   }
-  if (strb_p_long(self, mb)) {
-    return -5;
+  const long long gb = (mb + 512) >> 10;
+  // note: +512 is for rounding
+  if (gb == 0) {
+    if (strb_p_long(self, mb)) {
+      return -5;
+    }
+    if (strb_p(self, " MB")) {
+      return -6;
+    }
+    return 0;
   }
-  if (strb_p(self, " MB")) {
-    return -6;
+
+  if (strb_p_long(self, gb)) {
+    return -7;
   }
+  if (strb_p(self, " GB")) {
+    return -8;
+  }
+
   return 0;
 }
 
