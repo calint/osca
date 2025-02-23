@@ -64,6 +64,30 @@ static void str_to_lower(char *str) {
   }
 }
 
+static void str_compact_spaces(char *str) {
+  char *dst = str;
+  // "   a  b c  "
+  while (isspace(*str)) {
+    str++;
+  }
+  // "a  b c  "
+  while (1) {
+    *dst++ = *str;
+    if (*str == '\0') {
+      return;
+    }
+    str++;
+    int is_spc = 0;
+    while (isspace(*str)) {
+      str++;
+      is_spc++;
+    }
+    if (is_spc && *str != '\0') {
+      *dst++ = ' ';
+    }
+  }
+}
+
 // returns string value from '/sys/' file system without new line or "" if
 // anything goes wrong
 // path: full path of file
@@ -115,30 +139,6 @@ static long long sys_value_long(const char *path) {
 }
 
 static int sys_value_exists(const char *path) { return !access(path, F_OK); }
-
-static void str_compact_spaces(char *str) {
-  char *dst = str;
-  // "   a  b c  "
-  while (isspace(*str)) {
-    str++;
-  }
-  // "a  b c  "
-  while (1) {
-    *dst++ = *str;
-    if (*str == '\0') {
-      return;
-    }
-    str++;
-    int is_spc = 0;
-    while (isspace(*str)) {
-      str++;
-      is_spc++;
-    }
-    if (is_spc && *str != '\0') {
-      *dst++ = ' ';
-    }
-  }
-}
 
 static void auto_config_battery(void) {
   DIR *dir = opendir("/sys/class/power_supply");
