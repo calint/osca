@@ -117,8 +117,8 @@ static long long sys_value_long(const char *path) {
 static int sys_value_exists(const char *path) { return !access(path, F_OK); }
 
 static void str_compact_spaces(char *str) {
-  // "   a  b c  "
   char *dst = str;
+  // "   a  b c  "
   while (isspace(*str)) {
     str++;
   }
@@ -126,7 +126,6 @@ static void str_compact_spaces(char *str) {
   while (1) {
     *dst++ = *str;
     if (*str == '\0') {
-      // "a b c "
       return;
     }
     str++;
@@ -135,7 +134,7 @@ static void str_compact_spaces(char *str) {
       str++;
       is_spc++;
     }
-    if (is_spc) {
+    if (is_spc && *str != '\0') {
       *dst++ = ' ';
     }
   }
