@@ -61,7 +61,8 @@ inline int strb_p_int_with_width(strb *self, const int num, const int width) {
 }
 
 int strb_p_nbytes(strb *self, const long long nbytes) {
-  const long long kb = nbytes >> 10;
+  const long long kb = (nbytes + 512) >> 10;
+  // note: +512 is for rounding
   if (kb == 0) {
     if (strb_p_long(self, nbytes)) {
       return -1;
@@ -71,7 +72,8 @@ int strb_p_nbytes(strb *self, const long long nbytes) {
     }
     return 0;
   }
-  const long long mb = kb >> 10;
+  const long long mb = (kb + 512) >> 10;
+  // note: +512 is for rounding
   if (mb == 0) {
     if (strb_p_long(self, kb)) {
       return -3;
