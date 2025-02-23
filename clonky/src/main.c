@@ -119,7 +119,7 @@ static int sys_value_exists(const char *path) { return !access(path, F_OK); }
 static void str_compact_spaces(char *str) {
   // "   a  b c  "
   char *dst = str;
-  while (*str == ' ' || *str == '\t') {
+  while (isspace(*str)) {
     str++;
   }
   // "a  b c  "
@@ -131,7 +131,7 @@ static void str_compact_spaces(char *str) {
     }
     str++;
     int is_spc = 0;
-    while (*str == ' ' || *str == '\t') {
+    while (isspace(*str)) {
       str++;
       is_spc++;
     }
