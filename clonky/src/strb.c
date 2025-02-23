@@ -19,10 +19,6 @@ inline int strb_p(strb *self, const char *str) {
     return -1;
   }
   self->index += (unsigned)n;
-  const size_t remaining2 = strb_rem(self);
-  if (remaining2 < 1) {
-    return -2;
-  }
   return 0;
 }
 
