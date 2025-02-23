@@ -8,18 +8,17 @@ inline void strb_init(strb *self) {
 
 void strb_clear(strb *self) { strb_init(self); }
 
-inline size_t strb_rem(strb *self) {
-  const size_t rem = sizeof(self->chars) - self->index;
-  return rem;
+inline unsigned strb_rem(strb *self) {
+  return sizeof(self->chars) - self->index;
 }
 
 inline int strb_p(strb *self, const char *str) {
-  const size_t remaining = strb_rem(self);
+  const unsigned remaining = strb_rem(self);
   const int n = snprintf(self->chars + self->index, remaining, "%s", str);
-  if (n < 0 || (size_t)n >= remaining) {
+  if (n < 0 || (unsigned)n >= remaining) {
     return -1;
   }
-  self->index += (size_t)n;
+  self->index += (unsigned)n;
   const size_t remaining2 = strb_rem(self);
   if (remaining2 < 1) {
     return -2;

@@ -1,18 +1,17 @@
 #ifndef STRB_h
 #define STRB_h
-#include <unistd.h>
 
 typedef struct strb {
   char chars[512];
   // index in chars. points at string terminator '\0'
-  size_t index;
+  unsigned index;
 } strb;
 // note: declared in header because it is used on the stack
 
 void strb_init(strb *self);
 
 // returns remaining free chars
-size_t strb_rem(strb *self);
+unsigned strb_rem(strb *self);
 
 // appends 'str'
 // returns 0 if ok
