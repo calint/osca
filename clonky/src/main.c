@@ -371,6 +371,7 @@ static void render_mem_info(void) {
 static void render_net_graph(void) {
   if (net_device[0] == '\0') {
     // if no network device to graph
+    dc_draw_hr(dc);
     return;
   }
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + HR_PIXELS_BEFORE);
