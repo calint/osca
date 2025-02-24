@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-24
+//
 #ifndef DC_H
 #define DC_H
 
@@ -15,6 +18,7 @@ void dc_del(/*takes*/ struct dc *self);
 // clears the draw area and resets the cursor to the top left corner
 void dc_clear(struct dc *self);
 
+// draws a line from (x0, y0) to (x1, y1)
 void dc_draw_line(const struct dc *self, int32_t x0, int32_t y0, int32_t x1,
                   int32_t y1);
 
@@ -24,6 +28,7 @@ void dc_draw_hr(struct dc *self);
 // draws horizontal rule with custom width
 void dc_draw_hr1(struct dc *self, uint32_t width);
 
+// draws a string at the current cursor position
 void dc_draw_str(const struct dc *self, const char *str);
 
 // moves the cursor to the next line

@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-24
+//
 #include "graph.h"
 #include "dc.h"
 #include <stdio.h>
@@ -9,10 +12,10 @@ struct graph {
   uint32_t ix;
 };
 
-/*gives*/ struct graph *graph_new(uint32_t nvalues) {
+/*gives*/ struct graph *graph_new(const uint32_t nvalues) {
   struct graph *self = calloc(1, sizeof(struct graph));
   if (!self) {
-    printf("!!! graph_new cannot alloc\n");
+    puts("!!! cannot alloc struct graph_new");
     exit(1);
   }
   self->nvalues = nvalues;

@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-24
+//
 #include "dc.h"
 #include <X11/Xft/Xft.h>
 #include <stdio.h>
@@ -24,18 +27,20 @@ struct dc {
   XRenderColor render_color;
 };
 
-/*gives*/ struct dc *dc_new(const char *font_name, double font_size,
-                            uint32_t line_height, int32_t margin_top,
-                            uint32_t width, uint32_t pixels_before_hr,
-                            uint32_t pixels_after_hr, uint32_t align) {
+/*gives*/ struct dc *dc_new(const char *font_name, const double font_size,
+                            const uint32_t line_height,
+                            const int32_t margin_top, const uint32_t width,
+                            const uint32_t pixels_before_hr,
+                            const uint32_t pixels_after_hr,
+                            const uint32_t align) {
   struct dc *self = calloc(1, sizeof(struct dc));
   if (!self) {
-    printf("!!! could not allocate dc\n");
+    puts("!!! could not allocate struct dc");
     exit(1);
   }
   self->display = XOpenDisplay(NULL);
   if (!self->display) {
-    printf("!!! could not open display\n");
+    puts("!!! could not open display");
     exit(1);
   }
   self->screen = DefaultScreen(self->display);
@@ -48,7 +53,7 @@ struct dc {
   self->pixels_after_hr = pixels_after_hr;
   self->line_height = line_height;
   self->current_x = self->margin_left;
-  self->current_y = 0;
+  self->current_y = margin_top;
   self->window = RootWindow(self->display, self->screen);
   self->gc = XCreateGC(self->display, self->window, 0, NULL);
   self->color_map = DefaultColormap(self->display, self->screen);

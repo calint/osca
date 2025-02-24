@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-24
+//
 #include "strb.h"
 #include <stdio.h>
 

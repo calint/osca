@@ -1,3 +1,6 @@
+//
+// reviewed: 2025-02-24
+//
 #include "graphd.h"
 #include "dc.h"
 #include <stdio.h>
@@ -13,7 +16,7 @@ struct graphd {
 /*gives*/ struct graphd *graphd_new(const uint32_t nvalues) {
   struct graphd *self = calloc(1, sizeof(struct graphd));
   if (!self) {
-    printf("!!! graphd_new cannot alloc\n");
+    puts("!!! cannot alloc struct graphd_new");
     exit(1);
   }
   self->nvalues = nvalues;
