@@ -140,7 +140,7 @@ static Display *display;
 static Window root_window;
 static int current_desk;
 static xwin *focused_window;
-static long long time_of_last_map_notify_ms;
+static time_t time_of_last_map_notify_ms;
 
 // default screen info
 static struct screen {
@@ -149,10 +149,10 @@ static struct screen {
   unsigned hi; // height
 } screen;
 
-static long long current_time_ms() {
+static time_t current_time_ms() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  return (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 static xwin *xwin_get_by_window(Window w) {

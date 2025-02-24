@@ -11,23 +11,23 @@ struct dc {
   XftFont *font;
   XftDraw *draw;
   XftColor color;
-  unsigned display_width;
-  unsigned display_height;
-  unsigned width;
-  int margin_top;
-  unsigned pixels_before_hr;
-  unsigned pixels_after_hr;
-  int margin_left;
-  unsigned line_height;
-  int current_y;
-  int current_x;
+  uint32_t display_width;
+  uint32_t display_height;
+  uint32_t width;
+  int32_t margin_top;
+  uint32_t pixels_before_hr;
+  uint32_t pixels_after_hr;
+  int32_t margin_left;
+  uint32_t line_height;
+  int32_t current_y;
+  int32_t current_x;
   XRenderColor render_color;
 };
 
 /*gives*/ struct dc *dc_new(const char *font_name, double font_size,
-                            unsigned line_height, int margin_top,
-                            unsigned width, unsigned pixels_before_hr,
-                            unsigned pixels_after_hr, unsigned align) {
+                            uint32_t line_height, int32_t margin_top,
+                            uint32_t width, uint32_t pixels_before_hr,
+                            uint32_t pixels_after_hr, uint32_t align) {
   struct dc *self = calloc(1, sizeof(struct dc));
   if (!self) {
     printf("!!! could not allocate dc\n");
@@ -39,10 +39,10 @@ struct dc {
     exit(1);
   }
   self->screen = DefaultScreen(self->display);
-  self->display_width = (unsigned)DisplayWidth(self->display, self->screen);
-  self->display_height = (unsigned)DisplayHeight(self->display, self->screen);
+  self->display_width = (uint32_t)DisplayWidth(self->display, self->screen);
+  self->display_height = (uint32_t)DisplayHeight(self->display, self->screen);
   self->width = width;
-  self->margin_left = align == 0 ? 0 : (int)(self->display_width - width);
+  self->margin_left = align == 0 ? 0 : (int32_t)(self->display_width - width);
   self->margin_top = margin_top;
   self->pixels_before_hr = pixels_before_hr;
   self->pixels_after_hr = pixels_after_hr;
@@ -79,20 +79,20 @@ void dc_clear(struct dc *self) {
                  BlackPixel(self->display, self->screen));
   XFillRectangle(self->display, self->window, self->gc, self->margin_left,
                  self->margin_top, self->width,
-                 (unsigned)((int)self->display_height - self->margin_top));
+                 (uint32_t)((int32_t)self->display_height - self->margin_top));
   XSetForeground(self->display, self->gc,
                  WhitePixel(self->display, self->screen));
   self->current_y = self->margin_top;
   self->current_x = self->margin_left;
 }
 
-void dc_draw_line(const struct dc *self, const int x0, const int y0,
-                  const int x1, const int y1) {
+void dc_draw_line(const struct dc *self, const int32_t x0, const int32_t y0,
+                  const int32_t x1, const int32_t y1) {
   XDrawLine(self->display, self->window, self->gc, x0, y0, x1, y1);
 }
 
 void dc_newline(struct dc *self) {
-  self->current_y += (int)self->line_height;
+  self->current_y += (int32_t)self->line_height;
   self->current_x = self->margin_left;
 }
 
@@ -102,24 +102,27 @@ void dc_draw_str(const struct dc *self, const char *str) {
 }
 
 void dc_draw_hr(struct dc *self) {
-  self->current_y += (int)self->pixels_before_hr;
+  self->current_y += (int32_t)self->pixels_before_hr;
   XDrawLine(self->display, self->window, self->gc, self->margin_left,
             self->current_y, self->margin_left + (int)self->width,
             self->current_y);
-  self->current_y += (int)self->pixels_after_hr;
+  self->current_y += (int32_t)self->pixels_after_hr;
 }
 
-void dc_draw_hr1(struct dc *self, const int width) {
-  self->current_y += (int)self->pixels_before_hr;
+void dc_draw_hr1(struct dc *self, const uint32_t width) {
+  self->current_y += (int32_t)self->pixels_before_hr;
   XDrawLine(self->display, self->window, self->gc, self->margin_left,
-            self->current_y, self->margin_left + width, self->current_y);
-  self->current_y += (int)self->pixels_after_hr;
+            self->current_y, self->margin_left + (int32_t)width,
+            self->current_y);
+  self->current_y += (int32_t)self->pixels_after_hr;
 }
 
-void dc_inc_y(struct dc *self, const int dy) { self->current_y += dy; }
+void dc_inc_y(struct dc *self, const uint32_t dy) {
+  self->current_y += (int32_t)dy;
+}
 
 void dc_flush(const struct dc *self) { XFlush(self->display); }
 
-int dc_get_x(const struct dc *self) { return self->current_x; }
+int32_t dc_get_x(const struct dc *self) { return self->current_x; }
 
-int dc_get_y(const struct dc *self) { return self->current_y; }
+int32_t dc_get_y(const struct dc *self) { return self->current_y; }

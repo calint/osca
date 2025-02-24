@@ -8,21 +8,21 @@ inline void strb_init(strb *self) {
 
 void strb_clear(strb *self) { strb_init(self); }
 
-inline unsigned strb_rem(strb *self) {
+inline uint32_t strb_rem(strb *self) {
   return sizeof(self->chars) - self->index;
 }
 
 inline int strb_p(strb *self, const char *str) {
-  const unsigned remaining = strb_rem(self);
+  const uint32_t remaining = strb_rem(self);
   const int n = snprintf(self->chars + self->index, remaining, "%s", str);
-  if (n < 0 || (unsigned)n >= remaining) {
+  if (n < 0 || (uint32_t)n >= remaining) {
     return -1;
   }
-  self->index += (unsigned)n;
+  self->index += (uint32_t)n;
   return 0;
 }
 
-int strb_p_char(strb *self, char ch) {
+inline int strb_p_char(strb *self, char ch) {
   if (strb_rem(self) < 2) {
     return -1;
   }
@@ -31,35 +31,49 @@ int strb_p_char(strb *self, char ch) {
   return 0;
 }
 
-inline int strb_p_long(strb *self, const long long num) {
+inline int strb_p_int64(strb *self, const int64_t num) {
   char buf[32];
-  snprintf(buf, sizeof(buf), "%lld", num);
+  snprintf(buf, sizeof(buf), "%ld", num);
   return strb_p(self, buf);
 }
 
-inline int strb_p_int(strb *self, const int num) {
+inline int strb_p_uint64(strb *self, const uint64_t num) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%lu", num);
+  return strb_p(self, buf);
+}
+
+inline int strb_p_int32(strb *self, const int32_t num) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%d", num);
   return strb_p(self, buf);
 }
 
-inline int strb_p_uint(strb *self, const unsigned num) {
+inline int strb_p_uint32(strb *self, const uint32_t num) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%u", num);
   return strb_p(self, buf);
 }
 
-inline int strb_p_int_with_width(strb *self, const int num, const int width) {
+inline int strb_p_int32_with_width(strb *self, const int32_t num,
+                                   const uint32_t width) {
   char buf[32];
   snprintf(buf, sizeof(buf), "%*d", width, num);
   return strb_p(self, buf);
 }
 
-int strb_p_nbytes(strb *self, const long long nbytes) {
-  const long long kb = (nbytes + 512) >> 10;
+inline int strb_p_uint32_with_width(strb *self, const uint32_t num,
+                                    const uint32_t width) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%*u", width, num);
+  return strb_p(self, buf);
+}
+
+int strb_p_nbytes(strb *self, const uint64_t nbytes) {
+  const uint64_t kb = (nbytes + 512) >> 10;
   // note: +512 is for rounding
   if (kb == 0) {
-    if (strb_p_long(self, nbytes)) {
+    if (strb_p_uint64(self, nbytes)) {
       return -1;
     }
     if (strb_p(self, " B")) {
@@ -67,10 +81,10 @@ int strb_p_nbytes(strb *self, const long long nbytes) {
     }
     return 0;
   }
-  const long long mb = (kb + 512) >> 10;
+  const uint64_t mb = (kb + 512) >> 10;
   // note: +512 is for rounding
   if (mb == 0) {
-    if (strb_p_long(self, kb)) {
+    if (strb_p_uint64(self, kb)) {
       return -3;
     }
     if (strb_p(self, " KB")) {
@@ -78,10 +92,10 @@ int strb_p_nbytes(strb *self, const long long nbytes) {
     }
     return 0;
   }
-  const long long gb = (mb + 512) >> 10;
+  const uint64_t gb = (mb + 512) >> 10;
   // note: +512 is for rounding
   if (gb == 0) {
-    if (strb_p_long(self, mb)) {
+    if (strb_p_uint64(self, mb)) {
       return -5;
     }
     if (strb_p(self, " MB")) {
@@ -90,7 +104,7 @@ int strb_p_nbytes(strb *self, const long long nbytes) {
     return 0;
   }
 
-  if (strb_p_long(self, gb)) {
+  if (strb_p_uint64(self, gb)) {
     return -7;
   }
   if (strb_p(self, " GB")) {
