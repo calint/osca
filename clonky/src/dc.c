@@ -109,16 +109,18 @@ void dc_draw_str(const struct dc *self, const char *str) {
 void dc_draw_hr(struct dc *self) {
   self->current_y += (int32_t)self->pixels_before_hr;
   XDrawLine(self->display, self->window, self->gc, self->margin_left,
-            self->current_y, self->margin_left + (int)self->width,
+            self->current_y, self->margin_left + (int)self->width - 1,
             self->current_y);
+  // note: -1 because draw line includes the end point
   self->current_y += (int32_t)self->pixels_after_hr;
 }
 
 void dc_draw_hr1(struct dc *self, const uint32_t width) {
   self->current_y += (int32_t)self->pixels_before_hr;
   XDrawLine(self->display, self->window, self->gc, self->margin_left,
-            self->current_y, self->margin_left + (int32_t)width,
+            self->current_y, self->margin_left + (int32_t)width - 1,
             self->current_y);
+  // note: -1 because draw line includes the end point
   self->current_y += (int32_t)self->pixels_after_hr;
 }
 

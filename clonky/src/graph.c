@@ -54,7 +54,8 @@ void graph_draw(const struct graph *self, struct dc *dc, const uint32_t height,
   const int32_t dc_y = dc_get_y(dc);
   // draw top line
   const int32_t top_y = dc_y - (int32_t)height;
-  dc_draw_line(dc, dc_x, top_y, dc_x + (int32_t)self->nvalues, top_y);
+  dc_draw_line(dc, dc_x, top_y, dc_x + (int32_t)self->nvalues - 1, top_y);
+  // note: -1 because draw line includes the end point
   int32_t x = dc_x;
   // circular buffer, draw from current index to end
   for (uint32_t i = self->ix; i < self->nvalues; i++) {

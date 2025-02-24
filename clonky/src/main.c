@@ -300,16 +300,19 @@ static void render_cpu_load(void) {
   uint64_t irq = 0;
   uint64_t softirq = 0;
   // read first line
-  fscanf(file, "cpu %lu %lu %lu %lu %lu %lu %lu\n", &user, &nice, &system,
-         &idle, &iowait, &irq, &softirq);
+  if (fscanf(file, "cpu %lu %lu %lu %lu %lu %lu %lu\n", &user, &nice, &system,
+             &idle, &iowait, &irq, &softirq) != 7) {
+    fclose(file);
+    return;
+  }
   fclose(file);
   const uint64_t total = user + nice + system + idle + iowait + irq + softirq;
-  const uint64_t usage = total - idle;
-  const uint64_t dtotal = total - cpu_total_prv;
   cpu_total_prv = total;
-  const uint64_t dusage = usage - cpu_usage_prv;
+  const uint64_t usage = total - idle;
   cpu_usage_prv = usage;
-  const uint64_t usage_percent = dusage * 100 / dtotal;
+  const uint64_t dtotal = total - cpu_total_prv;
+  const uint64_t dusage = usage - cpu_usage_prv;
+  const uint64_t usage_percent = dtotal == 0 ? 0 : dusage * 100 / dtotal;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
@@ -318,11 +321,11 @@ static void render_cpu_load(void) {
 
 static void render_hello_clonky(void) {
   static uint64_t counter = 0;
-  counter++;
   char buf[128];
   snprintf(buf, sizeof(buf), "%lu hello%s clonky", counter,
            counter != 1 ? "s" : "");
   pl(buf);
+  counter++;
 }
 
 static void render_mem_info(void) {
