@@ -307,11 +307,11 @@ static void render_cpu_load(void) {
   }
   fclose(file);
   const uint64_t total = user + nice + system + idle + iowait + irq + softirq;
+  const uint64_t dtotal = total - cpu_total_prv;
   cpu_total_prv = total;
   const uint64_t usage = total - idle;
-  cpu_usage_prv = usage;
-  const uint64_t dtotal = total - cpu_total_prv;
   const uint64_t dusage = usage - cpu_usage_prv;
+  cpu_usage_prv = usage;
   const uint64_t usage_percent = dtotal == 0 ? 0 : dusage * 100 / dtotal;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
