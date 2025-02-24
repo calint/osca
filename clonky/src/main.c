@@ -335,8 +335,8 @@ static void render_mem_info(void) {
   graph_add_value(graph_mem, (long long)proc);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
-  if ((mem_avail + 512) >> 10 != 0) {
-    // note: +512 for rounding
+  if (mem_avail >> 10 != 0) {
+    // note: no rounding to nearest integer
     mem_avail >>= 10;
     mem_total >>= 10;
     unit = "MB";
