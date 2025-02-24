@@ -97,7 +97,7 @@ static void str_compact_spaces(char *str) {
 // value_buf_size: size of value buffer
 // if value is without '\n' at the end then write "" to value
 static void sys_value_str_line(const char *path, char *value,
-                               const uint32_t value_buf_size) {
+                               const size_t value_buf_size) {
   int fd = open(path, O_RDONLY);
   if (fd == -1) {
     value[0] = '\0';
