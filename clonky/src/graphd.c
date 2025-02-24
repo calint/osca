@@ -5,9 +5,9 @@
 
 struct graphd {
   uint64_t *values;
-  uint64_t _value_prev;
   uint32_t nvalues;
   uint32_t ix;
+  uint64_t _value_prev;
 };
 
 /*gives*/ struct graphd *graphd_new(const uint32_t nvalues) {
