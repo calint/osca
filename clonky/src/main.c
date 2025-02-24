@@ -133,11 +133,11 @@ static int64_t sys_value_int64(const char *path) {
   sys_value_str_line(path, str, sizeof(str));
 
   char *endptr = NULL;
-  int64_t result = strtoll(str, &endptr, 10);
+  const long long result = strtoll(str, &endptr, 10);
   if (endptr == str) {
     return 0;
   }
-  return result;
+  return (int64_t)result;
 }
 
 static uint64_t sys_value_uint64(const char *path) {
@@ -145,7 +145,7 @@ static uint64_t sys_value_uint64(const char *path) {
   sys_value_str_line(path, str, sizeof(str));
 
   char *endptr = NULL;
-  uint64_t result = strtoull(str, &endptr, 10);
+  const unsigned long long result = strtoull(str, &endptr, 10);
   if (endptr == str) {
     return 0;
   }
