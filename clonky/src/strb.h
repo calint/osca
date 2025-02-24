@@ -25,11 +25,11 @@ int strb_p_char(strb *self, char ch);
 
 // formats and appends 'num'
 // returns 0 if ok
-int strb_p_int32(strb *self, const int32_t num);
+int strb_p_int32(strb *self, int32_t num);
 
 // formats and appends 'num'
 // returns 0 if ok
-int strb_p_uint32(strb *self, const uint32_t num);
+int strb_p_uint32(strb *self, uint32_t num);
 
 // appends 'num' with specified field 'width' aligned right
 // returns 0 if ok
