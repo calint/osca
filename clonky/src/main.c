@@ -1,5 +1,6 @@
 //
 // reviewed: 2025-02-22
+// reviewed: 2025-02-24
 //
 #include "dc.h"
 #include "graph.h"
@@ -32,10 +33,8 @@ static struct graph *graph_mem;
 // network traffic graph
 static struct graphd *graph_net;
 
-// prefix to battery status directory
-static const char *power_supply_path_prefix = "/sys/class/power_supply/";
-
 // quirk for different names for battery charge indicator
+// set at 'auto_config_battery'
 static const char *battery_energy_or_charge_prefix;
 
 // 'auto_config_battery' copies the battery entry in '/sys/class/power_supply/'
@@ -48,12 +47,14 @@ static char net_device_is_wifi;
 
 // network interfaces
 static struct netifc {
-  // name as listed in '/sys/class/net/'
   char name[NETIFC_NAME_SIZE];
-  // bytes received at previous check
+  // name as listed in '/sys/class/net/'
+
   uint64_t rx_bytes_prv;
-  // bytes transmitted at previous check
+  // bytes received at previous check
+
   uint64_t tx_bytes_prv;
+  // bytes transmitted at previous check
 } netifcs[NETIFC_ARRAY_SIZE];
 
 // used network interfaces
@@ -171,6 +172,7 @@ static void auto_config_battery(void) {
     char buf[128] = "";
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%.*s/type", 64,
              entry->d_name);
+    // note: 64 is arbitrary max length of entry name
     sys_value_str_line(buf, buf, sizeof(buf));
     str_to_lower(buf);
     if (strcmp(buf, "battery")) {
@@ -179,7 +181,7 @@ static void auto_config_battery(void) {
     // found 'battery'
     strncpy(battery_name, entry->d_name, sizeof(battery_name));
 
-    //? quirk if it is 'energy_full_design' or 'charge_full_design'
+    //? quirk if it is 'energy' or 'charge' for battery charge info
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
              battery_name);
     if (sys_value_exists(buf)) {
@@ -239,7 +241,7 @@ static void auto_config_network_traffic(void) {
     strncpy(net_device, entry->d_name, sizeof(net_device));
   }
   closedir(dir);
-  if (net_device[0] == '\0') { //? map 'lo'?
+  if (net_device[0] == '\0') {
     puts("[!] no network device found in /sys/class/net/");
   }
   printf("· graph network interface: ");
@@ -267,7 +269,7 @@ static void render_date_time(void) {
   if (strb_p(&sb, asctime(lt))) {
     return;
   }
-  // delete the '\n' that asctime writes at the end of the string
+  // delete the '\n' that 'asctime' writes at the end of the string
   strb_back(&sb);
   pl(sb.chars);
 }
@@ -311,6 +313,7 @@ static void render_cpu_load(void) {
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
+  // note: 100 for percent
 }
 
 static void render_hello_clonky(void) {
@@ -347,8 +350,9 @@ static void render_mem_info(void) {
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
+  // note: 100 for percent
   if (mem_avail >> 10 != 0) {
-    // note: no rounding to nearest integer
+    // note: no rounding to nearest integer to give minimum
     mem_avail >>= 10;
     mem_total >>= 10;
     unit = "MB";
@@ -370,7 +374,7 @@ static void render_swaps(void) {
   fgets(buf, sizeof(buf), file);
   uint64_t size_kb = 0;
   uint64_t used_kb = 0;
-  if (!fscanf(file, "%*s %*s %lu %lu", &size_kb, &used_kb)) {
+  if (fscanf(file, "%*s %*s %lu %lu", &size_kb, &used_kb) != 2) {
     fclose(file);
     return;
   }
@@ -391,6 +395,7 @@ static void render_net_graph(void) {
   if (net_device[0] == '\0') {
     // if no network device to graph
     dc_draw_hr(dc);
+    // draw a line which otherwise is implied by the graph
     return;
   }
   dc_inc_y(dc, DEFAULT_GRAPH_HEIGHT + HR_PIXELS_BEFORE);
@@ -413,6 +418,7 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
     }
   }
   if (netifcs_len >= NETIFC_ARRAY_SIZE) {
+    // if no more devices fit in the array
     return NULL;
   }
   printf("· network interface: %s\n", name);
@@ -446,7 +452,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read SSID
   char ssid[128] = "";
-  if (!fscanf(file, "\tSSID: %127[^\n]%*c", ssid)) {
+  if (fscanf(file, "\tSSID: %127[^\n]%*c", ssid) != 1) {
     pclose(file);
     return;
   }
@@ -460,7 +466,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read signal strength
   char signal[64] = "";
-  if (!fscanf(file, "\tsignal: %63[^\n]%*c", signal)) {
+  if (fscanf(file, "\tsignal: %63[^\n]%*c", signal) != 1) {
     pclose(file);
     return;
   }
@@ -491,13 +497,14 @@ static void render_net_interface(struct ifaddrs *ifa) {
   char operstate[32] = "";
   sys_value_str_line(path, operstate, sizeof(operstate));
   str_to_lower(operstate);
-  if (!strcmp(operstate, "unknown")) {
+  if (!strncmp(operstate, "unknown", sizeof(operstate))) {
     operstate[0] = '\0';
   }
 
   char buf[256] = "";
   snprintf(buf, sizeof(buf), "%.*s: %.*s %.*s", 32, ifa->ifa_name, 64, ip_addr,
            (int)sizeof(operstate), operstate);
+  // note: 32 is arbitrary max length of interface name and 64 for ip address
   pl(buf);
 
   // is it the wifi device?
@@ -510,13 +517,16 @@ static void render_net_interface(struct ifaddrs *ifa) {
   // get stats from /sys
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/tx_bytes", 32,
            ifa->ifa_name);
+  // note: 32 is arbitrary max length of interface name
   const uint64_t tx_bytes = sys_value_uint64(path);
   snprintf(path, sizeof(path), "/sys/class/net/%.*s/statistics/rx_bytes", 32,
            ifa->ifa_name);
+  // note: 32 is arbitrary max length of interface name
   const uint64_t rx_bytes = sys_value_uint64(path);
   // get or create entry
   struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
   if (!ifc) {
+    // no more space in the network interfaces array
     return;
   }
   uint64_t delta_tx_bytes =
@@ -527,6 +537,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
   ifc->tx_bytes_prv = tx_bytes;
   ifc->rx_bytes_prv = rx_bytes;
 
+  // ? round to nearest integer
   const char *rx_scale = "B/s";
   if (delta_rx_bytes >> 20) {
     delta_rx_bytes >>= 20;
@@ -556,6 +567,7 @@ static void render_net_interfaces(void) {
     return;
   }
 
+  // ? implement new algorithm to make one pass through the list of interfaces
   // first the graphed device
   for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
     if (strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
@@ -604,18 +616,20 @@ static void render_io_stat(void) {
   fgets(buf, sizeof(buf), file);
   fgets(buf, sizeof(buf), file);
   // sum values
-  uint64_t kb_read = 0;
   uint64_t kb_read_total = 0;
-  uint64_t kb_written = 0;
   uint64_t kb_written_total = 0;
   while (fgets(buf, sizeof(buf), file)) {
     if (buf[0] == '\0') {
       // break on empty line
       break;
     }
-    sscanf(buf, "%*s %*s %*s %*s %*s %lu %lu", &kb_read, &kb_written);
-    kb_read_total += kb_read;
-    kb_written_total += kb_written;
+    uint64_t kb_read = 0;
+    uint64_t kb_written = 0;
+    if (sscanf(buf, "%*s %*s %*s %*s %*s %lu %lu", &kb_read, &kb_written) ==
+        2) {
+      kb_read_total += kb_read;
+      kb_written_total += kb_written;
+    }
   }
   pclose(file);
 
@@ -646,10 +660,10 @@ static void render_df(void) {
     if (fscanf(file, "%255[^\n]%*c", buf) == EOF) {
       break;
     }
-    str_compact_spaces(buf);
     if (buf[0] != '/') {
       continue;
     }
+    str_compact_spaces(buf);
     pl(buf);
   }
   pclose(file);
@@ -662,7 +676,10 @@ static void render_cores_throttle(void) {
   }
   uint32_t min = 0;
   uint32_t max = 0;
-  fscanf(file, "%u-%u", &min, &max);
+  if (fscanf(file, "%u-%u", &min, &max) != 2) {
+    fclose(file);
+    return;
+  }
   fclose(file);
 
   strb sb;
@@ -679,7 +696,7 @@ static void render_cores_throttle(void) {
   if (ncpus > 2) {
     // if more than 2 cpus display throttles on new line
     pl(sb.chars);
-    strb_clear(&sb);
+    strb_init(&sb);
   }
   const uint32_t ncols = 5;
   uint32_t cpu_ix = min;
@@ -709,9 +726,9 @@ static void render_cores_throttle(void) {
       cpu_ix++;
     }
     pl(sb.chars);
-    strb_clear(&sb);
+    strb_init(&sb);
   }
-  if (ncpus != 0 && total_proc != 0) {
+  if (ncpus > 1 && total_proc != 0) {
     strb_p(&sb, "average: ");
     strb_p_uint32(&sb, (total_proc + (ncpus / 2)) / ncpus);
     // note: ncpus / 2 for rounding to nearest integer
@@ -725,6 +742,11 @@ static void render_battery(void) {
     // if no battery on the system
     return;
   }
+
+  // prefix to battery status directory
+  const char *power_supply_path_prefix = "/sys/class/power_supply/";
+
+  // construct prefix of battery info path
   char path[256] = "";
   const int nchars =
       snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
@@ -786,6 +808,7 @@ static void render_bluetooth_connected_devices(void) {
       break;
     }
     if (counter == RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT - 1) {
+      // if first entry
       render_hr();
       pl("bluetooth devices connected:");
     }

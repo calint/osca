@@ -10,6 +10,7 @@ typedef struct strb {
 } strb;
 // note: declared in header because it is used on the stack
 
+// clears buffer by setting index to 0 and first char to '\0'
 void strb_init(strb *self);
 
 // returns remaining free chars
@@ -53,8 +54,5 @@ int strb_p_nbytes(strb *self, uint64_t nbytes);
 
 // backs one character and writes '\0'
 void strb_back(strb *self);
-
-// clears buffer by setting index to 0 and first char to '\0'
-void strb_clear(strb *self);
 
 #endif

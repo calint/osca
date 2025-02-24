@@ -6,8 +6,6 @@ inline void strb_init(strb *self) {
   self->chars[0] = '\0';
 }
 
-void strb_clear(strb *self) { strb_init(self); }
-
 inline uint32_t strb_rem(strb *self) {
   return sizeof(self->chars) - self->index;
 }
