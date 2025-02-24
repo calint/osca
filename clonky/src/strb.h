@@ -43,6 +43,8 @@ int strb_p_uint32_with_width(strb *self, uint32_t num, uint32_t width);
 // returns 0 if ok
 int strb_p_int64(strb *self, int64_t num);
 
+// appends 'num'
+// returns 0 if ok
 int strb_p_uint64(strb *self, uint64_t num);
 
 // formats number of bytes using suffixes (B, KB, MB, GB)
