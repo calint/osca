@@ -261,8 +261,8 @@ static void render_date_time(void) {
 
 static void render_cpu_load(void) {
   // previous reading
-  static long long cpu_total_prv = 0;
-  static long long cpu_usage_prv = 0;
+  static unsigned long long cpu_total_prv = 0;
+  static unsigned long long cpu_usage_prv = 0;
 
   FILE *file = fopen("/proc/stat", "r");
   if (!file) {
@@ -277,25 +277,26 @@ static void render_cpu_load(void) {
   //   iowait: waiting for I/O to complete
   //   irq: servicing interrupts
   //   softirq: servicing softirqs
-  long long user = 0;
-  long long nice = 0;
-  long long system = 0;
-  long long idle = 0;
-  long long iowait = 0;
-  long long irq = 0;
-  long long softirq = 0;
+  unsigned long long user = 0;
+  unsigned long long nice = 0;
+  unsigned long long system = 0;
+  unsigned long long idle = 0;
+  unsigned long long iowait = 0;
+  unsigned long long irq = 0;
+  unsigned long long softirq = 0;
   // read first line
-  fscanf(file, "cpu %lld %lld %lld %lld %lld %lld %lld\n", &user, &nice,
+  fscanf(file, "cpu %llu %llu %llu %llu %llu %llu %llu\n", &user, &nice,
          &system, &idle, &iowait, &irq, &softirq);
   fclose(file);
-  const long long total = user + nice + system + idle + iowait + irq + softirq;
-  const long long usage = total - idle;
-  const long long dtotal = total - cpu_total_prv;
+  const unsigned long long total =
+      user + nice + system + idle + iowait + irq + softirq;
+  const unsigned long long usage = total - idle;
+  const unsigned long long dtotal = total - cpu_total_prv;
   cpu_total_prv = total;
-  const long long dusage = usage - cpu_usage_prv;
+  const unsigned long long dusage = usage - cpu_usage_prv;
   cpu_usage_prv = usage;
-  const long long usage_percent = dusage * 100 / dtotal;
-  graph_add_value(graph_cpu, usage_percent);
+  const unsigned long long usage_percent = dusage * 100 / dtotal;
+  graph_add_value(graph_cpu, (long long)usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
 }
@@ -320,26 +321,25 @@ static void render_mem_info(void) {
   //  MemAvailable:   10814308 kB
   //  Buffers:          944396 kB
   //  Cached:          5425168 kB
-  char name[32] = "";
-  char unit[16] = "";
-  long long mem_total = 0;
-  long long mem_avail = 0;
+  const char *unit = "kB";
+  unsigned long long mem_total = 0;
+  unsigned long long mem_avail = 0;
   char buf[256] = "";
   fgets(buf, sizeof(buf), file); //	MemTotal:        1937372 kB
-  sscanf(buf, "%31s %lld %15s", name, &mem_total, unit);
+  sscanf(buf, "%*s %llu", &mem_total);
   fgets(buf, sizeof(buf), file); //	MemFree:           99120 kB
   fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
   fclose(file);
-
-  sscanf(buf, "%31s %lld %15s", name, &mem_avail, unit);
-  const int proc = (int)((mem_total - mem_avail) * 100 / mem_total);
-  graph_add_value(graph_mem, proc);
+  sscanf(buf, "%*s %llu", &mem_avail);
+  const unsigned long long proc = (mem_total - mem_avail) * 100 / mem_total;
+  graph_add_value(graph_mem, (long long)proc);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
-  if (mem_avail >> 10 != 0) {
+  if ((mem_avail + 512) >> 10 != 0) {
+    // note: +512 for rounding
     mem_avail >>= 10;
     mem_total >>= 10;
-    strncpy(unit, "MB", sizeof(unit)); //? kB to MB not same as KB to MBs
+    unit = "MB";
   }
   snprintf(buf, sizeof(buf), "freemem %llu of %llu %s", mem_avail, mem_total,
            unit);
@@ -356,9 +356,9 @@ static void render_swaps(void) {
   char buf[256] = "";
   // read column headers
   fgets(buf, sizeof(buf), file);
-  long long size_kb = 0;
-  long long used_kb = 0;
-  if (!fscanf(file, "%*s %*s %lld %lld", &size_kb, &used_kb)) {
+  unsigned long long size_kb = 0;
+  unsigned long long used_kb = 0;
+  if (!fscanf(file, "%*s %*s %llu %llu", &size_kb, &used_kb)) {
     fclose(file);
     return;
   }
@@ -369,7 +369,7 @@ static void render_swaps(void) {
   if (strb_p(&sb, "swapped ")) {
     return;
   }
-  if (strb_p_nbytes(&sb, used_kb << 10)) {
+  if (strb_p_nbytes(&sb, (long long)(used_kb << 10))) {
     return;
   }
   pl(sb.chars);
