@@ -1,6 +1,7 @@
 //
 // reviewed: 2025-02-22
 // reviewed: 2025-02-24
+// reviewed: 2025-02-25
 //
 #include "dc.h"
 #include "graph.h"
@@ -276,8 +277,8 @@ static void render_date_time(void) {
 
 static void render_cpu_load(void) {
   // previous reading
-  static uint64_t cpu_total_prv = 0;
-  static uint64_t cpu_usage_prv = 0;
+  static uint64_t prv_cpu_total = 0;
+  static uint64_t prv_cpu_usage = 0;
 
   FILE *file = fopen("/proc/stat", "r");
   if (!file) {
@@ -307,11 +308,11 @@ static void render_cpu_load(void) {
   }
   fclose(file);
   const uint64_t total = user + nice + system + idle + iowait + irq + softirq;
-  const uint64_t dtotal = total - cpu_total_prv;
-  cpu_total_prv = total;
+  const uint64_t dtotal = total - prv_cpu_total;
+  prv_cpu_total = total;
   const uint64_t usage = total - idle;
-  const uint64_t dusage = usage - cpu_usage_prv;
-  cpu_usage_prv = usage;
+  const uint64_t dusage = usage - prv_cpu_usage;
+  prv_cpu_usage = usage;
   const uint64_t usage_percent = dtotal == 0 ? 0 : dusage * 100 / dtotal;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
@@ -455,7 +456,8 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read SSID
   char ssid[128] = "";
-  if (fscanf(file, "\tSSID: %127[^\n]%*c", ssid) != 1) {
+  if (fscanf(file, " SSID: %127[^\n]%*c", ssid) != 1) {
+    // note: the leading space in format string ignores any whitespace
     pclose(file);
     return;
   }
@@ -469,7 +471,8 @@ static void render_wifi_info_for_interface(const char *interface_name) {
   fgets(cmd, sizeof(cmd), file);
   // read signal strength
   char signal[64] = "";
-  if (fscanf(file, "\tsignal: %63[^\n]%*c", signal) != 1) {
+  if (fscanf(file, " signal: %63[^\n]%*c", signal) != 1) {
+    // note: the leading space in format string ignores any whitespace
     pclose(file);
     return;
   }
@@ -622,7 +625,7 @@ static void render_io_stat(void) {
   uint64_t kb_read_total = 0;
   uint64_t kb_written_total = 0;
   while (fgets(buf, sizeof(buf), file)) {
-    if (buf[0] == '\0') {
+    if (buf[0] == '\n') {
       // break on empty line
       break;
     }
