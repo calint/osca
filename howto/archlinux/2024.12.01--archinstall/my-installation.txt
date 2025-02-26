@@ -16,6 +16,7 @@ cutecom
 dosfstools
 efibootmgr
 eog
+ethtool
 exfat-utils
 feh
 ffmpegthumbnailer
@@ -49,6 +50,7 @@ linux-firmware
 linux-lts
 llvm
 man-db
+man-pages
 mariadb
 memtest86+-efi
 mesa-utils
