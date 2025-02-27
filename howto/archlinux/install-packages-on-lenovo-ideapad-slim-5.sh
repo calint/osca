@@ -40,7 +40,6 @@ less
 libgepub
 libgsf
 libopenraw
-libva-intel-driver
 libva-utils
 libxcrypt-compat
 libxft
