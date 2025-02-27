@@ -47,7 +47,6 @@ libxcrypt-compat
 libxft
 linux
 linux-firmware
-linux-lts
 llvm
 man-db
 man-pages
