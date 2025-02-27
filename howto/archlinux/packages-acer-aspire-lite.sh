@@ -18,6 +18,7 @@ cutecom
 dosfstools
 efibootmgr
 eog
+ethtool
 exfat-utils
 feh
 ffmpegthumbnailer
@@ -30,7 +31,9 @@ gtkwave
 gvfs
 gvfs-mtp
 htop
+intel-media-driver
 intel-oneapi-tbb
+intel-ucode
 inxi
 iverilog
 iwd
@@ -40,6 +43,7 @@ less
 libgepub
 libgsf
 libopenraw
+libva-intel-driver
 libva-utils
 libxcrypt-compat
 libxft
@@ -47,7 +51,9 @@ linux
 linux-firmware
 llvm
 man-db
+man-pages
 mariadb
+memtest86+-efi
 mesa-utils
 mousepad
 mpv
@@ -74,6 +80,7 @@ scrot
 sdl2-compat
 sdl2_image
 sdl2_ttf
+sof-firmware
 sysstat
 tcl
 thunar
@@ -87,6 +94,7 @@ tumbler
 valgrind
 verible-bin
 visual-studio-code-bin
+vulkan-intel
 wireplumber
 xclip
 xorg-server
