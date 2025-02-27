@@ -3,5 +3,3 @@ DEST="$HOME/screenshots"
 FILE="$(date +%Y-%m-%d--%H-%M-%S).png"
 mkdir -p "$DEST" &&
 scrot "$DEST/$FILE"
-#cd "$DEST" &&
-#"$OSCA/snap/snap" "$FILE"
