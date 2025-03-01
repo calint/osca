@@ -1,109 +1,26 @@
 #!/bin/bash
-packages=(
-7zip
-acpi
-alsa-utils
-base
-base-devel
-bash-completion
-blender
-bluez
-bluez-utils
-brave-bin
-brightnessctl
-ca-certificates-mozilla
-clang
-cmake
-cutecom
-dosfstools
-efibootmgr
-eog
-ethtool
-exfat-utils
-feh
-ffmpegthumbnailer
-gimp
-git
-glm
-gnu-netcat
-gtk4
-gtkwave
-gvfs
-gvfs-mtp
-htop
-intel-media-driver
-intel-oneapi-tbb
-intel-ucode
-inxi
-iverilog
-iwd
-jq
-lcov
-less
-libgepub
-libgsf
-libopenraw
-libva-intel-driver
-libva-utils
-libxcrypt-compat
-libxft
-linux
-linux-firmware
-llvm
-man-db
-man-pages
-mariadb
-memtest86+-efi
-mesa-utils
-mousepad
-mpv
-nano
-nasm
-ncurses5-compat-libs
-openfpgaloader
-pacman-contrib
-pavucontrol
-perf
-pipewire
-pipewire-alsa
-pipewire-jack
-pipewire-pulse
-plocate
-poppler-glib
-powertop
-putty
-qemu-system-x86
-qemu-ui-gtk
-riscv64-elf-gcc
-rsync
-scrot
-sdl2-compat
-sdl2_image
-sdl2_ttf
-sof-firmware
-sysstat
-tcl
-thunar
-tiled
-tinyxxd
-tk
-tlp
-ttf-dejavu
-ttf-jetbrains-mono
-tumbler
-valgrind
-verible-bin
-visual-studio-code-bin
-vulkan-intel
-wireplumber
-xclip
-xorg-server
-xorg-xev
-xorg-xinit
-xorg-xinput
-xorg-xsetroot
-xterm
-yay
-zram-generator
-)
-yay -S --needed "${packages[@]}"
+set -e
+cd $(dirname "$0")
+
+# Package list file
+package_file="packages-acer-aspire-lite.txt"
+
+# Check if the package list file exists
+if [[ ! -f "$package_file" ]]; then
+  echo "Error: Package list file '$package_file' not found."
+  exit 1
+fi
+
+# Read packages from the file into an array
+packages=()
+while IFS= read -r line; do
+  # Skip empty lines and comments
+  if [[ -n "$line" && ! "$line" =~ ^# ]]; then
+    packages+=("$line")
+  fi
+done < "$package_file"
+
+# Install packages using yay
+yay -S --needed --noconfirm "${packages[@]}"
+
+echo "Packages installed successfully."
