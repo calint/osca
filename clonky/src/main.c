@@ -778,7 +778,8 @@ static void render_battery(void) {
   // format output
   char output[128];
   snprintf(output, sizeof(output), "battery %u%%  %s",
-           (uint32_t)(charge_now * 100 / charge_full), status);
+           charge_full ? (uint32_t)(charge_now * 100 / charge_full) : 100,
+           status);
   // draw a separator for visual que of current battery charge
   dc_draw_hr1(dc, (uint32_t)(WIDTH * charge_now / charge_full));
   pl(output);
