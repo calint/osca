@@ -760,41 +760,29 @@ static void render_battery(void) {
     return;
   }
 
-  // prefix to battery status directory
-  const char *power_supply_path_prefix = "/sys/class/power_supply/";
+  char buf[256] = "";
 
-  // construct prefix of battery info path
-  char path[256] = "";
-  const int nchars =
-      snprintf(path, sizeof(path), "%s%s/%s_", power_supply_path_prefix,
-               battery_name, battery_energy_or_charge_prefix);
-  if (nchars < 0 || (size_t)nchars >= sizeof(path)) {
-    return; // truncated
-  }
-  const size_t maxlen = sizeof(path) - (size_t)nchars;
-  // construct paths to '..._full' and '..._now'
-  char *path_prefix_end = path + nchars;
-  strncpy(path_prefix_end, "full", maxlen);
-  path[sizeof(path) - 1] = '\0'; // ensure null-termination
-  const uint64_t charge_full = sys_value_uint64(path);
-  strncpy(path_prefix_end, "now", maxlen);
-  path[sizeof(path) - 1] = '\0'; // ensure null-termination
-  const uint64_t charge_now = sys_value_uint64(path);
-  snprintf(path, sizeof(path), "%s%s/status", power_supply_path_prefix,
-           battery_name);
-  // read battery status
-  char status[64];
-  sys_value_str_line(path, status, sizeof(status));
-  str_to_lower(status);
-  // format output
-  char output[128];
-  snprintf(output, sizeof(output), "battery %u%%  %s",
-           charge_full ? (uint32_t)(charge_now * 100 / charge_full) : 100,
-           status);
+  snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/%s_full", battery_name,
+           battery_energy_or_charge_prefix);
+  const uint64_t charge_full = sys_value_uint64(buf);
+
+  snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/%s_now", battery_name,
+           battery_energy_or_charge_prefix);
+  const uint64_t charge_now = sys_value_uint64(buf);
+
   // draw a separator for visual que of current battery charge
   dc_draw_hr1(dc, charge_full ? (uint32_t)(WIDTH * charge_now / charge_full)
                               : WIDTH);
-  pl(output);
+
+  // print summary of battery
+  snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/status", battery_name);
+  char status[64];
+  sys_value_str_line(buf, status, sizeof(status));
+  str_to_lower(status);
+  snprintf(buf, sizeof(buf), "battery %u%%  %s",
+           charge_full ? (uint32_t)(charge_now * 100 / charge_full) : 100,
+           status);
+  pl(buf);
 }
 
 static void render_acpi(void) {
