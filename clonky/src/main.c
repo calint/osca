@@ -223,8 +223,8 @@ static void auto_config_network_traffic(void) {
     puts("[!] wifi: cannot open dir /sys/class/net");
     return;
   }
-  struct dirent *entry = NULL;
   net_device[0] = '\0';
+  struct dirent *entry = NULL;
   while ((entry = readdir(dir))) {
     if (entry->d_name[0] == '.') {
       // ignore hidden files
