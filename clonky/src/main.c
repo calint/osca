@@ -348,11 +348,16 @@ static void render_mem_info(void) {
   uint64_t mem_avail = 0;
   char buf[256] = "";
   fgets(buf, sizeof(buf), file); //	MemTotal:        1937372 kB
-  sscanf(buf, "%*s %lu", &mem_total);
+  if (sscanf(buf, "%*s %lu", &mem_total) != 1) {
+    fclose(file);
+    return;
+  }
   fgets(buf, sizeof(buf), file); //	MemFree:           99120 kB
   fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
   fclose(file);
-  sscanf(buf, "%*s %lu", &mem_avail);
+  if (sscanf(buf, "%*s %lu", &mem_avail) != 1) {
+    return;
+  }
   const uint64_t proc =
       mem_total ? ((mem_total - mem_avail) * 100 / mem_total) : 100;
   graph_add_value(graph_mem, proc);
