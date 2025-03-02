@@ -177,6 +177,7 @@ static void auto_config_battery(void) {
     sys_value_str_line(buf, buf, sizeof(buf));
     str_to_lower(buf);
     if (strcmp(buf, "battery")) {
+      // note: length of "battery" is less than 'buf'
       continue;
     }
     // found 'battery'
@@ -229,7 +230,8 @@ static void auto_config_network_traffic(void) {
       // ignore hidden files
       continue;
     }
-    if (!strcmp("lo", entry->d_name)) {
+    if (!strcmp(entry->d_name, "lo")) {
+      // note: length of "lo" is less than sizeof 'entry->d_name'
       // skip loopback
       continue;
     }
