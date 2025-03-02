@@ -42,36 +42,36 @@ contains:
 
             lines   words   chars
    source:    922    2838   28885
-   zipped:     23     159    6485
+   zipped:     23     154    6485
 
--rwxr-xr-x 1 c 21600 Feb 25 14:40 frameless
+-rwxrwxr-x 1 c 21936 mar  2 08:17 frameless
 
 
             lines   words   chars
-   source:   1368    4421   38375
-   zipped:     35     227    9268
+   source:   1369    4402   38324
+   zipped:     49     218    9144
 
--rwxr-xr-x 1 c 36984 Feb 25 14:40 clonky
+-rwxrwxr-x 1 c 37200 mar  2 08:17 clonky
 
 
             lines   words   chars
    source:    210     754    6718
-   zipped:      3      54    2290
+   zipped:      3      52    2290
 
--rwxr-xr-x 1 c 16440 Feb 25 14:40 menuq
+-rwxrwxr-x 1 c 16816 mar  2 08:17 menuq
 
 
             lines   words   chars
    source:     55     121    1856
    zipped:      1      15     802
 
--rwxr-xr-x 1 c 16552 Feb 25 14:40 stickyo
+-rwxrwxr-x 1 c 16944 mar  2 08:17 stickyo
 
 
             lines   words   chars
    source:     21      60     589
    zipped:      2       9     329
 
--rwxr-xr-x 1 c 15632 Feb 25 14:40 snap
+-rwxrwxr-x 1 c 16144 mar  2 08:17 snap
 
 ```
