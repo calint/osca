@@ -72,7 +72,6 @@ struct dc {
 }
 
 void dc_del(/*takes*/ struct dc *self) {
-  puts("· deleting dc");
   XftDrawDestroy(self->draw);
   XftFontClose(self->display, self->font);
   XFree(self->gc);

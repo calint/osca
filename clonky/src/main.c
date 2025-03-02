@@ -899,7 +899,6 @@ static void render_cheetsheet(void) {
 // }
 
 static void signal_exit(int i) {
-  puts("\nexiting");
   dc_del(/*gives*/ dc);
   if (graph_cpu) {
     graph_del(/*gives*/ graph_cpu);
