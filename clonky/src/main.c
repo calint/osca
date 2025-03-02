@@ -51,11 +51,11 @@ static struct netifc {
   char name[NETIFC_NAME_SIZE];
   // name as listed in '/sys/class/net/'
 
-  uint64_t rx_bytes_prv;
-  // bytes received at previous check
+  uint64_t rx_bytes;
+  // total bytes received
 
-  uint64_t tx_bytes_prv;
-  // bytes transmitted at previous check
+  uint64_t tx_bytes;
+  // total bytes transmitted
 } netifcs[NETIFC_ARRAY_SIZE];
 
 // used network interfaces
@@ -282,8 +282,8 @@ static void render_date_time(void) {
 
 static void render_cpu_load(void) {
   // previous reading
-  static uint64_t prv_cpu_total = 0;
-  static uint64_t prv_cpu_usage = 0;
+  static uint64_t prv_total = 0;
+  static uint64_t prv_usage = 0;
 
   FILE *file = fopen("/proc/stat", "r");
   if (!file) {
@@ -313,11 +313,11 @@ static void render_cpu_load(void) {
   }
   fclose(file);
   const uint64_t total = user + nice + system + idle + iowait + irq + softirq;
-  const uint64_t dtotal = total - prv_cpu_total;
-  prv_cpu_total = total;
+  const uint64_t dtotal = total - prv_total;
+  prv_total = total;
   const uint64_t usage = total - idle;
-  const uint64_t dusage = usage - prv_cpu_usage;
-  prv_cpu_usage = usage;
+  const uint64_t dusage = usage - prv_usage;
+  prv_usage = usage;
   const uint64_t usage_percent = dtotal ? (dusage * 100 / dtotal) : 0;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
@@ -547,12 +547,12 @@ static void render_net_interface(struct ifaddrs *ifa) {
     return;
   }
   uint64_t delta_tx_bytes =
-      tx_bytes - (ifc->tx_bytes_prv ? ifc->tx_bytes_prv : tx_bytes);
+      tx_bytes - (ifc->tx_bytes ? ifc->tx_bytes : tx_bytes);
   uint64_t delta_rx_bytes =
-      rx_bytes - (ifc->rx_bytes_prv ? ifc->rx_bytes_prv : rx_bytes);
+      rx_bytes - (ifc->rx_bytes ? ifc->rx_bytes : rx_bytes);
 
-  ifc->tx_bytes_prv = tx_bytes;
-  ifc->rx_bytes_prv = rx_bytes;
+  ifc->tx_bytes = tx_bytes;
+  ifc->rx_bytes = rx_bytes;
 
   // ? round to nearest integer
   const char *rx_scale = "B/s";
