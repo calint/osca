@@ -181,6 +181,7 @@ static void auto_config_battery(void) {
     }
     // found 'battery'
     strncpy(battery_name, entry->d_name, sizeof(battery_name));
+    battery_name[sizeof(battery_name) - 1] = '\0'; // ensure null-termination
 
     //? quirk if it is 'energy' or 'charge' for battery charge info
     snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
@@ -235,11 +236,13 @@ static void auto_config_network_traffic(void) {
     if (is_wifi_device(entry->d_name)) {
       // found wifi device (preferred)
       strncpy(net_device, entry->d_name, sizeof(net_device));
+      net_device[sizeof(net_device) - 1] = '\0'; // ensure null-termination
       net_device_is_wifi = 1;
       break;
     }
     // network device (not preferred)
     strncpy(net_device, entry->d_name, sizeof(net_device));
+    net_device[sizeof(net_device) - 1] = '\0'; // ensure null-termination
   }
   closedir(dir);
   if (net_device[0] == '\0') {
@@ -313,7 +316,7 @@ static void render_cpu_load(void) {
   const uint64_t usage = total - idle;
   const uint64_t dusage = usage - prv_cpu_usage;
   prv_cpu_usage = usage;
-  const uint64_t usage_percent = dtotal == 0 ? 0 : dusage * 100 / dtotal;
+  const uint64_t usage_percent = dtotal ? (dusage * 100 / dtotal) : 0;
   graph_add_value(graph_cpu, usage_percent);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_cpu, dc, DEFAULT_GRAPH_HEIGHT, 100);
@@ -350,7 +353,8 @@ static void render_mem_info(void) {
   fgets(buf, sizeof(buf), file); //	MemAvailable:     887512 kB
   fclose(file);
   sscanf(buf, "%*s %lu", &mem_avail);
-  const uint64_t proc = (mem_total - mem_avail) * 100 / mem_total;
+  const uint64_t proc =
+      mem_total ? ((mem_total - mem_avail) * 100 / mem_total) : 100;
   graph_add_value(graph_mem, proc);
   dc_inc_y(dc, HR_PIXELS_BEFORE + DEFAULT_GRAPH_HEIGHT);
   graph_draw(graph_mem, dc, DEFAULT_GRAPH_HEIGHT, 100);
@@ -429,6 +433,7 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
   struct netifc *ni = &netifcs[netifcs_len];
   netifcs_len++;
   strncpy(ni->name, name, sizeof(ni->name));
+  ni->name[sizeof(ni->name) - 1] = '\0'; // ensure null-termination
   return ni;
 }
 
@@ -721,7 +726,8 @@ static void render_cores_throttle(void) {
       strb_p_char(&sb, ' ');
       if (max_freq) {
         // if available render percent of max frequency
-        const uint32_t proc = (uint32_t)(cur_freq * 100 / max_freq);
+        const uint32_t proc =
+            max_freq ? (uint32_t)(cur_freq * 100 / max_freq) : 100;
         total_proc += proc;
         strb_p_uint32_with_width(&sb, proc, 3);
         strb_p_char(&sb, '%');
@@ -781,7 +787,8 @@ static void render_battery(void) {
            charge_full ? (uint32_t)(charge_now * 100 / charge_full) : 100,
            status);
   // draw a separator for visual que of current battery charge
-  dc_draw_hr1(dc, (uint32_t)(WIDTH * charge_now / charge_full));
+  dc_draw_hr1(dc, charge_full ? (uint32_t)(WIDTH * charge_now / charge_full)
+                              : WIDTH);
   pl(output);
 }
 
