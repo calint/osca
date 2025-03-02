@@ -339,7 +339,6 @@ static void render_mem_info(void) {
   if (!file) {
     return;
   }
-  // /proc/meminfo gives:
   //  MemTotal:       15766756 kB
   //  MemFree:         4058344 kB
   //  MemAvailable:   10814308 kB
@@ -667,7 +666,6 @@ static void render_df(void) {
   if (!file) {
     return;
   }
-  // df -h gives:
   //  Filesystem      Size  Used Avail Use% Mounted on
   //  tmpfs           1,6G  2,3M  1,6G   1% /run
   //  /dev/nvme0n1p6  235G  166G   57G  75% /
