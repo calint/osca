@@ -898,20 +898,6 @@ static void render_cheetsheet(void) {
 //   pclose(file);
 // }
 
-static void signal_exit(int i) {
-  dc_del(/*gives*/ dc);
-  if (graph_cpu) {
-    graph_del(/*gives*/ graph_cpu);
-  }
-  if (graph_mem) {
-    graph_del(/*gives*/ graph_mem);
-  }
-  if (graph_net) {
-    graphd_del(/*gives*/ graph_net);
-  }
-  exit(i);
-}
-
 static void render(void) {
   dc_clear(dc);
   render_date_time();
@@ -937,6 +923,20 @@ static void render(void) {
   render_hr();
   render_hr();
   dc_flush(dc);
+}
+
+static void signal_exit(int i) {
+  dc_del(/*gives*/ dc);
+  if (graph_cpu) {
+    graph_del(/*gives*/ graph_cpu);
+  }
+  if (graph_mem) {
+    graph_del(/*gives*/ graph_mem);
+  }
+  if (graph_net) {
+    graphd_del(/*gives*/ graph_net);
+  }
+  exit(i);
 }
 
 int main(int argc, char *argv[]) {
