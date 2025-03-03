@@ -22,7 +22,7 @@ inline int strb_p(strb *self, const char *str) {
 
   const uint32_t chars_written =
       (uint32_t)n > remaining - 1 ? remaining - 1 : (uint32_t)n;
-  // note: -1 is for the '\0' that is not included in 'n'  but is included in
+  // note: -1 is for the '\0' that is not included in 'n' but is included in
   // 'remaining'
 
   self->index += chars_written;
