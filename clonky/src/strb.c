@@ -20,12 +20,9 @@ inline int strb_p(strb *self, const char *str) {
     return -1;
   }
 
-  const uint32_t chars_written =
-      (uint32_t)n > remaining - 1 ? remaining - 1 : (uint32_t)n;
+  self->index += (uint32_t)n > remaining - 1 ? remaining - 1 : (uint32_t)n;
   // note: -1 is for the '\0' that is not included in 'n' but is included in
   // 'remaining'
-
-  self->index += chars_written;
 
   return (uint32_t)n < remaining ? 0 : -2;
 }
