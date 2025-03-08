@@ -103,7 +103,7 @@ static FILE *flog;
 #define KEY_DESKTOP_DOWN 116    // down
 #define KEY_DESKTOP_DOWN_ALT 38 // a
 
-#define IGNORED_ENTER_AFTER_MAP_TIME_MS 500
+#define IGNORED_ENTER_AFTER_MAP_TIME_US 500000
 // time to ignore enter notifies after a map notify
 // note: solves the problem with newly launched applications losing focus
 
@@ -140,7 +140,7 @@ static Display *display;
 static Window root_window;
 static int current_desk;
 static xwin *focused_window;
-static time_t time_of_last_map_notify_ms;
+static suseconds_t time_of_last_map_notify_us;
 
 // default screen info
 static struct screen {
@@ -149,10 +149,10 @@ static struct screen {
   unsigned hi; // height
 } screen;
 
-static time_t current_time_ms() {
+static suseconds_t current_time_us() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
 static xwin *xwin_get_by_window(Window w) {
@@ -625,7 +625,7 @@ int main(int argc, char **args, char **env) {
       XGrabButton(display, AnyButton, Mod4Mask, xw->win, True, ButtonPressMask,
                   GrabModeAsync, GrabModeAsync, None, None);
       XSelectInput(display, xw->win, EnterWindowMask);
-      time_of_last_map_notify_ms = current_time_ms();
+      time_of_last_map_notify_us = current_time_us();
       break;
     }
     //----------------------------------------------------------------------
@@ -640,8 +640,8 @@ int main(int argc, char **args, char **env) {
     //----------------------------------------------------------------------
     case EnterNotify: {
       if (is_dragging || is_switching_desktop ||
-          current_time_ms() - time_of_last_map_notify_ms <
-              IGNORED_ENTER_AFTER_MAP_TIME_MS) {
+          current_time_us() - time_of_last_map_notify_us <
+              IGNORED_ENTER_AFTER_MAP_TIME_US) {
         // * if dragging then it is resizing, don't change focus
         // * if switching desktop, don't focus on the window that is under
         //   the pointer; focus on previously focused window on that desktop
