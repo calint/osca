@@ -50,38 +50,38 @@ static FILE *flog;
 
 // key bindings (use 'xev' to find out keycode for key)
 #define KEY_LAUNCH_CONSOLE 54 // c
-#define CMD_LAUNCH_CONSOLE "xii-console"
+#define CMD_LAUNCH_CONSOLE "osca-console"
 
 #define KEY_LAUNCH_FILES 41 // f
-#define CMD_LAUNCH_FILES "xii-files"
+#define CMD_LAUNCH_FILES "osca-files"
 
 #define KEY_LAUNCH_EDITOR 26 // e
-#define CMD_LAUNCH_EDITOR "xii-editor"
+#define CMD_LAUNCH_EDITOR "osca-editor"
 
 #define KEY_LAUNCH_MEDIA 58 // m
-#define CMD_LAUNCH_MEDIA "xii-media"
+#define CMD_LAUNCH_MEDIA "osca-media"
 
 #define KEY_LAUNCH_MIXER 55 // v
-#define CMD_LAUNCH_MIXER "xii-mixer"
+#define CMD_LAUNCH_MIXER "osca-mixer"
 
 #define KEY_LAUNCH_INTERNET 31 // i
-#define CMD_LAUNCH_INTERNET "xii-internet"
+#define CMD_LAUNCH_INTERNET "osca-internet"
 
 #define KEY_LAUNCH_STICKY 53 // x
-#define CMD_LAUNCH_STICKY "xii-sticky"
+#define CMD_LAUNCH_STICKY "osca-sticky"
 
 #define KEY_LAUNCH_BINARIES 32 // o
-#define CMD_LAUNCH_BINARIES "xii-binaries"
+#define CMD_LAUNCH_BINARIES "osca-binaries"
 
 #define KEY_LAUNCH_SNAPSHOT 33 // p
-#define CMD_LAUNCH_SNAPSHOT "xii-screenshot"
-#define CMD_LAUNCH_SNAPSHOT_SHIFT "xii-screenshot-select"
+#define CMD_LAUNCH_SNAPSHOT "osca-screenshot"
+#define CMD_LAUNCH_SNAPSHOT_SHIFT "osca-screenshot-select"
 
-#define CMD_FN_SCREEN_BRIGHTNESS_DOWN "xii-screen-brightness-down"
-#define CMD_FN_SCREEN_BRIGHTNESS_UP "xii-screen-brightness-up"
-#define CMD_FN_VOLUME_TOGGLE "xii-volume-toggle"
-#define CMD_FN_VOLUME_DOWN "xii-volume-down"
-#define CMD_FN_VOLUME_UP "xii-volume-up"
+#define CMD_FN_SCREEN_BRIGHTNESS_DOWN "osca-screen-brightness-down"
+#define CMD_FN_SCREEN_BRIGHTNESS_UP "osca-screen-brightness-up"
+#define CMD_FN_VOLUME_TOGGLE "osca-volume-toggle"
+#define CMD_FN_VOLUME_DOWN "osca-volume-down"
+#define CMD_FN_VOLUME_UP "osca-volume-up"
 
 #define KEY_WINDOW_CLOSE 9            // esc
 #define KEY_WINDOW_CLOSE_ALT 49       // §

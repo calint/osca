@@ -5,7 +5,7 @@
 	<name>Open Terminal Here</name>
 	<submenu></submenu>
 	<unique-id>1734191813447754-1</unique-id>
-	<command>xii-console --working-directory %f</command>
+	<command>osca-console --working-directory %f</command>
 	<description></description>
 	<range></range>
 	<patterns>*</patterns>
