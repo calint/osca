@@ -14,7 +14,7 @@ fi
 export SESSION_MANAGER=
 
 # turn off 'caps lock'
-setxkbmap -option caps:none
+setxkbmap -option caps:escape
 
 # set background
 xsetroot -bitmap "$OSCA/bmp/sq.bmp"
