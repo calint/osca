@@ -13,8 +13,8 @@ fi
 # no session manager
 export SESSION_MANAGER=
 
-# turn off 'caps lock'
-setxkbmap -option caps:escape
+# turn 'caps lock' into CTRL
+setxkbmap -option ctrl:nocaps
 
 # set background
 xsetroot -bitmap "$OSCA/bmp/sq.bmp"
