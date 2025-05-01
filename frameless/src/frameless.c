@@ -515,6 +515,9 @@ static void free_window_and_resolve_focus(Window w) {
 }
 
 static void switch_to_desk(int dsk, Bool move_focused_window) {
+  if (dsk == current_desk) {
+    return;
+  }
   is_switching_desktop = True; // set global state
   int dsk_prv = current_desk;
   current_desk = dsk; // set global state
