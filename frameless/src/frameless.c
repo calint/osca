@@ -102,6 +102,10 @@ static FILE *flog;
 #define KEY_DESKTOP_UP_ALT 24   // q
 #define KEY_DESKTOP_DOWN 116    // down
 #define KEY_DESKTOP_DOWN_ALT 38 // a
+#define KEY_DESKTOP_0 43        // h
+#define KEY_DESKTOP_1 44        // j
+#define KEY_DESKTOP_2 45        // k
+#define KEY_DESKTOP_3 46        // l
 
 #define IGNORED_ENTER_AFTER_MAP_TIME_US 500000
 // time to ignore enter notifies after a map notify
@@ -141,6 +145,9 @@ static Window root_window;
 static int current_desk;
 static xwin *focused_window;
 static suseconds_t time_of_last_map_notify_us;
+
+static Bool is_switching_desktop;
+// True while switching desktop, False after any key release
 
 // default screen info
 static struct screen {
@@ -507,6 +514,24 @@ static void free_window_and_resolve_focus(Window w) {
   focus_on_only_window_on_desk();
 }
 
+static void switch_to_desk(int dsk, Bool move_focused_window) {
+  is_switching_desktop = True; // set global state
+  int dsk_prv = current_desk;
+  current_desk = dsk; // set global state
+  if (move_focused_window && focused_window) {
+    // 'focused_window' is the new focused window on desk 'current_desk'
+    turn_off_window_focus_on_desk(current_desk);
+    // change desk on focused window
+    focused_window->desk = current_desk;
+    // set 'desk_x' because 'desk_show' will restore it to 'x'
+    focused_window->desk_x = focused_window->x;
+    // place focused window on top
+    xwin_raise(focused_window);
+  }
+  desk_show(current_desk, dsk_prv);
+  focus_window_after_desk_switch();
+}
+
 static int error_handler(Display *d, XErrorEvent *e) {
 #ifdef FRAMELESS_DEBUG
   char buf[1024] = "";
@@ -562,8 +587,6 @@ int main(int argc, char **args, char **env) {
            GrabModeAsync, GrabModeAsync);
   XSelectInput(display, root_window, SubstructureNotifyMask);
 
-  int dsk_prv = 0; // previous desk
-
   unsigned key_pressed = 0; // current key pressed
 
   // dragging state
@@ -571,9 +594,6 @@ int main(int argc, char **args, char **env) {
   int dragging_prev_x = 0;
   int dragging_prev_y = 0;
   unsigned dragging_button = 0;
-
-  Bool is_switching_desktop = False;
-  // True while switching desktop, False after any key release
 
   // key codes for media keys
   const KeyCode key_code_audio_lower_volume =
@@ -764,44 +784,25 @@ int main(int argc, char **args, char **env) {
         break;
       case KEY_DESKTOP_UP:
       case KEY_DESKTOP_UP_ALT:
-        is_switching_desktop = True;
-        dsk_prv = current_desk;
-        current_desk++;
-        if (ev.xkey.state & ShiftMask) {
-          if (focused_window) {
-            // 'focused_window' is the new focused window on desk 'current_desk'
-            turn_off_window_focus_on_desk(current_desk);
-            // change desk on focused window
-            focused_window->desk = current_desk;
-            // set 'desk_x' because 'desk_show' will restore it to 'x'
-            focused_window->desk_x = focused_window->x;
-            // place focused window on top
-            xwin_raise(focused_window);
-          }
-        }
-        desk_show(current_desk, dsk_prv);
-        focus_window_after_desk_switch();
+        switch_to_desk(current_desk + 1, ev.xkey.state & ShiftMask);
         break;
       case KEY_DESKTOP_DOWN:
       case KEY_DESKTOP_DOWN_ALT:
-        is_switching_desktop = True;
-        dsk_prv = current_desk;
-        current_desk--;
-        if (ev.xkey.state & ShiftMask) {
-          if (focused_window) {
-            // 'focused_window' is the new focused window on desk 'current_desk'
-            turn_off_window_focus_on_desk(current_desk);
-            // change desk on focused window
-            focused_window->desk = current_desk;
-            // set 'desk_x' because 'desk_show' will restore it to 'x'
-            focused_window->desk_x = focused_window->x;
-            // place focused window on top
-            xwin_raise(focused_window);
-          }
-        }
-        desk_show(current_desk, dsk_prv);
-        focus_window_after_desk_switch();
+        switch_to_desk(current_desk - 1, ev.xkey.state & ShiftMask);
         break;
+      case KEY_DESKTOP_0:
+        switch_to_desk(0, ev.xkey.state & ShiftMask);
+        break;
+      case KEY_DESKTOP_1:
+        switch_to_desk(1, ev.xkey.state & ShiftMask);
+        break;
+      case KEY_DESKTOP_2:
+        switch_to_desk(2, ev.xkey.state & ShiftMask);
+        break;
+      case KEY_DESKTOP_3:
+        switch_to_desk(3, ev.xkey.state & ShiftMask);
+        break;
+
       default:
         // handle media keys
         if (key_pressed == key_code_mon_brightness_down) {
