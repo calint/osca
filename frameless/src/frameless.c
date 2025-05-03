@@ -398,7 +398,8 @@ static Bool focus_on_only_window_on_desk(void) {
         xwin *xw = &wins[i];
         if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
             if (focus) {
-                return False; // there are more than 1 window on this desk
+                return False; // there are more than 1 window on
+                              // this desk
             }
             focus = xw;
         }
@@ -461,7 +462,8 @@ static void focus_next_window(void) {
     }
     i = 0;
     // note. if 'i0' is -1 then no window will be focused
-    // '<= i0' not '< i0' to focus on same window if no other window available
+    // '<= i0' not '< i0' to focus on same window if no other window
+    // available
     while (i <= i0) {
         if (focus_window_by_index_try((unsigned)i)) {
             return;
@@ -479,7 +481,8 @@ static void focus_previous_window(void) {
         }
     }
     i = WIN_MAX_COUNT;
-    // '>= i0' not '> i0' to focus on same window if no other window available
+    // '>= i0' not '> i0' to focus on same window if no other window
+    // available
     while (--i >= i0) {
         if (focus_window_by_index_try((unsigned)i)) {
             return;
@@ -522,7 +525,8 @@ static void switch_to_desk(int dsk, Bool move_focused_window) {
     int dsk_prv = current_desk;
     current_desk = dsk; // set global state
     if (move_focused_window && focused_window) {
-        // 'focused_window' is the new focused window on desk 'current_desk'
+        // 'focused_window' is the new focused window on desk
+        // 'current_desk'
         turn_off_window_focus_on_desk(current_desk);
         // change desk on focused window
         focused_window->desk = current_desk;
@@ -668,9 +672,8 @@ int main(int argc, char **args, char **env) {
                     IGNORED_ENTER_AFTER_MAP_TIME_US) {
                 // * if dragging then it is resizing, don't change focus
                 // * if switching desktop, don't focus on the window that is
-                // under
-                //   the pointer; focus on previously focused window on that
-                //   desktop
+                //   under the pointer; focus on previously focused window on
+                //   that desktop
                 // * when launching a new window ignore the event for
                 //   IGNORED_ENTER_AFTER_MAP_TIME_MS since it might lose focus
                 //   from the newly launched application detail: a newly mapped
@@ -751,7 +754,8 @@ int main(int argc, char **args, char **env) {
                     } else {
                         xwin_wider(focused_window);
                     }
-                    // if window was full width then turn that bit off
+                    // if window was full width then turn
+                    // that bit off
                     focused_window->bits &= ~XWIN_BIT_FULL_WIDTH;
                 }
                 break;
@@ -917,8 +921,8 @@ int main(int argc, char **args, char **env) {
             is_dragging = False;
             dragging_button = 0;
             move_or_resize_window = xwin_get_by_window(ev.xbutton.window);
-            // in case a window was dragged from folded state (different
-            // desktop)
+            // in case a window was dragged from folded state
+            // (different desktop)
             move_or_resize_window->desk = current_desk;
             XUngrabPointer(display, CurrentTime);
             move_or_resize_window = NULL;
