@@ -7,20 +7,20 @@
 #include <stdlib.h>
 
 struct graphd {
-    uint64_t *values;
+    uint64_t* values;
     uint32_t nvalues;
     uint32_t ix;
     uint64_t _value_prev;
 };
 
-/*gives*/ struct graphd *graphd_new(const uint32_t nvalues) {
-    struct graphd *self = calloc(1, sizeof(struct graphd));
+/*gives*/ struct graphd* graphd_new(const uint32_t nvalues) {
+    struct graphd* self = calloc(1, sizeof(struct graphd));
     if (!self) {
         puts("!!! cannot alloc struct graphd_new");
         exit(1);
     }
     self->nvalues = nvalues;
-    self->values = (uint64_t *)calloc(nvalues, sizeof(uint64_t));
+    self->values = (uint64_t*)calloc(nvalues, sizeof(uint64_t));
     if (!self->values) {
         printf("!!! graphd_new cannot alloc array of size %d\n", nvalues);
         exit(1);
@@ -29,12 +29,12 @@ struct graphd {
     return self;
 }
 
-void graphd_del(/*takes*/ struct graphd *self) {
+void graphd_del(/*takes*/ struct graphd* self) {
     free(self->values);
     free(self);
 }
 
-void graphd_add_value(struct graphd *self, const uint64_t value) {
+void graphd_add_value(struct graphd* self, const uint64_t value) {
     uint64_t delta = value - self->_value_prev;
     self->_value_prev = value;
     self->values[self->ix] = delta;
@@ -51,7 +51,7 @@ static uint64_t cap_value(const uint64_t v, const uint32_t height) {
     return v;
 }
 
-void graphd_draw(const struct graphd *self, struct dc *dc,
+void graphd_draw(const struct graphd* self, struct dc* dc,
                  const uint32_t height, const uint64_t max_value) {
     const int32_t dc_x = dc_get_x(dc);
     const int32_t dc_y = dc_get_y(dc);

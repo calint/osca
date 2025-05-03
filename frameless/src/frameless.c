@@ -11,7 +11,7 @@
 #ifdef FRAMELESS_DEBUG
 #include <stdio.h>
 
-static const char *ix_event_names[LASTEvent] = {
+static const char* ix_event_names[LASTEvent] = {
     "unknown",        "unknown",        "KeyPress",         "KeyRelease",
     "ButtonPress",    "ButtonRelease",  "MotionNotify",     "EnterNotify",
     "LeaveNotify",    "FocusIn",        "FocusOut",         "KeymapNotify",
@@ -23,7 +23,7 @@ static const char *ix_event_names[LASTEvent] = {
     "ColormapNotify", "ClientMessage",  "MappingNotify",    "GenericEvent"};
 
 // log file
-static FILE *flog;
+static FILE* flog;
 #endif
 
 // maximum number of windows
@@ -140,10 +140,10 @@ static xwin wins[WIN_MAX_COUNT];
 // number of windows mapped
 static unsigned xwin_count;
 
-static Display *display;
+static Display* display;
 static Window root_window;
 static int current_desk;
-static xwin *focused_window;
+static xwin* focused_window;
 static suseconds_t time_of_last_map_notify_us;
 
 static Bool is_switching_desktop;
@@ -162,7 +162,7 @@ static suseconds_t current_time_us() {
     return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-static xwin *xwin_get_by_window(Window w) {
+static xwin* xwin_get_by_window(Window w) {
     int first_avail = -1;
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
         if (wins[i].bits & XWIN_BIT_ALLOCATED) {
@@ -182,7 +182,7 @@ static xwin *xwin_get_by_window(Window w) {
 #endif
         exit(3);
     }
-    xwin *xw = &wins[first_avail];
+    xwin* xw = &wins[first_avail];
     xw->bits = XWIN_BIT_ALLOCATED;
     xwin_count++;
     xw->win = w;
@@ -191,20 +191,20 @@ static xwin *xwin_get_by_window(Window w) {
     return xw;
 }
 
-static void xwin_focus_on(xwin *this) {
+static void xwin_focus_on(xwin* this) {
     XSetInputFocus(display, this->win, RevertToParent, CurrentTime);
     XSetWindowBorder(display, this->win, WIN_BORDER_ACTIVE_COLOR);
     this->bits |= XWIN_BIT_FOCUSED;
 }
 
-static void xwin_focus_off(xwin *this) {
+static void xwin_focus_off(xwin* this) {
     XSetWindowBorder(display, this->win, WIN_BORDER_INACTIVE_COLOR);
     this->bits &= ~XWIN_BIT_FOCUSED;
 }
 
-static void xwin_raise(xwin *this) { XRaiseWindow(display, this->win); }
+static void xwin_raise(xwin* this) { XRaiseWindow(display, this->win); }
 
-static xwin *winx_find_by_window(Window w) {
+static xwin* winx_find_by_window(Window w) {
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
         if (wins[i].win == w)
             return &wins[i];
@@ -212,18 +212,18 @@ static xwin *winx_find_by_window(Window w) {
     return NULL;
 }
 
-static void xwin_read_geom(xwin *this) {
+static void xwin_read_geom(xwin* this) {
     Window wsink;
     unsigned dummy;
     XGetGeometry(display, this->win, &wsink, &this->x, &this->y, &this->wi,
                  &this->hi, &dummy, &dummy);
 }
 
-static void xwin_set_geom(xwin *this) {
+static void xwin_set_geom(xwin* this) {
     XMoveResizeWindow(display, this->win, this->x, this->y, this->wi, this->hi);
 }
 
-static void xwin_center(xwin *this) {
+static void xwin_center(xwin* this) {
     xwin_read_geom(this);
     if (!(this->bits & XWIN_BIT_FULL_WIDTH)) {
         // only adjust x if window is not in full width
@@ -236,7 +236,7 @@ static void xwin_center(xwin *this) {
     xwin_set_geom(this);
 }
 
-static void xwin_wider(xwin *this) {
+static void xwin_wider(xwin* this) {
     xwin_read_geom(this);
     unsigned wi_prv = this->wi;
     this->wi = ((this->wi << 2) + this->wi) >> 2;
@@ -244,7 +244,7 @@ static void xwin_wider(xwin *this) {
     xwin_set_geom(this);
 }
 
-static void xwin_thinner(xwin *this) {
+static void xwin_thinner(xwin* this) {
     xwin_read_geom(this);
     unsigned wi_prv = this->wi;
     this->wi = ((this->wi << 1) + this->wi) >> 2;
@@ -255,7 +255,7 @@ static void xwin_thinner(xwin *this) {
     xwin_set_geom(this);
 }
 
-static void xwin_close(xwin *this) {
+static void xwin_close(xwin* this) {
     XEvent ke;
     ke.type = ClientMessage;
     ke.xclient.window = this->win;
@@ -266,7 +266,7 @@ static void xwin_close(xwin *this) {
     XSendEvent(display, this->win, False, NoEventMask, &ke);
 }
 
-static void xwin_toggle_fullscreen(xwin *this) {
+static void xwin_toggle_fullscreen(xwin* this) {
     xwin_read_geom(this);
     if ((this->bits & XWIN_BITS_FULL_SCREEN) == XWIN_BITS_FULL_SCREEN) {
         // toggle from fullscreen
@@ -290,7 +290,7 @@ static void xwin_toggle_fullscreen(xwin *this) {
     xwin_set_geom(this);
 }
 
-static void xwin_toggle_fullheight(xwin *this) {
+static void xwin_toggle_fullheight(xwin* this) {
     xwin_read_geom(this);
     if (this->bits & XWIN_BIT_FULL_HEIGHT) {
         this->y = this->y_pf;
@@ -305,7 +305,7 @@ static void xwin_toggle_fullheight(xwin *this) {
     xwin_set_geom(this);
 }
 
-static void xwin_toggle_fullwidth(xwin *this) {
+static void xwin_toggle_fullwidth(xwin* this) {
     xwin_read_geom(this);
     if (this->bits & XWIN_BIT_FULL_WIDTH) {
         this->x = this->x_pf;
@@ -321,7 +321,7 @@ static void xwin_toggle_fullwidth(xwin *this) {
 }
 
 // fold window to the right of screen
-static void xwin_hide(xwin *this) {
+static void xwin_hide(xwin* this) {
     xwin_read_geom(this);
     this->desk_x = this->x;
     unsigned slip = WIN_SLIP == 0 ? 0 : (unsigned)(rand() % WIN_SLIP);
@@ -330,19 +330,19 @@ static void xwin_hide(xwin *this) {
 }
 
 // unfold window from the right of screen
-static void xwin_show(xwin *this) {
+static void xwin_show(xwin* this) {
     this->x = this->desk_x;
     xwin_set_geom(this);
 }
 
-static void xwin_bump(xwin *this, int rand_amt) {
+static void xwin_bump(xwin* this, int rand_amt) {
     xwin_read_geom(this);
     this->x += (rand() % rand_amt) - (rand_amt >> 1);
     this->y += (rand() % rand_amt) - (rand_amt >> 1);
     xwin_set_geom(this);
 }
 
-static int xwin_ix(xwin *this) {
+static int xwin_ix(xwin* this) {
     if (this == NULL) {
         return -1;
     }
@@ -354,7 +354,7 @@ static int xwin_ix(xwin *this) {
     return -1;
 }
 
-static void focus_on_window(xwin *xw) {
+static void focus_on_window(xwin* xw) {
     if (focused_window) {
         xwin_focus_off(focused_window);
     }
@@ -364,7 +364,7 @@ static void focus_on_window(xwin *xw) {
 
 // returns True if window got focus False otherwise
 static Bool focus_window_by_index_try(unsigned ix) {
-    xwin *xw = &wins[ix];
+    xwin* xw = &wins[ix];
     if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
         xwin_raise(xw);
         focus_on_window(xw);
@@ -375,7 +375,7 @@ static Bool focus_window_by_index_try(unsigned ix) {
 
 static void desk_show(int dsk, int dsk_prv) {
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-        xwin *xw = &wins[i];
+        xwin* xw = &wins[i];
         if (!(xw->bits & XWIN_BIT_ALLOCATED)) {
             continue;
         }
@@ -393,9 +393,9 @@ static void desk_show(int dsk, int dsk_prv) {
 
 // returns True if there is only one window and is focused
 static Bool focus_on_only_window_on_desk(void) {
-    xwin *focus = NULL;
+    xwin* focus = NULL;
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-        xwin *xw = &wins[i];
+        xwin* xw = &wins[i];
         if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
             if (focus) {
                 return False; // there are more than 1 window on
@@ -414,9 +414,9 @@ static Bool focus_on_only_window_on_desk(void) {
 // focus on previously focused window if available or some window on this
 // desktop
 static void focus_window_after_desk_switch(void) {
-    xwin *focus = NULL;
+    xwin* focus = NULL;
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-        xwin *xw = &wins[i];
+        xwin* xw = &wins[i];
         if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == current_desk) {
             if (xw->bits & XWIN_BIT_FOCUSED) {
                 // found focused window on this desk
@@ -440,7 +440,7 @@ static void focus_window_after_desk_switch(void) {
 // used when switching desktop with window (host + shift + up/down)
 static void turn_off_window_focus_on_desk(int dsk) {
     for (unsigned i = 0; i < WIN_MAX_COUNT; i++) {
-        xwin *xw = &wins[i];
+        xwin* xw = &wins[i];
         if (xw->bits & XWIN_BIT_ALLOCATED && xw->desk == dsk &&
             xw->bits & XWIN_BIT_FOCUSED) {
             xwin_focus_off(xw);
@@ -491,7 +491,7 @@ static void focus_previous_window(void) {
 }
 
 static void free_window_and_resolve_focus(Window w) {
-    xwin *win = winx_find_by_window(w);
+    xwin* win = winx_find_by_window(w);
     if (!win) {
         // window not found
         return;
@@ -508,7 +508,7 @@ static void free_window_and_resolve_focus(Window w) {
     if (XQueryPointer(display, root_window, &root_return, &child_return,
                       &root_x, &root_y, &win_x, &win_y, &mask_return)) {
         if (child_return != None) {
-            xwin *xw = xwin_get_by_window(child_return);
+            xwin* xw = xwin_get_by_window(child_return);
             focus_on_window(xw);
             return;
         }
@@ -539,7 +539,7 @@ static void switch_to_desk(int dsk, Bool move_focused_window) {
     focus_window_after_desk_switch();
 }
 
-static int error_handler(Display *d, XErrorEvent *e) {
+static int error_handler(Display* d, XErrorEvent* e) {
 #ifdef FRAMELESS_DEBUG
     char buf[1024] = "";
     XGetErrorText(d, e->error_code, buf, sizeof(buf));
@@ -550,13 +550,13 @@ static int error_handler(Display *d, XErrorEvent *e) {
     fprintf(flog, "!!!   error code: %d\n", (unsigned)e->error_code);
     fprintf(flog, "!!! request code: %d\n", e->request_code);
     fprintf(flog, "!!!   minor code: %d\n", e->minor_code);
-    fprintf(flog, "!!!  resource id: %p\n", (void *)e->resourceid);
+    fprintf(flog, "!!!  resource id: %p\n", (void*)e->resourceid);
     fflush(flog);
 #endif
     return 0;
 }
 
-int main(int argc, char **args, char **env) {
+int main(int argc, char** args, char** env) {
 #ifdef FRAMELESS_DEBUG
     flog = fopen(FRAMELESS_DEBUG_FILE, "a");
     if (!flog) {
@@ -614,14 +614,14 @@ int main(int argc, char **args, char **env) {
     const KeyCode key_code_mon_brightness_up =
         XKeysymToKeycode(display, XF86XK_MonBrightnessUp);
 
-    xwin *move_or_resize_window = NULL;
+    xwin* move_or_resize_window = NULL;
     // window that is being moved or resized
 
     XEvent ev = {0};
     while (!XNextEvent(display, &ev)) {
 #ifdef FRAMELESS_DEBUG
         fprintf(flog, "%lu: event: %s   win=%p\n", ev.xany.serial,
-                ix_event_names[ev.type], (void *)ev.xany.window);
+                ix_event_names[ev.type], (void*)ev.xany.window);
         fflush(flog);
 #endif
         switch (ev.type) {
@@ -646,7 +646,7 @@ int main(int argc, char **args, char **env) {
 #endif
                 break;
             }
-            xwin *xw = xwin_get_by_window(ev.xmap.window);
+            xwin* xw = xwin_get_by_window(ev.xmap.window);
             xwin_center(xw);
             focus_on_window(xw);
             XGrabButton(display, AnyButton, Mod4Mask, xw->win, True,
@@ -687,7 +687,7 @@ int main(int argc, char **args, char **env) {
 #endif
                 break;
             }
-            xwin *xw = xwin_get_by_window(ev.xcrossing.window);
+            xwin* xw = xwin_get_by_window(ev.xcrossing.window);
             focus_on_window(xw);
             break;
         }

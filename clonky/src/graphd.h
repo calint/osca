@@ -9,13 +9,13 @@
 
 struct graphd;
 
-/*gives*/ struct graphd *graphd_new(uint32_t nvalues);
+/*gives*/ struct graphd* graphd_new(uint32_t nvalues);
 
-void graphd_del(/*takes*/ struct graphd *self);
+void graphd_del(/*takes*/ struct graphd* self);
 
-void graphd_draw(const struct graphd *self, struct dc *dc, uint32_t height,
+void graphd_draw(const struct graphd* self, struct dc* dc, uint32_t height,
                  uint64_t max_value);
 
-void graphd_add_value(struct graphd *self, uint64_t value);
+void graphd_add_value(struct graphd* self, uint64_t value);
 
 #endif

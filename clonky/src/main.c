@@ -23,20 +23,20 @@
 #include <unistd.h>
 
 // device context (renderer)
-static struct dc *dc;
+static struct dc* dc;
 
 // cpu usage graph
-static struct graph *graph_cpu;
+static struct graph* graph_cpu;
 
 // memory usage graph
-static struct graph *graph_mem;
+static struct graph* graph_mem;
 
 // network traffic graph
-static struct graphd *graph_net;
+static struct graphd* graph_net;
 
 // quirk for different names for battery charge indicator
 // set at 'auto_config_battery'
-static const char *battery_energy_or_charge_prefix;
+static const char* battery_energy_or_charge_prefix;
 
 // 'auto_config_battery' copies the battery entry in '/sys/class/power_supply/'
 static char battery_name[32];
@@ -61,15 +61,15 @@ static struct netifc {
 // used network interfaces
 static uint32_t netifcs_len;
 
-static void str_to_lower(char *str) {
+static void str_to_lower(char* str) {
     while (*str) {
         *str = (char)tolower(*str);
         str++;
     }
 }
 
-static void str_compact_spaces(char *str) {
-    char *dst = str;
+static void str_compact_spaces(char* str) {
+    char* dst = str;
     // "   a  b c  "
     while (isspace(*str)) {
         str++;
@@ -98,7 +98,7 @@ static void str_compact_spaces(char *str) {
 // value: destination is written to pointer
 // value_buf_size: size of value buffer
 // if value is without '\n' at the end then write "" to value
-static void sys_value_str_line(const char *path, char *value,
+static void sys_value_str_line(const char* path, char* value,
                                const size_t value_buf_size) {
     int fd = open(path, O_RDONLY);
     if (fd == -1) {
@@ -118,11 +118,11 @@ static void sys_value_str_line(const char *path, char *value,
     value[nbytes - 1] = '\0';
 }
 
-static int32_t sys_value_int32(const char *path) {
+static int32_t sys_value_int32(const char* path) {
     char str[64] = "";
     sys_value_str_line(path, str, sizeof(str));
 
-    char *endptr = NULL;
+    char* endptr = NULL;
     const long result = strtol(str, &endptr, 10);
     if (endptr == str) {
         return 0;
@@ -130,11 +130,11 @@ static int32_t sys_value_int32(const char *path) {
     return (int32_t)result;
 }
 
-static int64_t sys_value_int64(const char *path) {
+static int64_t sys_value_int64(const char* path) {
     char str[64] = "";
     sys_value_str_line(path, str, sizeof(str));
 
-    char *endptr = NULL;
+    char* endptr = NULL;
     const long long result = strtoll(str, &endptr, 10);
     if (endptr == str) {
         return 0;
@@ -142,11 +142,11 @@ static int64_t sys_value_int64(const char *path) {
     return (int64_t)result;
 }
 
-static uint64_t sys_value_uint64(const char *path) {
+static uint64_t sys_value_uint64(const char* path) {
     char str[64] = "";
     sys_value_str_line(path, str, sizeof(str));
 
-    char *endptr = NULL;
+    char* endptr = NULL;
     const unsigned long long result = strtoull(str, &endptr, 10);
     if (endptr == str) {
         return 0;
@@ -154,15 +154,15 @@ static uint64_t sys_value_uint64(const char *path) {
     return (uint64_t)result;
 }
 
-static int sys_value_exists(const char *path) { return !access(path, F_OK); }
+static int sys_value_exists(const char* path) { return !access(path, F_OK); }
 
 static void auto_config_battery(void) {
-    DIR *dir = opendir("/sys/class/power_supply");
+    DIR* dir = opendir("/sys/class/power_supply");
     if (!dir) {
         puts("[!] battery: cannot open dir '/sys/class/power_supply'");
         return;
     }
-    struct dirent *entry = NULL;
+    struct dirent* entry = NULL;
     battery_name[0] = '\0';
     while ((entry = readdir(dir))) {
         if (entry->d_name[0] == '.') {
@@ -210,7 +210,7 @@ static void auto_config_battery(void) {
     return;
 }
 
-static int is_wifi_device(const char *sys_cls_net_wlan) {
+static int is_wifi_device(const char* sys_cls_net_wlan) {
     // build string to file '/sys/class/net/XXX/wireless
     char buf[128] = "";
     snprintf(buf, sizeof(buf), "/sys/class/net/%s/wireless", sys_cls_net_wlan);
@@ -219,13 +219,13 @@ static int is_wifi_device(const char *sys_cls_net_wlan) {
 }
 
 static void auto_config_network_traffic(void) {
-    DIR *dir = opendir("/sys/class/net");
+    DIR* dir = opendir("/sys/class/net");
     if (!dir) {
         puts("[!] wifi: cannot open dir /sys/class/net");
         return;
     }
     net_device[0] = '\0';
-    struct dirent *entry = NULL;
+    struct dirent* entry = NULL;
     while ((entry = readdir(dir))) {
         if (entry->d_name[0] == '.') {
             // ignore hidden files
@@ -262,7 +262,7 @@ static void auto_config(void) {
     auto_config_network_traffic();
 }
 
-static void pl(const char *str) {
+static void pl(const char* str) {
     dc_newline(dc);
     dc_draw_str(dc, str);
 }
@@ -271,7 +271,7 @@ static void render_hr(void) { dc_draw_hr(dc); }
 
 static void render_date_time(void) {
     const time_t t = time(NULL);
-    const struct tm *lt = localtime(&t);
+    const struct tm* lt = localtime(&t);
     strb sb;
     strb_init(&sb);
     if (strb_p(&sb, asctime(lt))) {
@@ -287,7 +287,7 @@ static void render_cpu_load(void) {
     static uint64_t prv_total = 0;
     static uint64_t prv_usage = 0;
 
-    FILE *file = fopen("/proc/stat", "r");
+    FILE* file = fopen("/proc/stat", "r");
     if (!file) {
         return;
     }
@@ -337,7 +337,7 @@ static void render_hello_clonky(void) {
 }
 
 static void render_mem_info(void) {
-    FILE *file = fopen("/proc/meminfo", "r");
+    FILE* file = fopen("/proc/meminfo", "r");
     if (!file) {
         return;
     }
@@ -346,7 +346,7 @@ static void render_mem_info(void) {
     //  MemAvailable:   10814308 kB
     //  Buffers:          944396 kB
     //  Cached:          5425168 kB
-    const char *unit = "kB";
+    const char* unit = "kB";
     uint64_t mem_total = 0;
     uint64_t mem_avail = 0;
     char buf[256] = "";
@@ -379,7 +379,7 @@ static void render_mem_info(void) {
 }
 
 static void render_swaps(void) {
-    FILE *file = fopen("/proc/swaps", "r");
+    FILE* file = fopen("/proc/swaps", "r");
     if (!file) {
         return;
     }
@@ -426,9 +426,9 @@ static void render_net_graph(void) {
     graphd_draw(graph_net, dc, DEFAULT_GRAPH_HEIGHT, NET_GRAPH_MAX);
 }
 
-static struct netifc *netifcs_get_by_name_or_create(const char *name) {
+static struct netifc* netifcs_get_by_name_or_create(const char* name) {
     for (uint32_t i = 0; i < netifcs_len; i++) {
-        struct netifc *ni = &netifcs[i];
+        struct netifc* ni = &netifcs[i];
         if (!strncmp(ni->name, name, sizeof(ni->name))) {
             return &netifcs[i];
         }
@@ -438,14 +438,14 @@ static struct netifc *netifcs_get_by_name_or_create(const char *name) {
         return NULL;
     }
     printf("· network interface: %s\n", name);
-    struct netifc *ni = &netifcs[netifcs_len];
+    struct netifc* ni = &netifcs[netifcs_len];
     netifcs_len++;
     strncpy(ni->name, name, sizeof(ni->name));
     ni->name[sizeof(ni->name) - 1] = '\0'; // ensure null-termination
     return ni;
 }
 
-static void render_wifi_info_for_interface(const char *interface_name) {
+static void render_wifi_info_for_interface(const char* interface_name) {
     // :: iw dev wlan0 link
     // Connected to 38:d5:47:40:99:d4 (on wlan0)
     //         SSID: AC51_5G
@@ -461,7 +461,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
     // ::
     char cmd[256] = "";
     snprintf(cmd, sizeof(cmd), "iw dev %s link", interface_name);
-    FILE *file = popen(cmd, "r");
+    FILE* file = popen(cmd, "r");
     if (!file) {
         return;
     }
@@ -495,7 +495,7 @@ static void render_wifi_info_for_interface(const char *interface_name) {
     pl(cmd);
 }
 
-static void render_net_interface(struct ifaddrs *ifa) {
+static void render_net_interface(struct ifaddrs* ifa) {
     if (ifa->ifa_addr == NULL || (ifa->ifa_addr->sa_family != AF_INET &&
                                   ifa->ifa_addr->sa_family != AF_INET6)) {
         return;
@@ -543,7 +543,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
     // note: 32 is arbitrary max length of interface name
     const uint64_t rx_bytes = sys_value_uint64(path);
     // get or create entry
-    struct netifc *ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
+    struct netifc* ifc = netifcs_get_by_name_or_create(ifa->ifa_name);
     if (!ifc) {
         // no more space in the network interfaces array
         return;
@@ -557,7 +557,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
     ifc->rx_bytes = rx_bytes;
 
     // ? round to nearest integer
-    const char *rx_scale = "B/s";
+    const char* rx_scale = "B/s";
     if (delta_rx_bytes >> 20) {
         delta_rx_bytes >>= 20;
         rx_scale = "MB/s";
@@ -566,7 +566,7 @@ static void render_net_interface(struct ifaddrs *ifa) {
         rx_scale = "KB/s";
     }
 
-    const char *tx_scale = "B/s";
+    const char* tx_scale = "B/s";
     if (delta_tx_bytes >> 20) {
         delta_tx_bytes >>= 20;
         tx_scale = "MB/s";
@@ -581,14 +581,14 @@ static void render_net_interface(struct ifaddrs *ifa) {
 }
 
 static void render_net_interfaces(void) {
-    struct ifaddrs *ifas = NULL;
+    struct ifaddrs* ifas = NULL;
     if (getifaddrs(&ifas) == -1) {
         return;
     }
 
     // ? implement new algorithm to make one pass through the list of interfaces
     // first the graphed device
-    for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
+    for (struct ifaddrs* ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
         if (strncmp(ifa->ifa_name, net_device, sizeof(net_device))) {
             continue;
         }
@@ -597,7 +597,7 @@ static void render_net_interfaces(void) {
         // only one of those entries gives result from 'getnameinfo'
     }
     // then all others except 'lo'
-    for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
+    for (struct ifaddrs* ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
         if (!strncmp(ifa->ifa_name, net_device, sizeof(net_device)) ||
             !strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
             continue;
@@ -606,7 +606,7 @@ static void render_net_interfaces(void) {
         // not 'break' because see note above
     }
     // then 'lo'
-    for (struct ifaddrs *ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
+    for (struct ifaddrs* ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
         if (strncmp(ifa->ifa_name, "lo", sizeof("lo"))) {
             continue;
         }
@@ -620,7 +620,7 @@ static void render_io_stat(void) {
     static uint64_t prv_kb_read_total = 0;
     static uint64_t prv_kb_written_total = 0;
 
-    FILE *file = popen("iostat -d", "r");
+    FILE* file = popen("iostat -d", "r");
     if (!file) {
         return;
     }
@@ -664,7 +664,7 @@ static void render_io_stat(void) {
 }
 
 static void render_df(void) {
-    FILE *file = popen("df -h", "r");
+    FILE* file = popen("df -h", "r");
     if (!file) {
         return;
     }
@@ -688,7 +688,7 @@ static void render_df(void) {
 }
 
 static void render_cores_throttle(void) {
-    FILE *file = fopen("/sys/devices/system/cpu/present", "r");
+    FILE* file = fopen("/sys/devices/system/cpu/present", "r");
     if (!file) {
         return;
     }
@@ -789,7 +789,7 @@ static void render_battery(void) {
 }
 
 static void render_acpi(void) {
-    FILE *file = popen("acpi -at", "r");
+    FILE* file = popen("acpi -at", "r");
     if (!file) {
         return;
     }
@@ -806,7 +806,7 @@ static void render_acpi(void) {
 }
 
 static void render_bluetooth_connected_devices(void) {
-    FILE *file = popen("bluetoothctl devices Connected", "r");
+    FILE* file = popen("bluetoothctl devices Connected", "r");
     if (!file) {
         return;
     }
@@ -828,7 +828,7 @@ static void render_bluetooth_connected_devices(void) {
 }
 
 static void render_syslog(void) {
-    FILE *file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
+    FILE* file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
     if (!file) {
         return;
     }
@@ -844,7 +844,7 @@ static void render_syslog(void) {
 }
 
 static void render_cheetsheet(void) {
-    static char *keysheet[] = {"ĸey",
+    static char* keysheet[] = {"ĸey",
                                "+c               console",
                                "+f                 files",
                                "+e                editor",
@@ -878,7 +878,7 @@ static void render_cheetsheet(void) {
                                " ...                ... ",
                                NULL};
 
-    char **str_ptr = keysheet;
+    char** str_ptr = keysheet;
     while (*str_ptr) {
         pl(*str_ptr);
         str_ptr++;
@@ -942,7 +942,7 @@ static void signal_exit(int i) {
     exit(i);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     signal(SIGINT, signal_exit);
 
     puts("clonky system overview");

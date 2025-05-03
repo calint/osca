@@ -25,7 +25,7 @@
 
 // #define MENUQ_DEBUG
 #ifdef MENUQ_DEBUG
-static char *ix_evnames[LASTEvent] = {
+static char* ix_evnames[LASTEvent] = {
     "unknown",          "unknown",       // 0
     "KeyPress",         "KeyRelease",    // 2
     "ButtonPress",      "ButtonRelease", // 4
@@ -45,7 +45,7 @@ static char *ix_evnames[LASTEvent] = {
 #endif
 
 int main(void) {
-    Display *dpy = XOpenDisplay(NULL);
+    Display* dpy = XOpenDisplay(NULL);
     if (!dpy) {
         // fprintf(stderr, "!!! could not open display\n");
         return 1;
@@ -66,13 +66,13 @@ int main(void) {
 
     // load and set font
     Colormap cmap = DefaultColormap(dpy, scr);
-    XftFont *font = XftFontOpen(dpy, scr, XFT_FAMILY, XftTypeString, FONT_NAME,
+    XftFont* font = XftFontOpen(dpy, scr, XFT_FAMILY, XftTypeString, FONT_NAME,
                                 XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
     if (font == NULL) {
         fprintf(stderr, "unable to load font.\n");
         return 1;
     }
-    XftDraw *draw = XftDrawCreate(dpy, win, DefaultVisual(dpy, scr), cmap);
+    XftDraw* draw = XftDrawCreate(dpy, win, DefaultVisual(dpy, scr), cmap);
     XRenderColor rendcol = {0xffff, 0xffff, 0xffff, 0xffff};
     XftColor color;
     XftColorAllocValue(dpy, DefaultVisual(dpy, scr), cmap, &rendcol, &color);
@@ -83,11 +83,11 @@ int main(void) {
     const char cursor_str[] = "_";
     XSetForeground(dpy, gc, WhitePixel(dpy, scr));
     // -1 to exclude '\0'
-    XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8 *)cursor_str,
+    XftDrawStringUtf8(draw, &color, font, x, y, (const FcChar8*)cursor_str,
                       (int)sizeof(cursor_str) - 1);
     // the buffer that accumulates the string to be executed
     char buf[32] = "";
-    char *buf_ptr = buf;
+    char* buf_ptr = buf;
     unsigned buf_ix = 0;
     const unsigned options_start_x = (scr_width >> 1) + (scr_width >> 3);
 
@@ -139,7 +139,7 @@ int main(void) {
                 // draw cursor
                 XSetForeground(dpy, gc, WhitePixel(dpy, scr));
                 XftDrawStringUtf8(draw, &color, font, x, y,
-                                  (const FcChar8 *)cursor_str,
+                                  (const FcChar8*)cursor_str,
                                   (int)sizeof(cursor_str) - 1);
                 // adjust buffer pointer and indexs
                 buf_ix--;
@@ -161,13 +161,13 @@ int main(void) {
                 // not printable character, print cursor
                 // -1 to exclude the '\0'
                 XftDrawStringUtf8(draw, &color, font, x, y,
-                                  (const FcChar8 *)cursor_str,
+                                  (const FcChar8*)cursor_str,
                                   (int)sizeof(cursor_str) - 1);
                 break;
             }
             // printable character, draw
             XftDrawStringUtf8(draw, &color, font, x, y,
-                              (const FcChar8 *)printable_char, 1);
+                              (const FcChar8*)printable_char, 1);
             // append to string
             *buf_ptr++ = printable_char[0];
             buf_ix++;
@@ -182,7 +182,7 @@ int main(void) {
             // draw cursor
             // -1 to exclude '\0'
             XftDrawStringUtf8(draw, &color, font, x, y,
-                              (const FcChar8 *)cursor_str,
+                              (const FcChar8*)cursor_str,
                               (int)sizeof(cursor_str) - 1);
 
             // draw the effect
