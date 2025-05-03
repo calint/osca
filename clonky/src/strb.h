@@ -7,10 +7,10 @@
 #include <stdint.h>
 
 typedef struct strb {
-  char chars[512];
+    char chars[512];
 
-  uint32_t index;
-  // index in chars. points at string terminator '\0'
+    uint32_t index;
+    // index in chars. points at string terminator '\0'
 } strb;
 // note: declared in header because it is used on the stack
 
