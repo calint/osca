@@ -453,7 +453,7 @@ static void turn_off_window_focus_on_desk(int dsk) {
 
 static void focus_next_window(void) {
     int i0 = xwin_ix(focused_window);
-    // note. 'i0' might be -1 but incremented to 0
+    // note: 'i0' might be -1 but incremented to 0
     int i = i0;
     while (++i < WIN_MAX_COUNT) {
         if (focus_window_by_index_try((unsigned)i)) {
@@ -461,7 +461,7 @@ static void focus_next_window(void) {
         }
     }
     i = 0;
-    // note. if 'i0' is -1 then no window will be focused
+    // note: if 'i0' is -1 then no window will be focused
     // '<= i0' not '< i0' to focus on same window if no other window
     // available
     while (i <= i0) {
