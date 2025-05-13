@@ -4,6 +4,8 @@
 #include "dc.h"
 #include <X11/Xft/Xft.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct dc {
     int screen;
