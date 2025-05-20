@@ -5,6 +5,7 @@ base
 base-devel
 bash-completion
 bat
+bear
 blender
 bluez
 bluez-utils
@@ -45,6 +46,7 @@ iverilog
 iwd
 jq
 kitty
+lazygit
 lcov
 less
 libgepub
@@ -107,6 +109,7 @@ tldr
 tlp
 ttf-dejavu
 ttf-jetbrains-mono
+ttf-jetbrains-mono-nerd
 tumbler
 unzip
 valgrind
@@ -114,6 +117,7 @@ verible-bin
 visual-studio-code-bin
 vulkan-intel
 wireplumber
+wrk
 xclip
 xorg-server
 xorg-xev
