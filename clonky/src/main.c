@@ -806,7 +806,7 @@ static void render_acpi(void) {
 }
 
 static void render_bluetooth_connected_devices(void) {
-    FILE* file = popen("bluetoothctl devices Connected | grep Device", "r");
+    FILE* file = popen("bluetoothctl devices Connected | grep ^Device", "r");
     if (!file) {
         return;
     }
