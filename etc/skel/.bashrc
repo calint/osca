@@ -13,7 +13,7 @@ fi
 export PS1=" :: "
 
 # launch frameleses window manager
-alias start-frameless='xinit -- -nolisten tcp vt$XDG_VTNR'
+alias start-frameless='exec xinit -- -nolisten tcp vt$XDG_VTNR'
 # find
 alias f='grep --color=always -i'
 # list files
