@@ -54,7 +54,6 @@ libgsf
 libopenraw
 libva-intel-driver
 libva-utils
-libxcrypt-compat
 libxft
 linux
 linux-firmware
@@ -85,6 +84,7 @@ plocate
 poppler-glib
 powertop
 putty
+python-pip
 python-websockets
 qemu-system-x86
 qemu-ui-gtk
