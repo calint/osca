@@ -107,6 +107,7 @@ tinyxxd
 tk
 tldr
 tlp
+tree-sitter-cli
 ttf-dejavu
 ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
