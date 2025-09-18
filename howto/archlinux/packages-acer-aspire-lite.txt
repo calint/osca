@@ -71,6 +71,7 @@ nano
 nasm
 ncurses5-compat-libs
 neovim
+npm
 obsidian
 openfpgaloader
 pacman-contrib
