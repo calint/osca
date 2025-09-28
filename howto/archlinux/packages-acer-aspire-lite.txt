@@ -17,6 +17,7 @@ chaotic-keyring
 chaotic-mirrorlist
 chromium
 clang
+cloc
 cmake
 cool-retro-term
 cutecom
