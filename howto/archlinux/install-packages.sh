@@ -2,5 +2,5 @@
 set -e
 cd $(dirname "$0")
 
-packages=$(<packages-acer-aspire-lite.txt)
+packages=$(<packages.txt)
 yay -S --needed --noconfirm "${packages[@]}"
