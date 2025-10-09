@@ -1,2 +1,3 @@
+# set backspace in xterm to ^? instead of ^H
 XTerm*backarrowKey: false
 XTerm*ttyModes: erase ^?
