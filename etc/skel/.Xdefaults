@@ -1,0 +1,2 @@
+XTerm*backarrowKey: false
+XTerm*ttyModes: erase ^?
