@@ -10,8 +10,10 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
-# no session manager
-export SESSION_MANAGER=
+# start dbus if not already running
+if ! pgrep -u "$USER" dbus-daemon > /dev/null; then
+    eval "$(dbus-launch --sh-syntax --exit-with-session)"
+fi
 
 # re-map 'caps lock'
 setxkbmap -option ctrl:nocaps
