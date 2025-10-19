@@ -20,8 +20,10 @@ clang
 cloc
 cmake
 cool-retro-term
+cppcheck
 cutecom
 dosfstools
+doxygen
 efibootmgr
 eog
 ethtool
@@ -33,6 +35,7 @@ fzf
 gimp
 git
 glm
+gmtp
 gnu-netcat
 gtk4
 gtkwave
@@ -50,6 +53,7 @@ kitty
 lazygit
 lcov
 less
+libc++
 libgepub
 libgsf
 libopenraw
@@ -109,6 +113,7 @@ tinyxxd
 tk
 tldr
 tlp
+tree
 tree-sitter-cli
 ttf-dejavu
 ttf-jetbrains-mono
