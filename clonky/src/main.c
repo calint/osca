@@ -707,7 +707,7 @@ static void render_cores_throttle(void) {
     }
     const uint32_t ncpus = max - min + 1;
     strb_p_uint32(&sb, ncpus);
-    strb_p(&sb, " core");
+    strb_p(&sb, " thread");
     if (ncpus != 1) {
         strb_p_char(&sb, 's');
     }
@@ -871,7 +871,7 @@ static void render_cheetsheet(void) {
                                "+2           full-height",
                                "+3            full-width",
                                "+right        focus-next",
-                               "+left         focus-prev",
+                               "+left     focus-previous",
                                "+shift+up        move-up",
                                "+shift+down    move-down",
                                "+0   i-am-bored-surprise",
