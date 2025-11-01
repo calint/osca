@@ -1,41 +1,49 @@
 # notes
 
 ## installation
+
 * connect wifi using `https://wiki.archlinux.org/title/Iwd`
 * `archinstall` using profile `Xorg` with `pipewire` sound
 * run `install-step-1.sh`
 * run `install-step-2.sh`
 * install `yay`:
+
 ```
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
 yay --version
 ```
+
 * install brave browser: `yay -S brave-bin`
 * logout login
 * run: `start-frameless`
 * to configure touchpad see `config-touchpad.sh` or:
-* open terminal: `Super + c`
-* `xinput` to find touchpad, `xinput list-props x` to find properties:
-  - "Tapping Enabled"
-  - "Natural Scrolling Enabled"
-* `xinput set-prop x y 1`
-  save in script and run at login
-* example for HP Stream Notebook PC 11:
-```
-#/bin/sh
-xinput set-prop 9 306 1
-xinput set-prop 9 314 1
-```
+  * open terminal: `Super + c`
+  * `xinput` to find touchpad, `xinput list-props x` to find properties:
+    * "Tapping Enabled"
+    * "Natural Scrolling Enabled"
+  * `xinput set-prop x y 1`
+      save in script and run at login
+  * example for HP Stream Notebook PC 11:
+
+    ```
+    #/bin/sh
+    xinput set-prop 9 306 1
+    xinput set-prop 9 314 1
+    ```
 
 ## configure bluetooth speaker
+
 enable bluetooth daemon
+
 ```
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 ```
+
 from `https://wiki.archlinux.org/title/Bluetooth_headset`
+
 ```
 bluetoothctl
 [bluetooth]# power on
@@ -50,13 +58,17 @@ bluetoothctl
 ```
 
 ## on laptop
+
 * install power saving service
+
 ```
 sudo pacman -S tlp
 sudo systemctl enable tlp
 sudo systemctl start tlp
 ```
+
 * install `powertop` for overview of power consumption
+
 ```
 sudo pacman -S powertop
 ```
@@ -66,17 +78,23 @@ sudo pacman -S powertop
 ## HP Stream Notebook PC 11
 
 ### install media on usb does not boot
+
 * disable secure boot in bios
 * legacy mode can be disabled
 
 ### at install in `iwctl`: cannot find networks with  `scan`
+
 * power off and on the device
+
 ```
 device wlan0 set-property Powered off
 device wlan0 set-property Powered on
 ```
+
 ### wifi connectivity issues with disconnects
+
 * try `/etc/modprobe.d/rtl8723be.conf`:
+
 ```
 # disables power saving functions
 options rtl8723be aspm=0 ips=0 fwlps=0
@@ -85,11 +103,14 @@ options rtl8723be aspm=0 ips=0 fwlps=0
 ## Acer Aspire Lite AL14-51M-56HU
 
 ### install media on usb does not boot
+
 * disable secure boot in bios
 
 ### no sound from the speakers
+
 * `sudo pacman -S sof-firmware` and reboot
 
 ### occasionally the touchpad configuration is reset by the system
+
 * example of occurrence is when installing `tlp`
 * resolution: re-run `config-touchpad.sh`
