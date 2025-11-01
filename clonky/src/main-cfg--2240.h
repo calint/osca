@@ -1,7 +1,8 @@
 //
+// configuration for screen width 2240px
+//
 // reviewed: 2025-02-25
 //
-
 #ifndef CLONKY_CFG_H
 #define CLONKY_CFG_H
 
