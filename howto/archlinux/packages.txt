@@ -41,9 +41,7 @@ gtkwave
 gvfs
 gvfs-mtp
 htop
-intel-media-driver
 intel-oneapi-tbb
-intel-ucode
 inxi
 iverilog
 iwd
@@ -56,8 +54,6 @@ libc++
 libgepub
 libgsf
 libopenraw
-libva-intel-driver
-libva-utils
 libxft
 linux
 linux-firmware
@@ -122,7 +118,6 @@ unzip
 valgrind
 verible-bin
 visual-studio-code-bin
-vulkan-intel
 wireplumber
 wrk
 xclip
