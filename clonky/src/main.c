@@ -687,7 +687,7 @@ static void render_df(void) {
     pclose(file);
 }
 
-static void render_cores_throttle(void) {
+static void render_threads_throttle(void) {
     FILE* file = fopen("/sys/devices/system/cpu/present", "r");
     if (!file) {
         return;
@@ -914,7 +914,7 @@ static void render(void) {
     render_io_stat();
     render_df();
     render_hr();
-    render_cores_throttle();
+    render_threads_throttle();
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();

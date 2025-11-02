@@ -1,3 +1,4 @@
+[ ] clonky: threads throttle display based on lines instead of text with percents
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
 [ ] clonky: correct rounding at divisions
