@@ -49,4 +49,7 @@
 // max number of lines read in 'render_acpi'
 #define RENDER_ACPI_MAX_LINE_COUNT 64
 
+// visual or numeric display of threads throttling
+// #define RENDER_VISUAL_THREADS_THROTTLE
+
 #endif

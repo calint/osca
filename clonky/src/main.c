@@ -977,8 +977,11 @@ static void render(void) {
     render_io_stat();
     render_df();
     render_hr();
+#ifdef RENDER_VISUAL_THREADS_THROTTLE
     render_threads_throttle_visual();
-    // render_threads_throttle();
+#else
+    render_threads_throttle();
+#endif
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();
