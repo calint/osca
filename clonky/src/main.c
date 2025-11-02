@@ -977,7 +977,7 @@ static void render(void) {
     render_io_stat();
     render_df();
     render_hr();
-#ifdef RENDER_VISUAL_THREADS_THROTTLE
+#ifdef RENDER_THREADS_THROTTLE_VISUAL
     render_threads_throttle_visual();
 #else
     render_threads_throttle();

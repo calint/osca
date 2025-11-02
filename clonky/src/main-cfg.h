@@ -50,6 +50,6 @@
 #define RENDER_ACPI_MAX_LINE_COUNT 64
 
 // visual or numeric display of threads throttling
-// #define RENDER_VISUAL_THREADS_THROTTLE
+#define RENDER_THREADS_THROTTLE_VISUAL
 
 #endif
