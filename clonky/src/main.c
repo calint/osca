@@ -687,6 +687,69 @@ static void render_df(void) {
     pclose(file);
 }
 
+static void render_threads_throttle_visual(void) {
+    FILE* file = fopen("/sys/devices/system/cpu/present", "r");
+    if (!file) {
+        return;
+    }
+    uint32_t min = 0;
+    uint32_t max = 0;
+    if (fscanf(file, "%u-%u", &min, &max) != 2) {
+        fclose(file);
+        return;
+    }
+    fclose(file);
+
+    strb sb;
+    strb_init(&sb);
+    if (strb_p(&sb, "throttle ")) {
+        return;
+    }
+    const uint32_t ncpus = max - min + 1;
+    strb_p_uint32(&sb, ncpus);
+    strb_p(&sb, " thread");
+    if (ncpus != 1) {
+        strb_p_char(&sb, 's');
+    }
+
+    if (ncpus > 2) {
+        // if more than 2 cpus display throttles on new line
+        pl(sb.chars);
+        strb_init(&sb);
+    }
+
+    render_hr();
+
+    uint32_t total_proc = 0;
+
+    for (uint32_t i = min; i <= max; i++) {
+        char path[128] = "";
+        snprintf(path, sizeof(path),
+                 "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq", i);
+        const uint64_t max_freq = sys_value_uint64(path);
+
+        snprintf(path, sizeof(path),
+                 "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_cur_freq", i);
+        const uint64_t cur_freq = sys_value_uint64(path);
+
+        const uint32_t proc =
+            max_freq ? (uint32_t)(cur_freq * 100 / max_freq) : 100;
+        total_proc += proc;
+
+        dc_draw_hr1(dc, (uint32_t)(WIDTH * cur_freq / max_freq));
+    }
+
+    render_hr();
+
+    if (ncpus > 1 && total_proc != 0) {
+        strb_p(&sb, "average: ");
+        strb_p_uint32(&sb, (total_proc + (ncpus / 2)) / ncpus);
+        // note: ncpus / 2 for rounding to nearest integer
+        strb_p_char(&sb, '%');
+        pl(sb.chars);
+    }
+}
+
 static void render_threads_throttle(void) {
     FILE* file = fopen("/sys/devices/system/cpu/present", "r");
     if (!file) {
@@ -886,8 +949,8 @@ static void render_cheetsheet(void) {
 }
 
 // static void render_top_10_processes(void) {
-//   FILE *file = popen("ps -eo %mem,%cpu,comm --sort=-%mem | head -n 11", "r");
-//   if (!file) {
+//   FILE *file = popen("ps -eo %mem,%cpu,comm --sort=-%mem | head -n 11",
+//   "r"); if (!file) {
 //     return;
 //   }
 //   char buf[512];
@@ -914,7 +977,8 @@ static void render(void) {
     render_io_stat();
     render_df();
     render_hr();
-    render_threads_throttle();
+    render_threads_throttle_visual();
+    // render_threads_throttle();
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();
