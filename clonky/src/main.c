@@ -740,9 +740,7 @@ static void render_threads_throttle_visual(void) {
 
     strb sb;
     strb_init(&sb);
-    if (strb_p(&sb, "throttle ")) {
-        return;
-    }
+    strb_p(&sb, "throttle ");
     strb_p_uint32(&sb, nthreads);
     strb_p(&sb, " thread");
     if (nthreads != 1) {
