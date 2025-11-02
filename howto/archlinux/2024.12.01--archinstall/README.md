@@ -8,7 +8,7 @@
 * run `install-step-2.sh`
 * install `yay`:
 
-```
+```sh
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
@@ -37,7 +37,7 @@ yay --version
 
 enable bluetooth daemon
 
-```
+```sh
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 ```
@@ -61,7 +61,7 @@ bluetoothctl
 
 * install power saving service
 
-```
+```sh
 sudo pacman -S tlp
 sudo systemctl enable tlp
 sudo systemctl start tlp
