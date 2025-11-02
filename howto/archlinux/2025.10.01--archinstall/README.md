@@ -75,42 +75,4 @@ sudo pacman -S powertop
 
 ## troubleshooting
 
-### HP Stream Notebook PC 11
-
-#### install media on usb does not boot
-
-* disable secure boot in bios
-* legacy mode can be disabled
-
-#### at install in `iwctl`: cannot find networks with  `scan`
-
-* power off and on the device
-
-```
-device wlan0 set-property Powered off
-device wlan0 set-property Powered on
-```
-
-#### wifi connectivity issues with disconnects
-
-* try `/etc/modprobe.d/rtl8723be.conf`:
-
-```
-# disables power saving functions
-options rtl8723be aspm=0 ips=0 fwlps=0
-```
-
-### Acer Aspire Lite AL14-51M-56HU
-
-#### install media on usb does not boot
-
-* disable secure boot in bios
-
-#### no sound from the speakers
-
-* `sudo pacman -S sof-firmware` and reboot
-
-#### occasionally the touchpad configuration is reset by the system
-
-* example of occurrence is when installing `tlp`
-* resolution: re-run `config-touchpad.sh`
+### ASUS Zenbook 14 UM3406KA-PP761WA
