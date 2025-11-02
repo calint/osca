@@ -8,7 +8,7 @@
 * run `install-step-2.sh`
 * install `yay`:
 
-```
+```sh
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
@@ -27,7 +27,7 @@ yay --version
       save in script and run at login
   * example for HP Stream Notebook PC 11:
 
-    ```
+    ```sh
     #/bin/sh
     xinput set-prop 9 306 1
     xinput set-prop 9 314 1
@@ -37,7 +37,7 @@ yay --version
 
 enable bluetooth daemon
 
-```
+```sh
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 ```
@@ -61,7 +61,7 @@ bluetoothctl
 
 * install power saving service
 
-```
+```sh
 sudo pacman -S tlp
 sudo systemctl enable tlp
 sudo systemctl start tlp
@@ -69,7 +69,7 @@ sudo systemctl start tlp
 
 * install `powertop` for overview of power consumption
 
-```
+```sh
 sudo pacman -S powertop
 ```
 
