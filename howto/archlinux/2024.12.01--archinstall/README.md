@@ -27,7 +27,7 @@ yay --version
       save in script and run at login
   * example for HP Stream Notebook PC 11:
 
-    ```
+    ```sh
     #/bin/sh
     xinput set-prop 9 306 1
     xinput set-prop 9 314 1
@@ -69,7 +69,7 @@ sudo systemctl start tlp
 
 * install `powertop` for overview of power consumption
 
-```
+```sh
 sudo pacman -S powertop
 ```
 
