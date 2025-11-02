@@ -687,6 +687,20 @@ static void render_df(void) {
     pclose(file);
 }
 
+static int render_threads_throttle_visual_compare(const void* a,
+                                                  const void* b) {
+    const uint32_t val_a = *(uint32_t*)a;
+    const uint32_t val_b = *(uint32_t*)b;
+
+    if (val_b > val_a) {
+        return 1; // descending
+    }
+    if (val_b < val_a) {
+        return -1;
+    }
+    return 0;
+}
+
 static void render_threads_throttle_visual(void) {
     FILE* file = fopen("/sys/devices/system/cpu/present", "r");
     if (!file) {
@@ -712,17 +726,17 @@ static void render_threads_throttle_visual(void) {
         strb_p_char(&sb, 's');
     }
 
-    if (ncpus > 2) {
-        // if more than 2 cpus display throttles on new line
-        pl(sb.chars);
-        strb_init(&sb);
-    }
+    // if more than 2 cpus display throttles on new line
+    pl(sb.chars);
+    strb_init(&sb);
 
     render_hr();
 
     uint32_t total_proc = 0;
+    const size_t nthreads = max - min + 1;
+    uint32_t threads_width[nthreads];
 
-    for (uint32_t i = min; i <= max; i++) {
+    for (uint32_t i = min, j = 0; i <= max; i++, j++) {
         char path[128] = "";
         snprintf(path, sizeof(path),
                  "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq", i);
@@ -736,7 +750,14 @@ static void render_threads_throttle_visual(void) {
             max_freq ? (uint32_t)(cur_freq * 100 / max_freq) : 100;
         total_proc += proc;
 
-        dc_draw_hr1(dc, (uint32_t)(WIDTH * cur_freq / max_freq));
+        threads_width[j] = (uint32_t)(WIDTH * cur_freq / max_freq);
+    }
+
+    qsort(threads_width, nthreads, sizeof(uint32_t),
+          render_threads_throttle_visual_compare);
+
+    for (size_t i = 0; i < nthreads; i++) {
+        dc_draw_hr1(dc, threads_width[i]);
     }
 
     render_hr();
