@@ -762,7 +762,7 @@ static void render_threads_throttle_visual(void) {
         strb_init(&sb);
         strb_p(&sb, "average: ");
         strb_p_uint32(&sb, (total_proc + (nthreads / 2)) / nthreads);
-        // note: ncpus / 2 for rounding to nearest integer
+        // note: nthreads / 2 for rounding to nearest integer
         strb_p_char(&sb, '%');
         pl(sb.chars);
     }
