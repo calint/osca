@@ -714,21 +714,7 @@ static void render_threads_throttle_visual(void) {
     }
     fclose(file);
 
-    strb sb;
-    strb_init(&sb);
-    if (strb_p(&sb, "throttle ")) {
-        return;
-    }
     const uint32_t nthreads = max - min + 1;
-    strb_p_uint32(&sb, nthreads);
-    strb_p(&sb, " thread");
-    if (nthreads != 1) {
-        strb_p_char(&sb, 's');
-    }
-
-    pl(sb.chars);
-
-    render_hr();
 
     uint32_t total_proc = 0;
     uint32_t threads_width[nthreads];
@@ -752,19 +738,24 @@ static void render_threads_throttle_visual(void) {
     qsort(threads_width, nthreads, sizeof(uint32_t),
           render_threads_throttle_visual_compare);
 
+    strb sb;
+    strb_init(&sb);
+    if (strb_p(&sb, "throttle ")) {
+        return;
+    }
+    strb_p_uint32(&sb, nthreads);
+    strb_p(&sb, " thread");
+    if (nthreads != 1) {
+        strb_p_char(&sb, 's');
+    }
+    strb_p_char(&sb, ' ');
+    strb_p_uint32(&sb, (total_proc + (nthreads / 2)) / nthreads);
+    // note: nthreads / 2 for rounding to nearest integer
+    strb_p_char(&sb, '%');
+    pl(sb.chars);
+
     for (size_t i = 0; i < nthreads; i++) {
         dc_draw_hr1(dc, threads_width[i]);
-    }
-
-    render_hr();
-
-    if (nthreads > 1 && total_proc != 0) {
-        strb_init(&sb);
-        strb_p(&sb, "average: ");
-        strb_p_uint32(&sb, (total_proc + (nthreads / 2)) / nthreads);
-        // note: nthreads / 2 for rounding to nearest integer
-        strb_p_char(&sb, '%');
-        pl(sb.chars);
     }
 }
 
@@ -994,12 +985,12 @@ static void render(void) {
     render_hr();
     render_io_stat();
     render_df();
-    render_hr();
-    render_threads_throttle_visual();
-    // render_threads_throttle();
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();
+    render_hr();
+    render_threads_throttle_visual();
+    // render_threads_throttle();
     render_hr();
     render_syslog();
     render_hr();
