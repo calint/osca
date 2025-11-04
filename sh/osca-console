@@ -1,2 +1,2 @@
 #!/bin/sh
-xterm -fa mono:size=13 -bg black -fg gray &
+xterm -fa mono:size=15 -bg black -fg gray &
