@@ -80,3 +80,5 @@ sudo pacman -S powertop
 * if experiencing lag on input to `xterm`, or lag in `clonky` or other X11
 applications then add kernel parameter `amdgpu.dcdebugmask=0x10` in boot loader
 entry. __note: `kitty` does not exhibit this problem__
+* if `clonky` hangs make sure `bluetooth` service is enabled and command
+`bluetoothctl devices Connected` works
