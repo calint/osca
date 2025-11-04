@@ -77,6 +77,6 @@ sudo pacman -S powertop
 
 ### ASUS Zenbook 14 UM3406KA-PP761WA
 
-* if experiencing lag on input into `xterm` or other X11 applications, `clonky`
-etc add this kernel parameter in boot loader entry: `amdgpu.dcdebugmask=0x10`
-* note: `kitty` does not exhibit same problem
+* if experiencing lag on input to `xterm`, or lag in `clonky` or other X11
+applications add kernel parameter `amdgpu.dcdebugmask=0x10` in boot loader entry
+__note: `kitty` does not exhibit this problem__
