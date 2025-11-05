@@ -17,7 +17,7 @@ eval "$(dbus-launch --sh-syntax --exit-with-session)"
 setxkbmap -option ctrl:nocaps
 
 # set background
-xsetroot -bitmap "$OSCA/bmp/sq.bmp"
+xsetroot -bitmap "$OSCA/bmp/sq32.bmp"
 
 # launch clonky
 "$OSCA/clonky/clonky" &

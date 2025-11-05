@@ -13,8 +13,8 @@ WARNINGS="-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wno-unused-re
 LIBS="-lX11"
 
 echo
-$CC -o $BIN  $SRC $LIBS $OPTS $WARNINGS
-echo    "            lines   words   chars"
+$CC -o $BIN $SRC $LIBS $OPTS $WARNINGS
+echo "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
 echo -n "   zipped:"
@@ -22,3 +22,4 @@ cat $SRC | gzip | wc
 echo
 ls -o $BIN
 echo
+

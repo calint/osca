@@ -25,4 +25,3 @@ echo
 ls -o $BIN
 echo
 #valgrind --track-origins=yes --leak-check=full ./$BIN
-
