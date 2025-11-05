@@ -956,21 +956,23 @@ static void render_cheetsheet(void) {
     }
 }
 
-// static void render_top_10_processes(void) {
-//   FILE *file = popen("ps -eo %mem,%cpu,comm --sort=-%mem | head -n 11",
-//   "r"); if (!file) {
-//     return;
-//   }
-//   char buf[512];
-//   uint32_t counter = 11;
-//   while (counter--) {
-//     if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-//       break;
-//     }
-//     pl(buf);
-//   }
-//   pclose(file);
-// }
+static void render_top_10_processes(void) {
+    FILE* file = popen(
+        "ps -eo %cpu,%mem,comm --sort=-%cpu | awk '!a[$3]++' | head -n 11",
+        "r");
+    if (!file) {
+        return;
+    }
+    char buf[512];
+    uint32_t counter = 11;
+    while (counter--) {
+        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+            break;
+        }
+        pl(buf);
+    }
+    pclose(file);
+}
 
 static void render(void) {
     dc_clear(dc);
@@ -989,7 +991,9 @@ static void render(void) {
     render_bluetooth_connected_devices();
     render_hr();
     render_threads_throttle_visual();
-    //    render_threads_throttle();
+    // render_threads_throttle();
+    // render_hr();
+    // render_top_10_processes();
     render_hr();
     render_syslog();
     render_hr();
