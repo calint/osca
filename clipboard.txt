@@ -17,3 +17,5 @@ journalctl -p3 -o cat -n 15 --no-pager
 #           This will add "PRIORITY=" matches for the specified priorities.
 
 TAG=$(date "+%Y-%m-%d--%H-%M") && git tag $TAG && git push origin $TAG
+
+git add . && git commit -m "." && git push
