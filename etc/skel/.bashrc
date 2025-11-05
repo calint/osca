@@ -45,5 +45,7 @@ alias pkfq='pacman -F'
 # updates the database of mapping file to package
 alias pkfu='sudo pacman -Fy'
 
-# git
-alias gcp="git add . && git commit -m "." && git push"
+# git add, commit, push
+alias gcp='git add . && git commit -m "." && git push'
+# git tag, push
+alias gtp='TAG=$(date "+%Y-%m-%d--%H-%M") && git tag $TAG && git push origin $TAG'
