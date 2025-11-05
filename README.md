@@ -41,37 +41,37 @@ contains:
 ```
 
             lines   words   chars
-   source:    935    2855   32107
-   zipped:     23     142    6739
+   source:    947    2892   32436
+   zipped:     20     158    6830
 
--rwxr-xr-x 1 c 21496 Nov  2 22:11 frameless
+-rwxr-xr-x 1 c 21496 Nov  5 09:23 frameless
 
 
             lines   words   chars
-   source:   1449    4654   43343
-   zipped:     42     218    9651
+   source:   1449    4654   43341
+   zipped:     40     220    9657
 
--rwxr-xr-x 1 c 37096 Nov  2 22:11 clonky
+-rwxr-xr-x 1 c 37096 Nov  5 09:23 clonky
 
 
             lines   words   chars
    source:    215     751    7513
    zipped:      5      51    2326
 
--rwxr-xr-x 1 c 16440 Nov  2 22:11 menuq
+-rwxr-xr-x 1 c 16440 Nov  5 09:23 menuq
 
 
             lines   words   chars
    source:     58     121    1991
    zipped:      4      16     816
 
--rwxr-xr-x 1 c 16552 Nov  2 22:11 stickyo
+-rwxr-xr-x 1 c 16552 Nov  5 09:23 stickyo
 
 
             lines   words   chars
    source:     21      60     621
    zipped:      1       4     327
 
--rwxr-xr-x 1 c 15632 Nov  2 22:11 snap
+-rwxr-xr-x 1 c 15632 Nov  5 09:23 snap
 
 ```

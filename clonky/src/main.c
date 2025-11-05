@@ -719,14 +719,14 @@ static void render_threads_throttle_visual(void) {
     uint32_t total_proc = 0;
     uint32_t threads_width[nthreads];
 
-    for (uint32_t i = min, j = 0; i <= max; i++, j++) {
+    for (size_t i = min, j = 0; i <= max; i++, j++) {
         char path[128] = "";
         snprintf(path, sizeof(path),
-                 "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq", i);
+                 "/sys/devices/system/cpu/cpu%zu/cpufreq/scaling_max_freq", i);
         const uint64_t max_freq = sys_value_uint64(path);
 
         snprintf(path, sizeof(path),
-                 "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_cur_freq", i);
+                 "/sys/devices/system/cpu/cpu%zu/cpufreq/scaling_cur_freq", i);
         const uint64_t cur_freq = sys_value_uint64(path);
 
         const uint32_t proc =
@@ -790,7 +790,7 @@ static void render_threads_throttle(void) {
     uint32_t cpu_ix = min;
     uint32_t total_proc = 0;
     while (cpu_ix <= max) {
-        for (uint32_t col = 0; col < ncols && cpu_ix <= max; col++) {
+        for (size_t col = 0; col < ncols && cpu_ix <= max; col++) {
             char path[128] = "";
             snprintf(path, sizeof(path),
                      "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq",
