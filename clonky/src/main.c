@@ -182,8 +182,8 @@ static void auto_config_battery(void) {
         }
         // found 'battery'
         strncpy(battery_name, entry->d_name, sizeof(battery_name));
-        battery_name[sizeof(battery_name) - 1] =
-            '\0'; // ensure null-termination
+        battery_name[sizeof(battery_name) - 1] = '\0';
+        // note: ensure null-termination
 
         //? quirk if it is 'energy' or 'charge' for battery charge info
         snprintf(buf, sizeof(buf), "/sys/class/power_supply/%s/energy_now",
