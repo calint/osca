@@ -48,6 +48,9 @@ static FILE* flog;
 // pixels to 'bump' a window
 #define WIN_BUMP_PX 200
 
+// left margin when positioning window with "surprise me" key
+#define WIN_MARGIN_LEFT_PX 250
+
 // key bindings (use 'xev' to find out keycode for key)
 #define KEY_LAUNCH_CONSOLE 54 // c
 #define CMD_LAUNCH_CONSOLE "osca-console"
@@ -340,6 +343,15 @@ static void xwin_bump(xwin* this, int rand_amt) {
     this->x += (rand() % rand_amt) - (rand_amt >> 1);
     this->y += (rand() % rand_amt) - (rand_amt >> 1);
     xwin_set_geom(this);
+}
+
+static void xwin_place_with_left_margin(xwin* this, int margin) {
+    xwin_read_geom(this);
+    this->x = margin;
+    this->wi = screen.wi - (unsigned)margin - 2;
+    // note: -2 to display borders
+    xwin_set_geom(this);
+    xwin_toggle_fullheight(this);
 }
 
 static int xwin_ix(xwin* this) {
@@ -776,7 +788,8 @@ int main(int argc, char** args, char** env) {
                 break;
             case KEY_WINDOW_SURPRISE:
                 if (focused_window) {
-                    xwin_bump(focused_window, WIN_BUMP_PX);
+                    xwin_place_with_left_margin(focused_window,
+                                                WIN_MARGIN_LEFT_PX);
                 }
                 break;
             case KEY_WINDOW_FOCUS_PREVIOUS:
