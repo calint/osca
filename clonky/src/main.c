@@ -793,7 +793,7 @@ static void render_threads_throttle(void) {
         for (size_t col = 0; col < ncols && cpu_ix <= max; col++) {
             char path[128] = "";
             snprintf(path, sizeof(path),
-                     "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_max_freq",
+                     "/sys/devices/system/cpu/cpu%u/cpufreq/cpuinfo_max_freq",
                      cpu_ix);
             const uint64_t max_freq = sys_value_uint64(path);
             snprintf(path, sizeof(path),
@@ -988,7 +988,7 @@ static void render(void) {
     render_bluetooth_connected_devices();
     render_hr();
     render_threads_throttle_visual();
-    // render_threads_throttle();
+    //    render_threads_throttle();
     render_hr();
     render_syslog();
     render_hr();
