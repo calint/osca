@@ -44,3 +44,6 @@ alias pkf='pacman -Ql'
 alias pkfq='pacman -F'
 # updates the database of mapping file to package
 alias pkfu='sudo pacman -Fy'
+
+# git
+alias gcp="git add . && git commit -m "." && git push"
