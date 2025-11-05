@@ -44,11 +44,11 @@ struct dc {
     self->display = XOpenDisplay(NULL);
     if (!self->display) {
         puts("!!! could not open display");
-        exit(1);
+        exit(2);
     }
     if (FcInit() == FcFalse) {
         puts("!!! could not initiate font config library");
-        exit(1);
+        exit(3);
     }
     self->screen = DefaultScreen(self->display);
     self->display_width = (uint32_t)DisplayWidth(self->display, self->screen);
