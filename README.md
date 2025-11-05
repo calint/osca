@@ -44,34 +44,34 @@ contains:
    source:    947    2892   32436
    zipped:     20     158    6830
 
--rwxr-xr-x 1 c 21496 Nov  5 12:39 frameless
+-rwxr-xr-x 1 c 21496 Nov  5 14:51 frameless
 
 
             lines   words   chars
-   source:   1455    4682   43586
-   zipped:     53     219    9731
+   source:   1455    4683   43588
+   zipped:     60     252    9731
 
--rwxr-xr-x 1 c 37128 Nov  5 12:39 clonky
+-rwxr-xr-x 1 c 37128 Nov  5 14:51 clonky
 
 
             lines   words   chars
    source:    215     751    7513
    zipped:      5      51    2326
 
--rwxr-xr-x 1 c 16440 Nov  5 12:39 menuq
+-rwxr-xr-x 1 c 16440 Nov  5 14:51 menuq
 
 
             lines   words   chars
    source:     58     121    1991
    zipped:      4      16     816
 
--rwxr-xr-x 1 c 16552 Nov  5 12:39 stickyo
+-rwxr-xr-x 1 c 16552 Nov  5 14:51 stickyo
 
 
             lines   words   chars
    source:     21      60     621
    zipped:      1       4     327
 
--rwxr-xr-x 1 c 15632 Nov  5 12:39 snap
+-rwxr-xr-x 1 c 15632 Nov  5 14:51 snap
 
 ```
