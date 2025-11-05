@@ -345,15 +345,6 @@ static void xwin_bump(xwin* this, int rand_amt) {
     xwin_set_geom(this);
 }
 
-static void xwin_place_with_left_margin(xwin* this, int margin) {
-    xwin_read_geom(this);
-    this->x = margin;
-    this->wi = screen.wi - (unsigned)margin - 2;
-    // note: -2 to display borders
-    xwin_set_geom(this);
-    xwin_toggle_fullheight(this);
-}
-
 static int xwin_ix(xwin* this) {
     if (this == NULL) {
         return -1;
@@ -549,6 +540,15 @@ static void switch_to_desk(int dsk, Bool move_focused_window) {
     }
     desk_show(current_desk, dsk_prv);
     focus_window_after_desk_switch();
+}
+
+static void surprise_me(xwin* this) {
+    xwin_read_geom(this);
+    this->x = WIN_MARGIN_LEFT_PX;
+    this->wi = screen.wi - WIN_MARGIN_LEFT_PX - 2;
+    // note: -2 to display borders
+    xwin_set_geom(this);
+    xwin_toggle_fullheight(this);
 }
 
 static int error_handler(Display* d, XErrorEvent* e) {
@@ -788,8 +788,7 @@ int main(int argc, char** args, char** env) {
                 break;
             case KEY_WINDOW_SURPRISE:
                 if (focused_window) {
-                    xwin_place_with_left_margin(focused_window,
-                                                WIN_MARGIN_LEFT_PX);
+                    surprise_me(focused_window);
                 }
                 break;
             case KEY_WINDOW_FOCUS_PREVIOUS:
