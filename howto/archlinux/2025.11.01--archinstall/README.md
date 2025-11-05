@@ -85,3 +85,4 @@ fixes it__
 `bluetoothctl devices Connected` works
 * closing and opening the lid drops the touchpad configuration, use
 `config-touchpad.sh` to restore it
+* at reboot `F2` for BIOS, `Esc` for boot menu
