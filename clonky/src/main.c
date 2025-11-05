@@ -722,7 +722,7 @@ static void render_threads_throttle_visual(void) {
     for (size_t i = min, j = 0; i <= max; i++, j++) {
         char path[128] = "";
         snprintf(path, sizeof(path),
-                 "/sys/devices/system/cpu/cpu%zu/cpufreq/scaling_max_freq", i);
+                 "/sys/devices/system/cpu/cpu%zu/cpufreq/cpuinfo_max_freq", i);
         const uint64_t max_freq = sys_value_uint64(path);
 
         snprintf(path, sizeof(path),

@@ -3,6 +3,7 @@
 //
 #include "dc.h"
 #include <X11/Xft/Xft.h>
+#include <fontconfig/fontconfig.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,6 +44,10 @@ struct dc {
     self->display = XOpenDisplay(NULL);
     if (!self->display) {
         puts("!!! could not open display");
+        exit(1);
+    }
+    if (FcInit() == FcFalse) {
+        puts("!!! could not initiate font config library");
         exit(1);
     }
     self->screen = DefaultScreen(self->display);
