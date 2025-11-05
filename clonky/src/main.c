@@ -719,14 +719,14 @@ static void render_threads_throttle_visual(void) {
     uint32_t total_proc = 0;
     uint32_t threads_width[nthreads];
 
-    for (size_t i = min, j = 0; i <= max; i++, j++) {
+    for (uint32_t i = min, j = 0; i <= max; i++, j++) {
         char path[128] = "";
         snprintf(path, sizeof(path),
-                 "/sys/devices/system/cpu/cpu%zu/cpufreq/cpuinfo_max_freq", i);
+                 "/sys/devices/system/cpu/cpu%u/cpufreq/cpuinfo_max_freq", i);
         const uint64_t max_freq = sys_value_uint64(path);
 
         snprintf(path, sizeof(path),
-                 "/sys/devices/system/cpu/cpu%zu/cpufreq/scaling_cur_freq", i);
+                 "/sys/devices/system/cpu/cpu%u/cpufreq/scaling_cur_freq", i);
         const uint64_t cur_freq = sys_value_uint64(path);
 
         const uint32_t proc =
@@ -752,7 +752,7 @@ static void render_threads_throttle_visual(void) {
     strb_p_char(&sb, '%');
     pl(sb.chars);
 
-    for (size_t i = 0; i < nthreads; i++) {
+    for (uint32_t i = 0; i < nthreads; i++) {
         dc_draw_hr1(dc, threads_width[i]);
     }
 }
@@ -790,7 +790,7 @@ static void render_threads_throttle(void) {
     uint32_t cpu_ix = min;
     uint32_t total_proc = 0;
     while (cpu_ix <= max) {
-        for (size_t col = 0; col < ncols && cpu_ix <= max; col++) {
+        for (uint32_t col = 0; col < ncols && cpu_ix <= max; col++) {
             char path[128] = "";
             snprintf(path, sizeof(path),
                      "/sys/devices/system/cpu/cpu%u/cpufreq/cpuinfo_max_freq",
@@ -888,7 +888,8 @@ static void render_bluetooth_connected_devices(void) {
             break;
         }
         if (counter == RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT - 1) {
-            // if first entry
+            // note: -1 because counter starts at constant and decrements by 1
+            //       at first iteration
             render_hr();
             pl("bluetooth devices connected:");
         }
