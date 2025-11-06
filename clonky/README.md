@@ -20,4 +20,4 @@
 
 ## howto
 
-* change layout by editing `main.c` function `render`
+* modify `main-cfg.h` for settings and `main.c` function `render` for layout
