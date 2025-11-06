@@ -86,5 +86,6 @@ fixes it__
 * closing and opening the lid drops the touchpad configuration, use
 `config-touchpad.sh` to restore it
 * at reboot `F2` for BIOS, `Esc` for boot menu
-* uncomment `STOP_CHARGE_TRESH_BAT0=80` in `/etc/tlp.conf` for better long term
-battery health
+* in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
+`STOP_CHARGE_TRESH_BAT0=80` in `/etc/tlp.conf` for better long term battery
+health
