@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-cd $(dirname "$0")
+cd "$(dirname "$0")"
 
 SKEL="$(pwd)/etc/skel"
 echo "     source: $HOME"
@@ -8,7 +8,7 @@ echo "destination: $SKEL"
 
 rm -rf "$SKEL"
 mkdir -p "$SKEL/.config"
-cd $HOME
+cd "$HOME"
 cp -av .bashrc "$SKEL"
 cp -av .xinitrc "$SKEL"
 cp -rav .config/mimeapps.list "$SKEL/.config"

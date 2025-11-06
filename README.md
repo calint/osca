@@ -39,34 +39,34 @@ contains:
    source:    947    2892   32436
    zipped:     20     158    6830
 
--rwxr-xr-x 1 c 21496 Nov  6 17:21 frameless
+-rwxr-xr-x 1 c 21496 Nov  6 17:37 frameless
 
 
             lines   words   chars
    source:   1459    4676   43666
    zipped:     62     265    9710
 
--rwxr-xr-x 1 c 37128 Nov  6 17:21 clonky
+-rwxr-xr-x 1 c 37128 Nov  6 17:37 clonky
 
 
             lines   words   chars
    source:    215     751    7513
    zipped:      5      51    2326
 
--rwxr-xr-x 1 c 16440 Nov  6 17:21 menuq
+-rwxr-xr-x 1 c 16440 Nov  6 17:37 menuq
 
 
             lines   words   chars
    source:     58     121    1991
    zipped:      4      16     816
 
--rwxr-xr-x 1 c 16552 Nov  6 17:21 stickyo
+-rwxr-xr-x 1 c 16552 Nov  6 17:37 stickyo
 
 
             lines   words   chars
    source:     21      60     621
    zipped:      1       4     327
 
--rwxr-xr-x 1 c 15632 Nov  6 17:21 snap
+-rwxr-xr-x 1 c 15632 Nov  6 17:37 snap
 
 ```

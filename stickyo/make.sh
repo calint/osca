@@ -16,9 +16,9 @@ CMD="$CC $SRC -o $BIN $CF $CW $(pkg-config --cflags --libs gtk4)"
 $CMD
 echo
 echo "            lines   words   chars"
-echo -n "   source:"
+printf "   source:"
 cat $SRC | wc
-echo -n "   zipped:"
+printf "   zipped:"
 cat $SRC | gzip | wc
 echo
 ls -o $BIN

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # change to directory of the script
@@ -25,9 +25,9 @@ CMD="$CC $SRC -o $BIN $CF $CW -I/usr/include/cairo/ -lX11 -lcairo"
 $CMD
 echo
 echo "            lines   words   chars"
-echo -n "   source:"
+printf "   source:"
 cat $SRC | wc
-echo -n "   zipped:"
+printf "   zipped:"
 cat $SRC | gzip | wc
 echo
 ls -o $BIN
