@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # change to directory of the script
-cd $(dirname "$0")
+cd "$(dirname "$0")"
 
 BIN=menuq
 SRC=src/menuq.c
@@ -17,7 +17,7 @@ INCLUDES="-I/usr/include/freetype2/"
 CMD="$CC $SRC -o $BIN $OPTS $CF $CW $LIBS $INCLUDES"
 $CMD
 echo
-echo    "            lines   words   chars"
+echo "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
 echo -n "   zipped:"

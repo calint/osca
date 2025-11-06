@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # change to directory of the script
-cd $(dirname "$0")
+cd "$(dirname "$0")"
 
 BIN=snap
 SRC=src/snap.c
@@ -24,7 +24,7 @@ CMD="$CC $SRC -o $BIN $CF $CW -I/usr/include/cairo/ -lX11 -lcairo"
 #echo $CMD
 $CMD
 echo
-echo    "            lines   words   chars"
+echo "            lines   words   chars"
 echo -n "   source:"
 cat $SRC | wc
 echo -n "   zipped:"
