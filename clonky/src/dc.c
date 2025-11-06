@@ -2,6 +2,7 @@
 // reviewed: 2025-02-24
 //
 #include "dc.h"
+#include "main-cfg.h"
 #include <X11/Xft/Xft.h>
 #include <fontconfig/fontconfig.h>
 #include <stdio.h>
@@ -71,8 +72,9 @@ struct dc {
     self->draw = XftDrawCreate(self->display, self->window,
                                DefaultVisual(self->display, self->screen),
                                self->color_map);
-    const XRenderColor xrendcolwhite = {0xffff, 0xffff, 0xffff, 0xffff};
-    self->render_color = xrendcolwhite;
+    const XRenderColor xrendcol = {TEXT_COLOR_R, TEXT_COLOR_G, TEXT_COLOR_B,
+                                   TEXT_COLOR_A};
+    self->render_color = xrendcol;
     XftColorAllocValue(self->display,
                        DefaultVisual(self->display, self->screen),
                        self->color_map, &self->render_color, &self->color);
@@ -87,14 +89,12 @@ void dc_del(/*takes*/ struct dc* self) {
 }
 
 void dc_clear(struct dc* self) {
-    XSetForeground(self->display, self->gc,
-                   BlackPixel(self->display, self->screen));
+    XSetForeground(self->display, self->gc, BACKGROUND_COLOR);
     XFillRectangle(
         self->display, self->window, self->gc, self->margin_left,
         self->margin_top, self->width,
         (uint32_t)((int32_t)self->display_height - self->margin_top));
-    XSetForeground(self->display, self->gc,
-                   WhitePixel(self->display, self->screen));
+    XSetForeground(self->display, self->gc, FOREGROUND_COLOR);
     self->current_y = self->margin_top;
     self->current_x = self->margin_left;
 }

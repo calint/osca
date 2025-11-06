@@ -14,6 +14,14 @@
 // width of clonky output
 #define WIDTH 250
 
+// colors
+#define FOREGROUND_COLOR 0xbbbbbb
+#define BACKGROUND_COLOR 0x000000
+#define TEXT_COLOR_R 0xbbbb
+#define TEXT_COLOR_G 0xbbbb
+#define TEXT_COLOR_B 0xbbbb
+#define TEXT_COLOR_A 0xffff
+
 // font name and size
 #define FONT_NAME "dejavu sans"
 #define FONT_SIZE 11.0
