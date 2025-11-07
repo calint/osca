@@ -77,12 +77,13 @@ sudo pacman -S powertop
 
 ### ASUS Zenbook 14 UM3406KA-PP761WA
 
+- at reboot `F2` for BIOS, `Esc` for boot menu
+- disable "secure boot" in bios to boot archlinux iso
+- if `clonky` hangs make sure `bluetooth` service is enabled and command
+  `bluetoothctl devices Connected` works
 - if experiencing lag on input to `xterm`, or lag in `clonky` or other X11
   applications, then add kernel parameter `amdgpu.dcdebugmask=0x10` in boot loader
   entry. **note: `kitty` does not exhibit this problem, running lts kernel also
   fixes it**
-- if `clonky` hangs make sure `bluetooth` service is enabled and command
-  `bluetoothctl devices Connected` works
-- at reboot `F2` for BIOS, `Esc` for boot menu
 - in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
   `STOP_CHARGE_TRESH_BAT0=80` for better long term battery health
