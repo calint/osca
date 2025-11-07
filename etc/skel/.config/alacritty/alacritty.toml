@@ -1,12 +1,12 @@
 [font]
-size = 6.20
+size = 6.1
 
 [font.normal]
 family = "JetBrains Mono Nerd Font"
 
 [font.offset]
 x = 0
-y = 6
+y = 7
 
 [colors.primary]
 background = "0x000000" 
