@@ -2,11 +2,11 @@
 
 ## installation
 
-* connect wifi using `https://wiki.archlinux.org/title/Iwd`
-* `archinstall` using profile `Xorg` with `pipewire` sound
-* run `install-step-1.sh`
-* run `install-step-2.sh`
-* install `yay`:
+- connect wifi using `https://wiki.archlinux.org/title/Iwd`
+- `archinstall` using profile `Xorg` with `pipewire` sound
+- run `install-step-1.sh`
+- run `install-step-2.sh`
+- install `yay`:
 
 ```sh
 git clone https://aur.archlinux.org/yay.git
@@ -15,17 +15,17 @@ makepkg -si
 yay --version
 ```
 
-* install brave browser: `yay -S brave-bin`
-* logout login
-* run: `start-frameless`
-* to configure touchpad see `config-touchpad.sh` or:
-  * open terminal: `Super + c`
-  * `xinput` to find touchpad, `xinput list-props x` to find properties:
-    * "Tapping Enabled"
-    * "Natural Scrolling Enabled"
-  * `xinput set-prop x y 1`
-      save in script and run at login
-  * example for HP Stream Notebook PC 11:
+- install brave browser: `yay -S brave-bin`
+- logout login
+- run: `start-frameless`
+- to configure touchpad see `config-touchpad.sh` or:
+  - open terminal: `Super + c`
+  - `xinput` to find touchpad, `xinput list-props x` to find properties:
+    - "Tapping Enabled"
+    - "Natural Scrolling Enabled"
+  - `xinput set-prop x y 1`
+    save in script and run at login
+  - example for HP Stream Notebook PC 11:
 
     ```sh
     #/bin/sh
@@ -59,7 +59,7 @@ bluetoothctl
 
 ## on laptop
 
-* install power saving service
+- install power saving service
 
 ```sh
 sudo pacman -S tlp
@@ -67,7 +67,7 @@ sudo systemctl enable tlp
 sudo systemctl start tlp
 ```
 
-* install `powertop` for overview of power consumption
+- install `powertop` for overview of power consumption
 
 ```sh
 sudo pacman -S powertop
@@ -77,14 +77,12 @@ sudo pacman -S powertop
 
 ### ASUS Zenbook 14 UM3406KA-PP761WA
 
-* if experiencing lag on input to `xterm`, or lag in `clonky` or other X11
-applications, then add kernel parameter `amdgpu.dcdebugmask=0x10` in boot loader
-entry. __note: `kitty` does not exhibit this problem, running lts kernel also
-fixes it__
-* if `clonky` hangs make sure `bluetooth` service is enabled and command
-`bluetoothctl devices Connected` works
-* closing and opening the lid drops the touchpad configuration, use
-`config-touchpad.sh` to restore it
-* at reboot `F2` for BIOS, `Esc` for boot menu
-* in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
-`STOP_CHARGE_TRESH_BAT0=80` for better long term battery health
+- if experiencing lag on input to `xterm`, or lag in `clonky` or other X11
+  applications, then add kernel parameter `amdgpu.dcdebugmask=0x10` in boot loader
+  entry. **note: `kitty` does not exhibit this problem, running lts kernel also
+  fixes it**
+- if `clonky` hangs make sure `bluetooth` service is enabled and command
+  `bluetoothctl devices Connected` works
+- at reboot `F2` for BIOS, `Esc` for boot menu
+- in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
+  `STOP_CHARGE_TRESH_BAT0=80` for better long term battery health
