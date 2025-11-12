@@ -10,7 +10,11 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
+# prompt
 export PS1=" :: "
+
+# displays colored output
+export LESS='-R'
 
 # launch frameleses window manager
 alias start-frameless='exec xinit -- -nolisten tcp vt$XDG_VTNR'
