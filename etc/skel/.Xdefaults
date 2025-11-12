@@ -1,7 +1,10 @@
-# set backspace in xterm to ^? instead of ^H
+# backspace to ^? instead of ^H
 XTerm.vt100.backarrowKey: false
 XTerm.vt100.ttyModes: erase ^?
-# default font
+# colors
+XTerm.vt100.background: black
+XTerm.vt100.foreground: grey
+# font
 XTerm.vt100.faceName: JetBrains Mono Nerd Font
 XTerm.vt100.faceSize: 15
 XTerm.vt100.scaleHeight: 1.3
