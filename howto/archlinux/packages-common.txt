@@ -1,5 +1,6 @@
 7zip
 acpi
+alacritty
 alsa-utils
 base
 base-devel
