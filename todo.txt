@@ -1,4 +1,6 @@
-[ ] clonky: threads throttle display based on lines instead of text with percents
+[ ] clonky: separate config files that depend on screen resolutions from common
+    settings
+[x] clonky: threads throttle display based on lines instead of text with percents
 [ ] frameless: gracious handle of max windows reached
 [ ] frameless: dynamic allocation of more xwins
 [ ] clonky: correct rounding at divisions
