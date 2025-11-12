@@ -8,6 +8,13 @@ XTerm.vt100.foreground: grey
 XTerm.vt100.faceName: JetBrains Mono Nerd Font
 XTerm.vt100.faceSize: 16
 XTerm.vt100.scaleHeight: 1.2
+! don’t scroll when new output arrives if user scrolled up
+XTerm.vt100.scrollTtyOutput: false
+XTerm.vt100.autoScrollLock: true
+! jump to bottom of buffer if user makes input
+XTerm.vt100.scrollKey: true
+! history buffer
+XTerm.vt100.saveLines: 10000
 ! keybindings
 XTerm.vt100.translations: #override \n\
     Ctrl <Key> -: smaller-vt-font() \n\
