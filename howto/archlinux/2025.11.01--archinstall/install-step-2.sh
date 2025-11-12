@@ -9,7 +9,6 @@ sudo pacman --needed -S xterm xorg-xsetroot xorg-xinput libxft thunar tumbler \
 cd ~/w/osca
 ./init-user-home.sh
 ./make-all.sh
-
 sudo systemctl enable bluetooth
 sudo systemctl start bluetooth
 sudo systemctl enable tlp
