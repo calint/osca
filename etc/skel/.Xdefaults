@@ -6,8 +6,8 @@ XTerm.vt100.background: black
 XTerm.vt100.foreground: grey
 # font
 XTerm.vt100.faceName: JetBrains Mono Nerd Font
-XTerm.vt100.faceSize: 15.5
-XTerm.vt100.scaleHeight: 1.3
+XTerm.vt100.faceSize: 16
+XTerm.vt100.scaleHeight: 1.2
 # keybindings
 XTerm.vt100.translations: #override \n\
     Ctrl <Key> -: smaller-vt-font() \n\
