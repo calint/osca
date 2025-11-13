@@ -44,7 +44,7 @@ sudo systemctl start bluetooth
 
 from `https://wiki.archlinux.org/title/Bluetooth_headset`
 
-```
+```sh
 bluetoothctl
 [bluetooth]# power on
 [bluetooth]# agent on
