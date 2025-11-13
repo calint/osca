@@ -30,6 +30,8 @@ alias lt='ls --color -lAtF'
 alias p='cat'
 # ps in 2-columns, id and name
 alias psa=$'ps ax|awk \'{print $1 "\t" $5}\''
+
+# archlinux package management
 # install package
 alias pki='sudo pacman -S'
 # list installed packages
@@ -46,6 +48,7 @@ alias pkf='pacman -Ql'
 alias pkfq='pacman -F'
 # updates the database of mapping file to package
 alias pkfu='sudo pacman -Fy'
+
 # git add, commit, push
 alias gcp='git add . && git commit -m "." && git push'
 # git tag, push

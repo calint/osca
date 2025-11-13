@@ -6,7 +6,7 @@
 	<submenu></submenu>
 	<unique-id>1734191813447754-1</unique-id>
 	<command>osca-console --working-directory %f</command>
-	<description></description>
+	<description>Open terminal here</description>
 	<range></range>
 	<patterns>*</patterns>
 	<startup-notify/>
