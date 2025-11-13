@@ -1,6 +1,5 @@
 7zip
 acpi
-alacritty
 alsa-utils
 base
 base-devel
@@ -46,7 +45,6 @@ iverilog
 iw
 iwd
 jq
-kitty
 lazygit
 lcov
 less
