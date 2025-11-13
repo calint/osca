@@ -5,5 +5,8 @@ image/gif=feh.desktop;
 video/3gpp=mpv.desktop
 audio/basic=mpv.desktop
 audio/midi=mpv.desktop
-text/plain=org.xfce.mousepad.desktop
+text/plain=nvim.desktop
 application/zip=thunar.desktop
+
+[Added Associations]
+text/plain=nvim.desktop;
