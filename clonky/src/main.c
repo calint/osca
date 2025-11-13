@@ -1005,7 +1005,10 @@ static void render(void) {
 }
 
 static void signal_exit(int i) {
-    dc_del(/*gives*/ dc);
+    if (dc) {
+        dc_del(/*gives*/ dc);
+        dc = NULL;
+    }
     if (graph_cpu) {
         graph_del(/*gives*/ graph_cpu);
         graph_cpu = NULL;
