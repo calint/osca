@@ -1008,12 +1008,15 @@ static void signal_exit(int i) {
     dc_del(/*gives*/ dc);
     if (graph_cpu) {
         graph_del(/*gives*/ graph_cpu);
+        graph_cpu = NULL;
     }
     if (graph_mem) {
         graph_del(/*gives*/ graph_mem);
+        graph_mem = NULL;
     }
     if (graph_net) {
         graphd_del(/*gives*/ graph_net);
+        graph_net = NULL;
     }
     exit(i);
 }
