@@ -63,7 +63,6 @@ man-pages
 mariadb
 memtest86+-efi
 mesa-utils
-mousepad
 mpv
 nano
 nasm
