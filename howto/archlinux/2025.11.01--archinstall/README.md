@@ -85,6 +85,5 @@ sudo pacman -S powertop
   applications, then add kernel parameter `amdgpu.dcdebugmask=0x10` in boot
   loader entry. **note: `kitty` does not exhibit this problem, running lts
   kernel also fixes it**
-  - note: fixed in Linux 6.17.7-arch1-2
 - in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
   `STOP_CHARGE_TRESH_BAT0=80` for better long term battery health
