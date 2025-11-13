@@ -10,11 +10,11 @@
   <property name="last-statusbar-visible" type="bool" value="false"/>
   <property name="last-location-bar" type="string" value="void"/>
   <property name="last-menubar-visible" type="bool" value="false"/>
-  <property name="last-window-width" type="int" value="866"/>
-  <property name="last-window-height" type="int" value="768"/>
+  <property name="last-window-width" type="int" value="968"/>
+  <property name="last-window-height" type="int" value="586"/>
   <property name="last-window-maximized" type="bool" value="false"/>
-  <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_150_PERCENT"/>
-  <property name="last-details-view-column-widths" type="string" value="50,50,131,50,50,97,50,50,526,50,50,79,50,99"/>
+  <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_38_PERCENT"/>
+  <property name="last-details-view-column-widths" type="string" value="50,50,131,50,50,97,50,50,708,50,50,62,50,67"/>
   <property name="last-show-hidden" type="bool" value="false"/>
   <property name="last-details-view-visible-columns" type="string" value="THUNAR_COLUMN_DATE_MODIFIED,THUNAR_COLUMN_NAME,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_TYPE"/>
   <property name="last-sort-column" type="string" value="THUNAR_COLUMN_NAME"/>
