@@ -672,6 +672,8 @@ int main(int argc, char** args, char** env) {
                         None);
             XSelectInput(display, xw->win, EnterWindowMask);
             ignore_enter_notify_started_at_us = current_time_us();
+            // note: ignore focus change requests to maintain focus on current
+            //       window
             break;
         }
         //----------------------------------------------------------------------

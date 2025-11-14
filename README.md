@@ -36,37 +36,37 @@ contains:
 ```
 
             lines   words   chars
-   source:    956    2955   33016
-   zipped:     25     166    6912
+   source:    958    2970   33136
+   zipped:     20     146    6914
 
--rwxr-xr-x 1 c 21544 Nov 14 07:57 frameless
+-rwxr-xr-x 1 c 21544 Nov 14 08:46 frameless
 
 
             lines   words   chars
    source:   1465    4692   43774
    zipped:     42     247    9752
 
--rwxr-xr-x 1 c 37128 Nov 14 07:57 clonky
+-rwxr-xr-x 1 c 37128 Nov 14 08:47 clonky
 
 
             lines   words   chars
    source:    215     751    7513
    zipped:      5      51    2326
 
--rwxr-xr-x 1 c 16440 Nov 14 07:57 menuq
+-rwxr-xr-x 1 c 16440 Nov 14 08:47 menuq
 
 
             lines   words   chars
    source:     58     121    1991
    zipped:      4      16     816
 
--rwxr-xr-x 1 c 16552 Nov 14 07:57 stickyo
+-rwxr-xr-x 1 c 16552 Nov 14 08:47 stickyo
 
 
             lines   words   chars
    source:     21      60     621
    zipped:      1       4     327
 
--rwxr-xr-x 1 c 15632 Nov 14 07:57 snap
+-rwxr-xr-x 1 c 15632 Nov 14 08:47 snap
 
 ```
