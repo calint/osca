@@ -147,7 +147,7 @@ static Display* display;
 static Window root_window;
 static int current_desk;
 static xwin* focused_window;
-static suseconds_t time_of_last_map_notify_us;
+static suseconds_t ignore_enter_notify_started_at_us;
 
 static Bool is_switching_desktop;
 // True while switching desktop, False after any key release
@@ -290,7 +290,7 @@ static void xwin_toggle_fullscreen(xwin* this) {
         this->hi = screen.hi;
         this->bits |= XWIN_BITS_FULL_SCREEN;
     }
-    time_of_last_map_notify_us = current_time_us();
+    ignore_enter_notify_started_at_us = current_time_us();
     // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
@@ -307,7 +307,7 @@ static void xwin_toggle_fullheight(xwin* this) {
         this->hi = screen.hi;
     }
     this->bits ^= XWIN_BIT_FULL_HEIGHT;
-    time_of_last_map_notify_us = current_time_us();
+    ignore_enter_notify_started_at_us = current_time_us();
     // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
@@ -324,7 +324,7 @@ static void xwin_toggle_fullwidth(xwin* this) {
         this->wi = screen.wi;
     }
     this->bits ^= XWIN_BIT_FULL_WIDTH;
-    time_of_last_map_notify_us = current_time_us();
+    ignore_enter_notify_started_at_us = current_time_us();
     // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
@@ -671,7 +671,7 @@ int main(int argc, char** args, char** env) {
                         ButtonPressMask, GrabModeAsync, GrabModeAsync, None,
                         None);
             XSelectInput(display, xw->win, EnterWindowMask);
-            time_of_last_map_notify_us = current_time_us();
+            ignore_enter_notify_started_at_us = current_time_us();
             break;
         }
         //----------------------------------------------------------------------
@@ -686,7 +686,7 @@ int main(int argc, char** args, char** env) {
         //----------------------------------------------------------------------
         case EnterNotify: {
             if (is_dragging || is_switching_desktop ||
-                current_time_us() - time_of_last_map_notify_us <
+                current_time_us() - ignore_enter_notify_started_at_us <
                     IGNORED_ENTER_AFTER_MAP_TIME_US) {
                 // * if dragging then it is resizing, don't change focus
                 // * if switching desktop, don't focus on the window that is
