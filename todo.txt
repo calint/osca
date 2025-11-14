@@ -1,3 +1,5 @@
+[ ] frameless: when a window is de-maximized ignore focus switch to keep
+    current window in focus
 [ ] clonky: separate config files that depend on screen resolutions from common
     settings
 [x] clonky: threads throttle display based on lines instead of text with percents
