@@ -698,10 +698,10 @@ int main(int argc, char** args, char** env) {
                 //   IGNORED_ENTER_NOTIFY_TIME_US since it might lose focus
                 //   from the newly launched application
                 //   detail: a newly mapped window is at 0,0 and moved to center
-                //   of screen and focused. if the move leaves the pointer on
-                //   some other window then that window receives focus. this
-                //   somewhat hacky way of avoiding that is good enough compared
-                //   to the complications.
+                //   of screen and focused; if the move leaves the pointer on
+                //   another window then that window receives focus; this
+                //   somewhat hacky way of avoiding that is better compared to
+                //   the complications using a different method
 #ifdef FRAMELESS_DEBUG
                 fprintf(flog, "  ignored\n");
                 fflush(flog);
