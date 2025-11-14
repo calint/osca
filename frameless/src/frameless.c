@@ -290,6 +290,8 @@ static void xwin_toggle_fullscreen(xwin* this) {
         this->hi = screen.hi;
         this->bits |= XWIN_BITS_FULL_SCREEN;
     }
+    time_of_last_map_notify_us = current_time_us();
+    // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
 
@@ -305,6 +307,8 @@ static void xwin_toggle_fullheight(xwin* this) {
         this->hi = screen.hi;
     }
     this->bits ^= XWIN_BIT_FULL_HEIGHT;
+    time_of_last_map_notify_us = current_time_us();
+    // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
 
@@ -320,6 +324,8 @@ static void xwin_toggle_fullwidth(xwin* this) {
         this->wi = screen.wi;
     }
     this->bits ^= XWIN_BIT_FULL_WIDTH;
+    time_of_last_map_notify_us = current_time_us();
+    // note: ignore focus change requests to maintain focus on current window
     xwin_set_geom(this);
 }
 
