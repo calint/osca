@@ -695,7 +695,7 @@ int main(int argc, char** args, char** env) {
                 // * if toggled un-maximized ignore focus change since the
                 //   pointer might be over another window
                 // * when launching a new window ignore the event for
-                //   IGNORED_ENTER_AFTER_MAP_TIME_MS since it might lose focus
+                //   IGNORED_ENTER_NOTIFY_TIME_US since it might lose focus
                 //   from the newly launched application
                 //   detail: a newly mapped window is at 0,0 and moved to center
                 //   of screen and focused. if the move leaves the pointer on
