@@ -110,7 +110,7 @@ static FILE* flog;
 #define KEY_DESKTOP_2 45        // k
 #define KEY_DESKTOP_3 46        // l
 
-#define IGNORED_ENTER_AFTER_MAP_TIME_US 500000
+#define IGNORED_ENTER_NOTIFY_TIME_US 500000
 // time to ignore enter notifies after a map notify
 // note: solves the problem with newly launched applications losing focus
 
@@ -687,7 +687,7 @@ int main(int argc, char** args, char** env) {
         case EnterNotify: {
             if (is_dragging || is_switching_desktop ||
                 current_time_us() - ignore_enter_notify_started_at_us <
-                    IGNORED_ENTER_AFTER_MAP_TIME_US) {
+                    IGNORED_ENTER_NOTIFY_TIME_US) {
                 // * if dragging then it is resizing, don't change focus
                 // * if switching desktop, don't focus on the window that is
                 //   under the pointer; focus on previously focused window on
