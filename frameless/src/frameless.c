@@ -692,13 +692,16 @@ int main(int argc, char** args, char** env) {
                 // * if switching desktop, don't focus on the window that is
                 //   under the pointer; focus on previously focused window on
                 //   that desktop
+                // * if toggled un-maximized ignore focus change since the
+                //   pointer might be over another window
                 // * when launching a new window ignore the event for
                 //   IGNORED_ENTER_AFTER_MAP_TIME_MS since it might lose focus
-                //   from the newly launched application detail: a newly mapped
-                //   window is at 0,0 and moved to center of screen and focused.
-                //   if the move leaves the pointer on some other window then
-                //   that window receives focus. this somewhat hacky way of
-                //   avoiding that is good enough compared to the complications.
+                //   from the newly launched application
+                //   detail: a newly mapped window is at 0,0 and moved to center
+                //   of screen and focused. if the move leaves the pointer on
+                //   some other window then that window receives focus. this
+                //   somewhat hacky way of avoiding that is good enough compared
+                //   to the complications.
 #ifdef FRAMELESS_DEBUG
                 fprintf(flog, "  ignored\n");
                 fflush(flog);
