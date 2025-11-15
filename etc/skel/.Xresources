@@ -10,6 +10,7 @@ XTerm*faceSize: 16
 XTerm*scaleHeight: 1.2
 ! don’t scroll when new output arrives if user scrolled up
 XTerm*scrollTtyOutput: false
+XTerm*autoScrollLock: true
 ! jump to bottom of buffer if user makes input
 XTerm*scrollKey: true
 ! history buffer
