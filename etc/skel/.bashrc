@@ -16,6 +16,9 @@ export PS1=" :: "
 # displays colored output
 export LESS='-R'
 
+# scale Qt UI for high resolution screens
+export QT_SCALE_FACTOR=1.25
+
 # launch frameleses window manager
 alias start-frameless='exec xinit -- -nolisten tcp vt$XDG_VTNR'
 # find
