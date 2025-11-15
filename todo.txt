@@ -1,3 +1,4 @@
+[ ] frameless: key + 9 put window at top of screen
 [x] frameless: when a window is de-maximized ignore focus switch to keep
     current window in focus
 [ ] clonky: separate config files that depend on screen resolutions from common
