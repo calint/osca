@@ -17,8 +17,8 @@ XTerm*scrollKey: true
 XTerm*saveLines: 10000
 ! keybindings
 XTerm.vt100.translations: #override \n\
-    Ctrl <Key> -: smaller-vt-font() \n\
-    Ctrl <Key> +: larger-vt-font() \n\
+    Ctrl <Key> minus: smaller-vt-font() \n\
+    Ctrl <Key> plus: larger-vt-font() \n\
     Ctrl <Key> 0: set-vt-font(d) \n\
     Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
     Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
