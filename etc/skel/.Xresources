@@ -16,7 +16,7 @@ XTerm*scrollKey: true
 ! history buffer
 XTerm*saveLines: 10000
 ! keybindings
-XTerm*translations: #override \n\
+XTerm.vt100.translations: #override \n\
     Ctrl <Key> -: smaller-vt-font() \n\
     Ctrl <Key> +: larger-vt-font() \n\
     Ctrl <Key> 0: set-vt-font(d) \n\
