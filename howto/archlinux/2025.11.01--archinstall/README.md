@@ -59,7 +59,7 @@ bluetoothctl
 
 ## on laptop
 
-- install power saving service
+- install `tlp` for power saving service
 
 ```sh
 sudo pacman -S tlp
@@ -71,6 +71,14 @@ sudo systemctl start tlp
 
 ```sh
 sudo pacman -S powertop
+```
+
+- install `upower` for clean shutdown when battery is at critical level
+
+```sh
+sudo pacman -S upower
+sudo systemctl enable upower
+sudo systemctl start upower
 ```
 
 ## troubleshooting
