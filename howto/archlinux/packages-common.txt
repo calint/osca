@@ -112,6 +112,7 @@ ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
 tumbler
 unzip
+upower
 valgrind
 verible-bin
 visual-studio-code-bin
