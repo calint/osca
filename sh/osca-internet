@@ -1,2 +1,2 @@
 #!/bin/sh
-brave &
+brave --force-device-scale-factor=1.5 %U &
