@@ -7,6 +7,9 @@ audio/basic=mpv.desktop
 audio/midi=mpv.desktop
 text/plain=nvim.desktop
 application/zip=thunar.desktop
+application/x-zerosize=nvim.desktop
 
 [Added Associations]
 text/plain=nvim.desktop;
+application/x-tiled-tmx=nvim.desktop;
+application/x-zerosize=nvim.desktop;

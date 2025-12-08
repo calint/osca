@@ -483,6 +483,7 @@ static void focus_next_window(void) {
 
 static void focus_previous_window(void) {
     int i0 = xwin_ix(focused_window);
+    // note: 'i0' might be -1
     int i = i0;
     while (--i >= 0) {
         if (focus_window_by_index_try((unsigned)i)) {
@@ -492,6 +493,9 @@ static void focus_previous_window(void) {
     i = WIN_MAX_COUNT;
     // '>= i0' not '> i0' to focus on same window if no other window
     // available
+    if (i0 < 0) {
+        i0 = 0;
+    }
     while (--i >= i0) {
         if (focus_window_by_index_try((unsigned)i)) {
             return;
