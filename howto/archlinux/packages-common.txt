@@ -12,6 +12,7 @@ bluez-utils
 brave-bin
 brightnessctl
 calibre
+cc65
 chromium
 clang
 cloc
@@ -28,6 +29,7 @@ fd
 feh
 ffmpegthumbnailer
 fzf
+gdb
 gimp
 git
 glm
@@ -115,6 +117,7 @@ unzip
 upower
 valgrind
 verible-bin
+vice
 visual-studio-code-bin
 wireplumber
 wrk
