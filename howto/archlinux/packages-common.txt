@@ -28,6 +28,7 @@ exfat-utils
 fd
 feh
 ffmpegthumbnailer
+fuse-emulator
 fzf
 gdb
 gimp
@@ -74,6 +75,7 @@ npm
 obsidian
 openfpgaloader
 pacman-contrib
+pasmo
 pavucontrol
 perf
 pipewire
