@@ -10,7 +10,6 @@ opt.colorcolumn = "81,101,121" -- delimiter at columns
 opt.tabstop = 4 -- number of spaces for tab
 opt.shiftwidth = 4 -- size of indent
 opt.scrolloff = 100 -- keeps window vertically centered
-
 vim.filetype.add({
   extension = {
     baz = "baz",

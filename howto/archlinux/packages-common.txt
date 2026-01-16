@@ -99,6 +99,7 @@ scid
 scrot
 sdl2_image
 sdl2_ttf
+sjasmplus-z00m128
 sof-firmware
 speedtest-cli
 sysstat
