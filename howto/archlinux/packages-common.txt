@@ -35,6 +35,7 @@ gimp
 git
 glm
 gmtp
+gnu-efi
 gnu-netcat
 gst-plugin-pipewire
 gtk4
@@ -60,6 +61,7 @@ libxft
 linux
 linux-firmware
 linux-lts
+lld
 llvm
 man-db
 man-pages
@@ -67,6 +69,7 @@ mariadb
 memtest86+-efi
 mesa-utils
 mpv
+mtools
 nano
 nasm
 ncurses5-compat-libs
