@@ -10,9 +10,6 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
-# start dbus and execute the output
-eval "$(dbus-launch --sh-syntax --exit-with-session)"
-
 # load default settings
 xrdb -load ~/.Xresources
 
