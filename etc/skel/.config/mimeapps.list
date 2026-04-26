@@ -13,3 +13,4 @@ application/x-zerosize=nvim.desktop
 text/plain=nvim.desktop;
 application/x-tiled-tmx=nvim.desktop;
 application/x-zerosize=nvim.desktop;
+application/vnd.chess-pgn=nvim.desktop;
