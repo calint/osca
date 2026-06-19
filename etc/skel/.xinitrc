@@ -10,7 +10,7 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
-# enables file upload in brave
+# enables file download in brave
 dbus-update-activation-environment --systemd DISPLAY XAUTHORITY
 
 # load default settings
