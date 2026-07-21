@@ -95,3 +95,5 @@ sudo systemctl start upower
   kernel also fixes it**
 - in `/etc/tlp.conf` uncomment `START_CHARGE_THRESH_BAT0=75` and
   `STOP_CHARGE_TRESH_BAT0=80` for better long term battery health
+- some package updates of archlinux resets touchpad and keyboard configuration.
+  Re-run `config-touchpad.sh` and `setxkbmap` setting from `.xinitrc`  
