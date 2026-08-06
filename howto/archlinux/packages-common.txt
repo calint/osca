@@ -17,6 +17,7 @@ chromium
 clang
 cloc
 cmake
+code
 cool-retro-term
 cppcheck
 cutecom
@@ -102,9 +103,13 @@ scid
 scrot
 sdl2_image
 sdl2_ttf
+sdl3_image
+sdl3_ttf
 sjasmplus-z00m128
+socat
 sof-firmware
 speedtest-cli
+stockfish
 sysstat
 tcl
 thunar
@@ -113,6 +118,7 @@ tinyxxd
 tk
 tldr
 tlp
+trash-cli
 tree
 tree-sitter-cli
 ttf-dejavu
@@ -124,7 +130,6 @@ upower
 valgrind
 verible-bin
 vice
-visual-studio-code-bin
 wireplumber
 wrk
 xclip
