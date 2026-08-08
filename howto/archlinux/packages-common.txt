@@ -86,10 +86,12 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+platformio-core
 plocate
 poppler-glib
 powertop
 putty
+python-intelhex
 python-pip
 python-websockets
 qemu-system-x86
