@@ -130,7 +130,6 @@ tumbler
 unzip
 upower
 valgrind
-verible-bin
 vice
 wireplumber
 wrk
