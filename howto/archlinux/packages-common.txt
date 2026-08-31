@@ -82,11 +82,13 @@ pacman-contrib
 pasmo
 pavucontrol
 perf
+picocom
 pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
 platformio-core
+platformio-core-udev
 plocate
 poppler-glib
 powertop
