@@ -878,9 +878,11 @@ static void render_acpi(void) {
 static void render_bluetooth_connected_devices(void) {
     FILE* file =
         popen("echo devices Connected | bluetoothctl | grep ^Device", "r");
+
     if (!file) {
         return;
     }
+
     char device_name[128] = "  ";
     uint32_t counter = RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT;
     while (counter--) {
@@ -900,18 +902,20 @@ static void render_bluetooth_connected_devices(void) {
 }
 
 static void render_syslog(void) {
-    FILE* file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
+    FILE* const file = popen("journalctl -b -p6 -o cat -n 15 --no-pager", "r");
     if (!file) {
         return;
     }
+
+    char buf[512];
     uint32_t counter = RENDER_SYSLOG_MAX_LINE_COUNT;
-    while (counter--) {
-        char buf[512] = "";
-        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-            break;
-        }
+
+    while (counter > 0 && fgets(buf, sizeof(buf), file)) {
+        buf[strcspn(buf, "\n")] = '\0';
         pl(buf);
+        --counter;
     }
+
     pclose(file);
 }
 
@@ -939,28 +943,31 @@ static void render_upower(void) {
     //  model:                TEKSIDE
     //    percentage:          90%
     // ::
-
-    FILE* file = popen("upower -e |  grep 'dev_' | xargs -I {} upower -i {} | "
-                       "grep -E \"model|percentage\" ",
+    FILE* file = popen("upower -e | grep 'dev_' | xargs -I {} upower -i {} | "
+                       "grep -E \"model|percentage\"",
                        "r");
-
     if (!file) {
         return;
     }
 
-    pl("upower:");
+    char buf[128] = "  ";
+    uint32_t counter = RENDER_UPOWER_DEVICES_COUNT;
 
-    char buf[512] = "  ";
-    uint32_t counter = 11;
-    while (counter--) {
-        if (fscanf(file, "%509[^\n]%*c", buf + 2) == EOF) {
-            // note: 509 for remaining buffer and +2 to not overwrite the spaces
-            break;
+    while (counter > 0 && fgets(buf + 2, sizeof(buf) - 2, file)) {
+        if (counter == RENDER_UPOWER_DEVICES_COUNT) {
+            render_hr();
+            pl("upower:");
         }
+
+        // Strip trailing newline if present
+        buf[strcspn(buf, "\n")] = '\0';
+
         str_compact_spaces(buf + 2);
-        // note: see above
         pl(buf);
+
+        --counter;
     }
+
     pclose(file);
 }
 
@@ -1021,7 +1028,6 @@ static void render(void) {
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();
-    render_hr();
     render_upower();
     render_hr();
     render_threads_throttle_visual();

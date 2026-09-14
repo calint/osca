@@ -48,6 +48,9 @@
 // max number of connected bluetooth devices shown
 #define RENDER_BLUETOOTH_CONNECTED_DEVICES_COUNT 8
 
+// max number of upower devices rendered
+#define RENDER_UPOWER_DEVICES_COUNT 16
+
 // max number of lines read in 'render_syslog'
 #define RENDER_SYSLOG_MAX_LINE_COUNT 15
 
