@@ -934,12 +934,10 @@ static void render_top_10_processes(void) {
 }
 
 static void render_upower(void) {
-    // :: upower -e | xargs -I {} upower -i {} | grep -E "model|percentage"
-    //  model:                ASUS Battery
-    //    percentage:          79%
+    // :: upower -e | grep 'dev_' | xargs -I {} upower -i {} | grep -E
+    // "model|percentage"
     //  model:                TEKSIDE
     //    percentage:          90%
-    //    percentage:          79%
     // ::
 
     FILE* file = popen("upower -e |  grep 'dev_' | xargs -I {} upower -i {} | "
