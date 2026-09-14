@@ -948,7 +948,7 @@ static void render_upower(void) {
         return;
     }
 
-    pl("batteries:");
+    pl("upower:");
 
     char buf[512];
     uint32_t counter = 11;
@@ -956,6 +956,7 @@ static void render_upower(void) {
         if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
             break;
         }
+        str_compact_spaces(buf);
         pl(buf);
     }
     pclose(file);
