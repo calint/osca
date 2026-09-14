@@ -950,13 +950,15 @@ static void render_upower(void) {
 
     pl("upower:");
 
-    char buf[512];
+    char buf[512] = "  ";
     uint32_t counter = 11;
     while (counter--) {
-        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+        if (fscanf(file, "%509[^\n]%*c", buf + 2) == EOF) {
+            // note: 509 for remaining buffer and +2 to not overwrite the spaces
             break;
         }
-        str_compact_spaces(buf);
+        str_compact_spaces(buf + 2);
+        // note: see above
         pl(buf);
     }
     pclose(file);
