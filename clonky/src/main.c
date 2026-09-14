@@ -915,6 +915,54 @@ static void render_syslog(void) {
     pclose(file);
 }
 
+static void render_top_10_processes(void) {
+    FILE* file = popen(
+        "ps -eo %cpu,%mem,comm --sort=-%cpu | awk '!a[$3]++' | head -n 11",
+        "r");
+    if (!file) {
+        return;
+    }
+    char buf[512];
+    uint32_t counter = 11;
+    while (counter--) {
+        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+            break;
+        }
+        pl(buf);
+    }
+    pclose(file);
+}
+
+static void render_upower(void) {
+    // :: upower -e | xargs -I {} upower -i {} | grep -E "model|percentage"
+    //  model:                ASUS Battery
+    //    percentage:          79%
+    //  model:                TEKSIDE
+    //    percentage:          90%
+    //    percentage:          79%
+    // ::
+
+    FILE* file = popen("upower -e |  grep 'dev_' | xargs -I {} upower -i {} | "
+                       "grep -E \"model|percentage\" ",
+                       "r");
+
+    if (!file) {
+        return;
+    }
+
+    pl("batteries:");
+
+    char buf[512];
+    uint32_t counter = 11;
+    while (counter--) {
+        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
+            break;
+        }
+        pl(buf);
+    }
+    pclose(file);
+}
+
 static void render_cheetsheet(void) {
     static char* keysheet[] = {"ĸey",
                                "+c               console",
@@ -957,24 +1005,6 @@ static void render_cheetsheet(void) {
     }
 }
 
-static void render_top_10_processes(void) {
-    FILE* file = popen(
-        "ps -eo %cpu,%mem,comm --sort=-%cpu | awk '!a[$3]++' | head -n 11",
-        "r");
-    if (!file) {
-        return;
-    }
-    char buf[512];
-    uint32_t counter = 11;
-    while (counter--) {
-        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-            break;
-        }
-        pl(buf);
-    }
-    pclose(file);
-}
-
 static void render(void) {
     dc_clear(dc);
     render_date_time();
@@ -990,6 +1020,8 @@ static void render(void) {
     render_battery();
     render_acpi();
     render_bluetooth_connected_devices();
+    render_hr();
+    render_upower();
     render_hr();
     render_threads_throttle_visual();
     // render_threads_throttle();
