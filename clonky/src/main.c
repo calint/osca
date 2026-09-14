@@ -664,26 +664,28 @@ static void render_io_stat(void) {
 }
 
 static void render_df(void) {
-    FILE* file = popen("df -h", "r");
-    if (!file) {
-        return;
-    }
     //  Filesystem      Size  Used Avail Use% Mounted on
     //  tmpfs           1,6G  2,3M  1,6G   1% /run
     //  /dev/nvme0n1p6  235G  166G   57G  75% /
+    FILE* const file = popen("df -h", "r");
+    if (!file) {
+        return;
+    }
 
-    char buf[256] = "";
+    char buf[256];
     uint32_t counter = RENDER_DF_MAX_LINE_COUNT;
-    while (counter--) {
-        if (fscanf(file, "%255[^\n]%*c", buf) == EOF) {
-            break;
-        }
+
+    while (counter > 0 && fgets(buf, sizeof(buf), file)) {
         if (buf[0] != '/') {
             continue;
         }
+
+        buf[strcspn(buf, "\n")] = '\0';
         str_compact_spaces(buf);
         pl(buf);
+        --counter;
     }
+
     pclose(file);
 }
 
@@ -859,19 +861,21 @@ static void render_battery(void) {
 }
 
 static void render_acpi(void) {
-    FILE* file = popen("acpi -at", "r");
+    FILE* const file = popen("acpi -at", "r");
     if (!file) {
         return;
     }
+
+    char buf[512];
     uint32_t counter = RENDER_ACPI_MAX_LINE_COUNT;
-    while (counter--) {
-        char buf[512] = "";
-        if (fscanf(file, "%511[^\n]%*c", buf) == EOF) {
-            break;
-        }
+
+    while (counter > 0 && fgets(buf, sizeof(buf), file)) {
+        buf[strcspn(buf, "\n")] = '\0';
         str_to_lower(buf);
         pl(buf);
+        --counter;
     }
+
     pclose(file);
 }
 
