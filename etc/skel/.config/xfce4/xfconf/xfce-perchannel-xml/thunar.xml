@@ -10,8 +10,8 @@
   <property name="last-statusbar-visible" type="bool" value="false"/>
   <property name="last-location-bar" type="string" value="void"/>
   <property name="last-menubar-visible" type="bool" value="false"/>
-  <property name="last-window-width" type="int" value="1215"/>
-  <property name="last-window-height" type="int" value="619"/>
+  <property name="last-window-width" type="int" value="978"/>
+  <property name="last-window-height" type="int" value="550"/>
   <property name="last-window-maximized" type="bool" value="false"/>
   <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_50_PERCENT"/>
   <property name="last-details-view-column-widths" type="string" value="50,50,147,138,50,97,50,50,728,50,50,98,50,242"/>
