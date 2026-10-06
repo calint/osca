@@ -34,6 +34,7 @@ fzf
 gdb
 gimp
 git
+github-cli
 glm
 gmtp
 gnu-efi
@@ -64,6 +65,9 @@ linux-firmware
 linux-lts
 lld
 llvm
+lsof
+lua51
+luarocks
 man-db
 man-pages
 mariadb
@@ -75,6 +79,7 @@ nano
 nasm
 ncurses5-compat-libs
 neovim
+noto-fonts-emoji
 npm
 obsidian
 openfpgaloader
@@ -96,8 +101,10 @@ putty
 python-intelhex
 python-pip
 python-websockets
+qemu-system-riscv
 qemu-system-x86
 qemu-ui-gtk
+qemu-user
 rhythmbox
 ripgrep
 riscv64-elf-gcc

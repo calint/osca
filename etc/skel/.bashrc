@@ -10,6 +10,10 @@ if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     export PATH="$HOME/bin:$PATH"
 fi
 
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # prompt
 export PS1=" :: "
 
