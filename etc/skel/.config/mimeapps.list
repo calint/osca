@@ -8,6 +8,7 @@ audio/midi=mpv.desktop
 text/plain=nvim.desktop
 application/zip=thunar.desktop
 application/x-zerosize=nvim.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 
 [Added Associations]
 text/plain=nvim.desktop;
