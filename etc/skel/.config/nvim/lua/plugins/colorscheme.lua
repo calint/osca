@@ -3,6 +3,27 @@ return {
     "sainnhe/everforest",
   },
   {
+    -- the bufferline filler above the explorer uses the darkened side pane
+    -- background instead of a guessed, undarkened one
+    "akinsho/bufferline.nvim",
+    opts = {
+      options = {
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = "Neo-tree",
+            highlight = "SidePaneNormal",
+            text_align = "left",
+          },
+          {
+            filetype = "snacks_layout_box",
+            highlight = "SidePaneNormal",
+          },
+        },
+      },
+    },
+  },
+  {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = "everforest",
