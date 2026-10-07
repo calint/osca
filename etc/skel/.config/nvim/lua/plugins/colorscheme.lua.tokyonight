@@ -1,0 +1,27 @@
+return {
+  "folke/tokyonight.nvim",
+  style = "moon",
+  opts = {
+    on_colors = function(colors)
+      colors.fg = "#b4a47e"
+      colors.fg_dark = "#c4b48e"
+      -- explorer pane draws with the float/sidebar colors, which tokyonight
+      -- derives from the original fg before this hook runs
+      colors.fg_float = "#b4a47e"
+      colors.fg_sidebar = "#b4a47e"
+    end,
+    on_highlights = function(hl, colors)
+      hl.SnacksPickerFile = { fg = "#b4a47e" }
+      hl.SnacksPickerDir = { fg = "#7f9a7d" }
+      hl.SnacksPickerTree = { fg = "#5f7a5d" }
+      hl["@lsp.typemod.variable.fileScope.cpp"] = {
+        fg = colors.cyan,
+        bold = true,
+      }
+      hl["@lsp.typemod.variable.globalScope.cpp"] = {
+        fg = colors.cyan,
+        bold = true,
+      }
+    end,
+  },
+}

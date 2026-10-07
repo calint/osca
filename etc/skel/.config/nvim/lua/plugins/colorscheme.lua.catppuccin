@@ -1,14 +1,19 @@
 return {
   {
     "catppuccin/nvim",
+    name = "catppuccin",
     opts = {
       flavour = "frappe",
+      custom_highlights = function(colors)
+        return {
+          ["@lsp.typemod.variable.fileScope.cpp"] = { fg = colors.sky, bold = true },
+          ["@lsp.typemod.variable.globalScope.cpp"] = { fg = colors.sky, bold = true },
+        }
+      end,
     },
   },
   {
     "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin",
-    },
+    opts = { colorscheme = "catppuccin" },
   },
 }
