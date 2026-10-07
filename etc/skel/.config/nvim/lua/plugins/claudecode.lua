@@ -4,9 +4,9 @@ return {
   opts = {
     terminal = {
       snacks_win_opts = {
-        -- use the editor background instead of the float one
+        -- slightly darker than the editor background (see colorscheme.lua)
         wo = {
-          winhighlight = "Normal:Normal,NormalNC:Normal,WinBar:Normal,WinBarNC:Normal",
+          winhighlight = "Normal:SidePaneNormal,NormalNC:SidePaneNormal,WinBar:SidePaneNormal,WinBarNC:SidePaneNormal",
         },
       },
     },
