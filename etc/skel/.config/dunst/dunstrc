@@ -98,10 +98,10 @@
     separator_height = 2
 
     # Padding between text and separator.
-    padding = 8
+    padding = 32
 
     # Horizontal padding.
-    horizontal_padding = 8
+    horizontal_padding = 48
 
     # Padding between text and icon.
     text_icon_padding = 0
@@ -236,7 +236,7 @@
     # icon_theme = "Adwaita, breeze"
 
     # Align icons left/right/top/off
-    icon_position = left
+    icon_position = off
 
     # Scale small icons up to this size, set to 0 to disable. Helpful
     # for e.g. small files or high-dpi screens. In case of conflict,
@@ -360,14 +360,14 @@
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
-    background = "#000000"
+    background = "#d96c6c"
     foreground = "#ffffff"
     timeout = 10
     # Icon for notifications with low urgency
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#000000"
+    background = "#d96c6c"
     foreground = "#ffffff"
     timeout = 10
     override_pause_level = 30
@@ -375,7 +375,7 @@
     default_icon = dialog-information
 
 [urgency_critical]
-    background = "#000000"
+    background = "#d96c6c"
     foreground = "#ffffff"
     frame_color = "#ff0000"
     timeout = 0
@@ -516,6 +516,6 @@
 [claude-code]
     appname = "Claude Code"
     timeout = 0
-    background = "#000000"
+    background = "#d96c6c"
     foreground = "#ffffff"
     frame_color = "#4caf50"
