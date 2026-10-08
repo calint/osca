@@ -22,6 +22,7 @@ cool-retro-term
 cppcheck
 cutecom
 dosfstools
+dunst
 efibootmgr
 eog
 ethtool
