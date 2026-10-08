@@ -41,6 +41,16 @@ return {
         local param_fg = vim.o.background == "dark" and "#e69875" or "#f57d26"
         vim.api.nvim_set_hl(0, "@variable.parameter", { fg = param_fg, italic = true })
         vim.api.nvim_set_hl(0, "@lsp.type.parameter", { fg = param_fg, italic = true })
+
+        -- globals get a muted steel blue, a little bluer and duller than the
+        -- teal blue everforest uses for fields and properties
+        local global_fg = vim.o.background == "dark" and "#7a9bb5" or "#4a7a9c"
+        vim.api.nvim_set_hl(0, "@lsp.typemod.variable.globalScope", { fg = global_fg })
+        vim.api.nvim_set_hl(0, "@lsp.typemod.variable.static", { fg = global_fg })
+
+        -- baz highlights.scm marks file level 'dat', 'var' and 'let' as
+        -- '@module', which everforest colors like '@type'
+        vim.api.nvim_set_hl(0, "@module.baz", { fg = global_fg })
       end
 
       -- explorer (left) and claude (right) panes get a background a little
