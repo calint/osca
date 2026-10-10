@@ -186,7 +186,7 @@
     #   %n  progress value if set without any extra characters
     #   %%  literal %
     # Markup is allowed
-    format = "<b>%s</b>\n%b"
+    format = "<b>%s</b> %a\n%b"
 
     # Alignment of message text.
     # Possible values are "left", "center" and "right".
@@ -360,23 +360,23 @@
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
-    background = "#d96c6c"
-    foreground = "#ffffff"
-    timeout = 10
+    background = "#ffffff"
+    foreground = "#000000"
+    timeout = 0
     # Icon for notifications with low urgency
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#d96c6c"
-    foreground = "#ffffff"
-    timeout = 10
+    background = "#ffffff"
+    foreground = "#000000"
+    timeout = 0
     override_pause_level = 30
     # Icon for notifications with normal urgency
     default_icon = dialog-information
 
 [urgency_critical]
-    background = "#d96c6c"
-    foreground = "#ffffff"
+    background = "#ffffff"
+    foreground = "#000000"
     frame_color = "#ff0000"
     timeout = 0
     override_pause_level = 60
@@ -516,6 +516,6 @@
 [claude-code]
     appname = "Claude Code"
     timeout = 0
-    background = "#d96c6c"
-    foreground = "#ffffff"
+    background = "#ffffff"
+    foreground = "#000000"
     frame_color = "#4caf50"
